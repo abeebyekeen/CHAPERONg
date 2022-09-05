@@ -2205,7 +2205,7 @@ umbre_s15_findIniConf()
 	#run extract_spaced_frame_dist.py script
 	echo " Running the extract_spaced_frame_dist.py script..."
 	sleep 2
-	python3 extract_spaced_frame_dist.py || python extract_spaced_frame_dist.py
+	python3 ./utilities/extract_spaced_frame_dist.py || python ./utilities/extract_spaced_frame_dist.py
 
 	echo " Run extract_spaced_frame_dist.py...DONE""$demB"
 	sleep 2
