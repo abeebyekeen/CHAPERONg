@@ -1,10 +1,10 @@
 #! /bin/bash
 
-#CHAP_colPar - The parameter collection module of CHAPERONg
-#CHAPERONg - An automation program for GROMACS md simulation
-#Author: Abeeb A. Yekeen
-#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date: 2022.02.11
+#CHAP_colPar -- The parameter collection module of CHAPERONg
+#CHAPERONg -- An automation program for GROMACS md simulation
+#Author -- Abeeb A. Yekeen
+#Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
+#Date -- 2022.02.11
 
 set -e
 set -o pipefail
