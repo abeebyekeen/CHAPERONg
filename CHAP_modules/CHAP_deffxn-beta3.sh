@@ -1,10 +1,10 @@
 #! /bin/bash
 
-#CHAP_deffxn -- The function definition module of CHAPERONg
-#CHAPERONg -- An automation program for GROMACS md simulation
-#Author -- Abeeb A. Yekeen
-#Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date -- 2022.02.11
+#CHAP_deffxn - The function definition module of CHAPERONg
+#CHAPERONg - An automation program for GROMACS md simulation
+#Author: Abeeb A. Yekeen
+#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
+#Date: 2022.02.11
 
 
 set -e
@@ -98,7 +98,7 @@ makeNDXGroup()
 
 	ndxNAME="$nameForIndex"".ndx"
 
-	gmx make_ndx -f em.gro -o $ndxNAME
+	eval $gmx_exe_path make_ndx -f em.gro -o $ndxNAME
 
 	echo "$demA"" Make index group ${nameForIndex}... DONE""$demB"
 }
@@ -116,13 +116,13 @@ s0GenTop()
 	if [[ "$ffUse" == "wd" || "$ffUse" == '"wd"' ]] && [[ "$wat" != "" ]]; then
 		echo "$demA"" GROMACS will use the force-field present in the working directory!""$demB"
 		sleep 2
-		echo 1 | gmx pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
+		echo 1 | eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	elif [[ "$ffUse" != "" && "$ffUse" != "wd" && "$ffUse" != '"wd"' ]]; then
 		echo "$demA"" gmx will use the specified $ffUse force-field""$demB"
 		sleep 2
-		gmx pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr -ff $ffUse ${wmodel}
+		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr -ff $ffUse ${wmodel}
 	elif [[ "$ffUse" == "" ]]; then
-		gmx pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
+		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	fi
 	echo "$demA"" Generate protein topology...DONE""$demB"
 	sleep 2
@@ -279,7 +279,7 @@ ligPDB=$(basename "$LigINIpdb" _ini.pdb)
 
 echo "$demA"" Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
 
-gmx editconf -f $LigINIpdb -o "$ligPDB"".gro"
+eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
 
 echo "$demA"" Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
 }
@@ -1348,13 +1348,13 @@ s1DefBox()
 {
 	echo "$demA"" Define box...""$demB"
 	if [[ "$mdType" == 1 ]] && [[ $sysType == 1 || $sysType == 3 ]] ; then
-		gmx editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
+		eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	elif [[ "$mdType" == 1 && "$sysType" == 2 ]]; then
-		gmx editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
+		eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	elif [[ "$mdType" == 2 && "$sysType" == 1 ]] ; then
-		gmx editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
+		eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	elif [[ "$mdType" == 2 && $sysType == 2 ]] ; then
-		gmx editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
+		eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	fi
 
 	if [[ "$mdType" == 2 ]] ; then
@@ -1374,9 +1374,9 @@ s1DefBox()
 			read -p 'Box dimensions (x y z):' boxVector
 			echo ""
 			if [[ "$sysType" == 1 ]] ; then
-				gmx editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
+				eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
 			elif [[ "$sysType" == 2 ]] ; then
-				gmx editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
+				eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
 			fi
 			echo "Provide dimensions or proceed to solvation?"
 			echo $'\n    1.  Provide dimensions\n    2.  Proceed\n'
@@ -1392,7 +1392,7 @@ s2Solvat()
 {
 echo "$demA"" Solvating the system...""$demB"
 sleep 2
-gmx solvate -cp ${coordinates}_newbox.gro -cs spc216.gro -o ${coordinates}_solv.gro -p topol.top
+eval $gmx_exe_path solvate -cp ${coordinates}_newbox.gro -cs spc216.gro -o ${coordinates}_solv.gro -p topol.top
 echo "$demA"" Solvate system... DONE""$demB"
 sleep 2
 }
@@ -1402,13 +1402,13 @@ s3AddIons1()
 echo "$demA"" Adding ions...""$demB"
 sleep 2
 #1. Assemble .tpr file with grompp, using ions.mdp
-gmx grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $mw
+eval $gmx_exe_path grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $mw
 }
 
 s4AddIons2()
 {
 #2. Pass .tpr file to genion to add ions
-echo 'SOL' | gmx genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
+echo 'SOL' | eval $gmx_exe_path genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
 echo "$demA"" Add ions... DONE""$demB"
 sleep 2
 }
@@ -1438,14 +1438,14 @@ elif [[ "$Minmdp" == 0 ]] && [[ "$Enmdp" == 1 ]]; then
 	
 fi
 sleep 1	
-gmx grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $mw
+eval $gmx_exe_path grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $mw
 
 }
 
 s6EnMin2()
 {
 	#2. Invoke mdrun to carry out the EM
-	gmx mdrun ${threader} ${THREA} $gpidn -deffnm em
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -deffnm em
 	#tail -n 8 em.log
 	echo "$demA"" Run energy minimization... DONE""$demB"
 	sleep 2
@@ -1453,7 +1453,7 @@ s6EnMin2()
 	if [[ "$sysType" == 3 ]] ; then
 		echo "$demA""CHAPERONg will run a check to detect the group numbers of protein and DNA...""$demB"
 		sleep 2
-	echo q | gmx make_ndx -f em.gro -o temp.ndx  > tempNDXfile
+	echo q | eval $gmx_exe_path make_ndx -f em.gro -o temp.ndx  > tempNDXfile
 
 	while IFS= read -r tNDXline; do
 		if [[ "$tNDXline" == *"DNA"*":"*"atoms"* ]] ; then
@@ -1472,7 +1472,7 @@ s6EnMin2()
 	echo "$demA""CHAPERONg will now make a Protein-DNA index group...""$demB"
 	sleep 2
 
-gmx make_ndx -f em.gro -o index.ndx << ProvProDNAMakNdx
+eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << ProvProDNAMakNdx
 $proNDXno | $dnaNDXno
 q
 ProvProDNAMakNdx
@@ -1571,7 +1571,7 @@ s6aLigRes()
 		$'CHAPERONg will create an index group for the non-hydrogen atoms of $ligname'"$demB"
 		sleep 2
 
-gmx make_ndx -f "$lignamFile".gro -o index_"$lignamFile".ndx << ProvMakNdx
+eval $gmx_exe_path make_ndx -f "$lignamFile".gro -o index_"$lignamFile".ndx << ProvMakNdx
 0 & ! a H*
 q
 ProvMakNdx
@@ -1581,7 +1581,7 @@ ProvMakNdx
 	sleep 2
 	
 	if [[ "$customNDXask" == "no" || "$customNDXask" == $'"no"' || "$customNDXask" == '' ]] ; then
-		echo "System_&_!H*" | gmx genrestr -f $lignamFile.gro -n index_$lignamFile.ndx -o posre_$lignamFile.itp -fc 1000 1000 1000
+		echo "System_&_!H*" | eval $gmx_exe_path genrestr -f $lignamFile.gro -n index_$lignamFile.ndx -o posre_$lignamFile.itp -fc 1000 1000 1000
 
 		if [[ -f "$ligname""_GMX.itp" ]] && [[ -d acpype ]] ; then modTop2forAcpype
 		else
@@ -1648,7 +1648,7 @@ ProvMakNdx
 		fi
 
 	elif [[ "$customNDXask" != "no" || "$customNDXask" != $'"no"' ]] ; then
-		gmx genrestr -f $lignamFile.gro -n $ndxNAME -o "posre_"$ndxNAME -fc 1000 1000 1000
+		eval $gmx_exe_path genrestr -f $lignamFile.gro -n $ndxNAME -o "posre_"$ndxNAME -fc 1000 1000 1000
 	fi
 
 }
@@ -1659,7 +1659,7 @@ s6bTempCoup()
 		echo "$demA"" Coupling the protein with $ligname...""$demB"
 		sleep 2
 	#Make index for temperature coupling
-gmx make_ndx -f em.gro -o index.ndx << TempCoupIN1
+eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << TempCoupIN1
 "Protein" | 13
 q
 TempCoupIN1
@@ -1668,7 +1668,7 @@ TempCoupIN1
 	then echo "$demA"" Coupling the protein with $ligname...""$demB"
 	sleep 2
 #Make index for temperature coupling
-gmx make_ndx -f em.gro -o index.ndx << TempCoupIN2
+eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << TempCoupIN2
 "Protein" | 13
 q
 TempCoupIN2
@@ -1679,7 +1679,7 @@ TempCoupIN2
 	$'also couple water with '"$pn and\or $nn""$demB"
 	sleep 3
 #Make index for temperature coupling
-gmx make_ndx -f em.gro -o index.ndx << TempCoupIN3
+eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << TempCoupIN3
 "Protein" | 13
 "Water" | "$pn" | "$nn"
 q
@@ -1692,16 +1692,15 @@ TempCoupIN3
 			tail -n 15 topol.top > tempMolcfile
 			ionAdded1=''
 			ionAdded2=''
+			tcgrpWt='Water'
 			while IFS= read -r Molcline; do
 				molecl=$(echo $Molcline | awk '{print $1}')
 				if [[ "$molecl" == "$pn" ]] ; then
-					tcgrpWt="Water_""$molecl"
+					tcgrpWt="$tcgrpWt""_""$molecl"
 					ionAdded1="$molecl"
-					#echo $tcgrpWt
 					sleep 2
 				elif [[ "$molecl" == "$nn" ]] ; then
 					tcgrpWt="$tcgrpWt""_""$molecl"
-					#echo $tcgrpWt
 					ionAdded2="$molecl"
 					sleep 2
 				fi
@@ -1896,9 +1895,9 @@ s7NVTeq1()
 	sleep 2
 
 	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
-		gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -maxwarn $mw
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
-		gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr -maxwarn $mw
 	elif [[ $runNVTeq == "no" || $runNVTeq != '"no"' ]] ; then
 		echo "$demA"$' Skipping NVT equilibration, proceeding to NPT equilibration'"$demB"
 	fi
@@ -1907,7 +1906,7 @@ s7NVTeq1()
 s8NVTeq2()
 {
 	if [[ $runNVTeq == "yes" ]] ; then
-		gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm nvt
+		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm nvt
 		echo "$demA"" NVT Equilibration... DONE""$demB"
 		sleep 2
 	fi
@@ -1917,20 +1916,20 @@ s9NPTeq1()
 {
 	echo "$demA"" Now running NPT Equilibration...""$demB"
 	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
-		gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $mw
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
-		gmx grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
 	#if NVT equilibration was skipped
 	elif [[ $sysType == 1 && $runNVTeq == "no" ]] ; then
-		gmx grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $mw
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "no" ]] ; then
-		gmx grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
 	fi
 }
 
 s10NPTeq2()
 {
-	gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm npt
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt
 	echo "$demA"" NPT Equilibration... DONE""$demB"
 	sleep 2
 	if [[ $sysType == 1 && $mdType == 2 ]] ; then
@@ -1945,7 +1944,7 @@ s10NPTeq2()
 		if [[ $cstmndx == "yes" ]] ; then
 			echo "$demA"" Will now make an index for the pulling groups...""$demB"
 			sleep 2
-			gmx make_ndx -f npt.gro
+			eval $gmx_exe_path make_ndx -f npt.gro
 			echo "$demA"" Make an index for the pulling groups...DONE""$demB"
 		fi
 	fi
@@ -1956,9 +1955,9 @@ s11RelPosRe()
 	echo "$demA"" Releasing position restraints...""$demB"
 	sleep 2
 	if [[ $sysType == 1 ]]; then
-		gmx grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o ${filenm}.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o ${filenm}.tpr -maxwarn $mw
 	elif [[ $sysType == 2 || $sysType == 3 ]] ; then
-		gmx grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $mw
 	fi
 	echo "$demA"" Release position restraints... DONE""$demB"
 	sleep 2
@@ -1968,26 +1967,26 @@ umbre_s11_SMD1()
 {
 	echo "$demA"" Now executing grompp for steered MD simulation...""$demB"
 	sleep 2
-	gmx grompp -f md_pull.mdp -c npt.gro -p topol.top -r npt.gro -n index.ndx -t npt.cpt -o pull.tpr -maxwarn $mw
+	eval $gmx_exe_path grompp -f md_pull.mdp -c npt.gro -p topol.top -r npt.gro -n index.ndx -t npt.cpt -o pull.tpr -maxwarn $mw
 }
 
 umbre_s12_SMD2()
 {
 	echo "$demA"" Now running steered MD simulation...""$demB"
 	sleep 2
-	gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm pull -pf pullf.xvg -px pullx.xvg
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm pull -pf pullf.xvg -px pullx.xvg
 
 	echo "$demA"$'Generating finished figures of key results of the pulling simulation...'"$demB"
 	sleep 2
-	cat pullx.xvg | grep -v [@#] | awk '{ print $2 }' > displacementAxis
-	cat pullf.xvg | grep -v [@#] | awk '{ print $2 }' > pullforceAxis
-	echo "# The Pull Force and Displacement data in this file were extracted by CHAPERONg"
-	echo "# from the pullx.xvg and pullf.xvg files generated by GROMACS..."
-	echo "#"
-	echo "@    title "$'"Plot of Pull force against Displacement"' > displacement_pullForce.xvg
+	cat pullx.xvg | grep -v "^[@#]" | awk '{ print $2 }' > displacementAxis
+	cat pullf.xvg | grep -v "^[@#]" | awk '{ print $2 }' > pullforceAxis
+	echo "# The Pull Force and Displacement data in this file were extracted by CHAPERONg" > displacement_pullForce.xvg
+	echo "# from the pullx.xvg and pullf.xvg files generated by GROMACS..." >> displacement_pullForce.xvg
+	echo "#" >> displacement_pullForce.xvg
+	echo "@    title "$'"Plot of Pull force against Displacement"' >> displacement_pullForce.xvg
 	echo "@    xaxis  label "$'"Displacement (nm)"' >> displacement_pullForce.xvg
 	echo "@    yaxis  label "$'"Force (kJ/mol/nm)"' >> displacement_pullForce.xvg
-	echo "@TYPE xy"
+	echo "@TYPE xy" >> displacement_pullForce.xvg
 	paste -d "        " displacementAxis pullforceAxis >> displacement_pullForce.xvg
 	rm displacementAxis pullforceAxis
 
@@ -2025,13 +2024,13 @@ s12MDrun()
 {
 	echo "$demA"" Now running production MD...""$demB"
 	if [[ $nohp == '' ]]; then
-		gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
+		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	elif [[ $nohp == 1 ]]; then
 		echo "$demA"$' gmx mdrun will be launched and run in the background.\n\nYou can tail the '\
 		$'output file "nohup.txt" to monitor the progress of the simulation at any time...\n'"$demB"
 		sleep 2
 	
-		nohup gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
+		nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
 		echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
 		Credit
@@ -2047,7 +2046,7 @@ s12MDrun()
 
 	elif [[ $nohp == '' ]]; then
 	
-		gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
+		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
 		echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
 		Credit
@@ -2085,7 +2084,7 @@ if [[ $nohp == 1 ]]; then
 	You can tail the output file "nohup.txt" to monitor the progress of the simulation at any time...\n'"$demB"
 	sleep 2
 	
-	nohup gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
+	nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
 	
 	echo $'\n'"$demA"" Simulation extended/appended successfully...""$demB"
 	Credit
@@ -2100,7 +2099,7 @@ if [[ $nohp == 1 ]]; then
 	if test "$psa" == "yes"; then Analysis ; fi
 
 elif [[ $nohp == '' ]]; then
-	gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
 		
 	#echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
 	#Credit
@@ -2135,7 +2134,7 @@ umbre_s13_xtractFrames()
 {
 	echo "$demA"" Now extracting frames from the steered MDS trajectory...""$demB"
 	sleep 2
-	echo 0 | gmx trjconv -s pull.tpr -f pull.xtc -o coordinate.gro -sep
+	echo 0 | eval $gmx_exe_path trjconv -s pull.tpr -f pull.xtc -o coordinate.gro -sep
 	echo "$demA"" Extract frames from the steered MDS trajectory...DONE""$demB"
 	sleep 2
 }
@@ -2152,7 +2151,7 @@ umbre_s14_calcCOMdist()
 
 	for Structure in ./"coordinate"*".gro" ; do
 		#calculate distance between the groups
-		gmx distance -s pull.tpr -f coordinate"$StructNo".gro -n index.ndx -select \
+		eval $gmx_exe_path distance -s pull.tpr -f coordinate"$StructNo".gro -n index.ndx -select \
 		"com of group $group1_name plus com of group $group2_name" -oall dist${StructNo}.xvg
 		if [[ $StructNo == 50 ]] ; then sleep 2 ; fi
 		#extract the distances into a summary file
@@ -2205,7 +2204,7 @@ umbre_s15_findIniConf()
 	#run extract_spaced_frame_dist.py script
 	echo " Running the extract_spaced_frame_dist.py script..."
 	sleep 2
-	python3 ./utilities/extract_spaced_frame_dist.py || python ./utilities/extract_spaced_frame_dist.py
+	python3 extract_spaced_frame_dist.py || python extract_spaced_frame_dist.py
 
 	echo " Run extract_spaced_frame_dist.py...DONE""$demB"
 	sleep 2
@@ -2220,18 +2219,18 @@ umbre_s16_USampling()
 		elif [[ $line != *"#"* ]] ; then
 			us_frame=$(echo "$line" | awk '{print $1}')
 			echo "$demA""Now running NPT equilibration for configuration $us_frame"
-			gmx grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
+			eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
 			./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $mw
 
-			gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
+			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
 			echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
 		
 			echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
-			gmx grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
+			eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 			topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
-			gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
+			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
 			echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
 		fi
@@ -2263,7 +2262,7 @@ umbre_s17_WHAM()
 {
 	echo "$demA"" Now extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
-	gmx wham -it tpr_files.dat -if pullf_files.dat -o -hist -unit kCal
+	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o -hist -unit kCal
 
 	echo "$demA"$'Generating finished figures of key results of WHAM analysis...'"$demB"
 	sleep 2
@@ -2310,18 +2309,18 @@ umbre_s18_MoreWin()
 	done
 		
 	echo "$demA""Now running NPT equilibration for configuration $us_frame"
-	gmx grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
+	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
 	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $mw
 
-	gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
 	echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
 
 	echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
-	gmx grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
+	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
-	gmx mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
 	echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
 	echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat

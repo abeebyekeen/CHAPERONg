@@ -1,0 +1,64 @@
+; this is an input parameter file for CHAPERONg
+; lines beginning with ";" are comments
+; lines beginning with "#" are disabled parameters
+; delete the "#" to activate and set a parameter
+
+
+; Input coordinate file (.pdb or .gro)
+# input            =      x
+
+; Simulation box type i.e. cubic, dodecahedron
+# bt               =      x
+
+; Number of threads to use
+# nt               =      x
+
+; Use system GPU for non-bonded interactions
+# nb gpu           =      x
+
+; List ID(s) of unique GPU device(s) available for use
+# gpu_id           =      x
+
+; Define filename prefix
+# deffnm           =      x
+   
+; Water model i.e. tip3p, spc
+# water            =      x
+
+; Force-field (e.g. charmm27, amber94 etc.), "wd" if ff in working directory
+# ff               =      x
+
+; Number of thread-MPI ranks      
+# ntmpi            =      x
+
+; Number of OpenMP threads per MPI rank
+# ntomp            =      x
+
+; Absolute path to gmx binary to be used for mmpbsa
+# mmgpath          =      /home/abeeb/local/gromacs5.1/bin/gmx
+
+; Name of the positive ion
+# pname            =      x
+
+; Name of the negative ion
+# nname            =      x
+
+; Salt concentration (mol/L)
+# conc             =      x
+
+; Number of allowed warnings 
+# maxwarn          =      x
+
+; Solute-box distance i.e. distance to box edge 
+# dist             =      x
+
+; Corrected trajectory to use for analyses (options: noPBC, nojump, fit)
+# inputtraj        =      x
+
+; Parameter for umbrella sampling window spacing
+# smd_pull_spacing =      x
+
+; Absolute path to the gmx executable to use for all gmx runs except those involving mmpbsa
+# gmx_exe          =      x
+
+  

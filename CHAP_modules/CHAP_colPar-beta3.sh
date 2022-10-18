@@ -1,10 +1,10 @@
 #! /bin/bash
 
-#CHAP_colPar -- The parameter collection module of CHAPERONg
-#CHAPERONg -- An automation program for GROMACS md simulation
-#Author -- Abeeb A. Yekeen
-#Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date -- 2022.02.11
+#CHAP_colPar - The parameter collection module of CHAPERONg
+#CHAPERONg - An automation program for GROMACS md simulation
+#Author: Abeeb A. Yekeen
+#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
+#Date: 2022.02.11
 
 set -e
 set -o pipefail
@@ -22,13 +22,14 @@ extr="-ignh" ; customNDXask=''
 PBCcorrectType='' ; trajFraction=''
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; mmpbframesNo=''
+gmx_exe_path="gmx"
 #gmxV=''
 
 #Defining primary functions
 Credit()
 {
-	echo $'\n'\
-	$'#############################################################################'\
+	echo \
+  $'\n#############################################################################'\
   $'\n#-------------------------------- CHAPERONg --------------------------------#'\
   $'\n#  An automated pipeline for GROMACS MD simulation and end-point analysis   #'\
   $'\n#      If you find this program useful please cite the relevant paper:      #'\
@@ -97,6 +98,8 @@ More Options:
 -c, --conc <int>    Set salt concentration (mol/L) for the system
 -W, --maxwarn <int> Number of allowed warnings (default is 0)
 -M, --mmgpath <str> Absolute path to gmx binary to use for g_mmpbsa
+-E, --gmx_exe <str> Path to gmx to use for all gmx runs except g_mmpbsa
+                    (Default is to use the gmx set in the environment)
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
 --trFrac <int>      Fraction of trajectory to use for mmpbsa
                     (e.g. enter 2 for the 2nd half, 3 for the last 3rd, etc.)
@@ -115,14 +118,34 @@ demA=$'\n\n'"#================================= CHAPERONg ======================
 demB=$'\n'"#=============================================================================#"$'\n\n'
 #demB=$'\n'"#*****************************************************************************#"$'\n\n'
 
+
+#function to check if the parFile flag is used and then read the provided CHAPERONg parFile
+read_parFile()
+{
+	if [[ "$parfilename" != '' ]] ; then 
+		while IFS= read -r line; do
+			par=$(echo "$line" | awk '{print $1}')
+			if [[ "$par" == "mmgpath" ]] ; then
+				mmGMXpath=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "gmx_exe" ]] ; then
+				gmx_exe_path=$(echo "$line" | awk '{print $3}')
+			fi
+		done < "$parfilename"
+	fi
+}
+
+#then check other flags
+#flags provided on the terminal overwrite parameters in parFile in case of conflicts
 while [ "$1" != "" ]; do	
 	case "$1" in
+	--parFile) shift; parfilename="$1"; read_parFile;;	
 	-a | --auto) flw=1;;
 	-b | --bt) shift; btype="$1";;
 	-c | --conc) shift; ion_conc="$1";;
 	--dist) shift; edgeDist="$1";;
 	--bg) nohp=1;;
 	-p | --deffnm) shift; filenm="$1";;
+	-E | --gmx_exe) shift; gmx_exe_path="$1";;
 	-f | --ff) shift; ffUse="$1";;
 	-F | --mmFrame) shift;  mmpbframesNo="$1";;
 	-g | --nb) nb=1;;
@@ -135,7 +158,7 @@ while [ "$1" != "" ]; do
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
 	-N | --nname) shift; nn="$1";;
 	-P | --pname) shift; pn="$1";;
-	--parFile) shift; parfilename="$1";;
+	--parFile) shift; parfilename="$1";;	
 	-R | --ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
 	--trFrac) shift; trajFraction="$1";;	
@@ -214,8 +237,8 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 fi
 
 
-echo $'\n'\
-	$'#############################################################################'\
+echo \
+  $'\n#############################################################################'\
   $'\n#-------------------------------- CHAPERONg --------------------------------#'\
   $'\n#  An automated pipeline for GROMACS MD simulation and end-point analysis   #'\
   $'\n#      If you find this program useful please cite the relevant paper:      #'\
@@ -235,11 +258,11 @@ chmod +x ./run_CHAPERONg-<version>
 #-----------------------------------------------------------------------------#
 ######## ========================= IMPORTANT ========================= ########
 #-----------------------------------------------------------------------------#
-MAKE SURE the following are in the current working directory:
-(1) Input structure (.pdb for protein-only mds, .gro for protein-ligand mds)
-(2) mdp files (named as minim.mdp/em.mdp, nvt.mdp, npt.md, ions.mdp, md.mdp)
-  *PLEASE READ THE HIGHLIGHTED NOTES PRINTED ON THE TERMINAL DURING RUNS!!
-    *THIS WAY, YOU WON'T MISS ANY INFO YOU MAY FIND IMPORTANT... ENJOY!
+ MAKE SURE the following are in the current working directory:
+  (1) Input structure (.pdb or .gro)
+  (2) mdp files (named as minim.mdp/em.mdp, nvt.mdp, npt.md, ions.mdp, md.mdp)
+    *PLEASE READ THE HIGHLIGHTED NOTES PRINTED ON THE TERMINAL DURING RUNS!!
+       *THIS WAY, YOU WON'T MISS ANY INFO YOU MAY FIND IMPORTANT... ENJOY!
 #-----------------------------------------------------------------------------#
 
 usageSt
@@ -252,13 +275,3 @@ elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'fit' ]] ; then touch pb
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'center' ]] ; then touch pbccenter
 fi
 
-#check if the parFile flag is used and then read the provided CHAPERONg parFile
-if [[ "$parfilename" != '' ]] ; then 
-	while IFS= read -r line; do
-		par=$(echo "$line" | awk '{print $1}')
-		if [[ "$par" == "mmgpath" ]] ; then
-			mmGMXpath=$(echo "$line" | awk '{print $3}')
-		fi
-	done < "$parfilename"
-
-fi
