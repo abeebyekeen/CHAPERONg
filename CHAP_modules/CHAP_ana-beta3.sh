@@ -1817,7 +1817,7 @@ inputFormat
 		echo $' Map landscape data point to simulation time...DONE\n'
 		sleep 2
 
-		tail -n +2 ./collect_mappings/1.txt | sort -k 2,3 -n > ./collect_mappings/sorted_1.txt
+		tail -n +2 ./collect_mappings/1.txt | sort -k2,2n -k3,3n > ./collect_mappings/sorted_1.txt
 
 		head -n 2 ./collect_mappings/1.txt | tail -n 1 > ./collect_mappings/EnergyMinim.txt
 
@@ -1847,13 +1847,149 @@ inputFormat
 		echo "$demA"$' Extract lowest energy structure from the trajectory...DONE'"$demB"
 
 		mv "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb ./collect_mappings/ || true
+		mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat collect_mappings SimTime_OrderParameters1_2.dat ./"$results_folder" || true
+		rm $OrderParameter1 $OrderParameter2
+		
+cat << extractMoreStructs
+ Do you want to map all data points from the FES to simulation time and,
+ optionally, extract additional structures from the trajectory based on
+ free energy and order parameters?
 
+  1) Yes
+  2) No
+
+extractMoreStructs
+
+		read -p ' Enter a response here (1 or 2): ' getMoreStructs
+		
+		while [[ "$getMoreStructs" != 1 && "$getMoreStructs" != 2 ]]
+		do
+			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+			echo $' Proceed to mapping the FES data points to simulation time??\n  1) Yes\n  2) No\n'
+			read -p ' Enter 1 or 2 here: ' getMoreStructs
+		done
+		
+		echo "$demA"$' Mapping all data points from the Free Enery Surface to simulation time...\n'
+		sleep 2
+
+		if [[ "$getMoreStructs" == 1 ]] ; then
+			cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
+			cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
+			mkdir collect_mappings_extra
+			python3 ./utilities/CHAP_map_all_dataPoint_to_simTime.py || \
+			python ./utilities/CHAP_map_all_dataPoint_to_simTime.py
+
+			echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
+			sleep 2
+			echo $' Sorting and pre-processing FES data points...'
+			cd ./collect_mappings_extra
+			dataRec_counter=0
+			for dataRec in DataPt_*.txt
+			do
+				dataRec_counter=$(( dataRec_counter + 1 ))
+				if (( "$dataRec_counter" == 1 )) ; then
+					tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n > sorted_"${dataRec}"
+					mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
+					echo "$dataRec"$'\t'"$mapped_fes_Data" > mapped_dataPt.txt
+					rm "${dataRec}"
+				elif (( "$dataRec_counter" > 1 )) ; then
+					tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n >> sorted_"${dataRec}"
+					mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
+					echo "$dataRec"$'\t'"$mapped_fes_Data" >> mapped_dataPt.txt
+					rm "${dataRec}"
+				fi
+			done
+			cd ../
+			echo $' Generating approximated simulation times mapped with free energy...\n'
+			python3 ./utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
+			python ./utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
+
+			sort ./collect_mappings_extra/mappedFESdataPoints_timed.dat -k1,1n -k4,4n > \
+			./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
+			sort ./collect_mappings_extra/mappedFESdataPoints_timed.dat -k4,4n -k2,2n > \
+			./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
+			
+			mv ./collect_mappings_extra/mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+			mv ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+			mv ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+			rm -r ./collect_mappings_extra SimTime_OrderParameters1_2.dat OrderParameters1_2_dG_nogap-sorted.dat
+
+			echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"$demB"
+			echo "$demA"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
+			$'\n sorted by time and energy all containing the mapped simulation time, order'\
+			$'\n parameters and the corresponding free energy has been generated and saved'\
+			$'\n into the folder '"$results_folder""/collect_mappings."\
+			$'\n\n **You may use this file to identify the sumulation time(s) of the'\
+			$'\n structure(s) you may want to extract from the free energy landscape'"$demB"
+
+cat << extractMoreStructs
+
+ Do you want to extract a structure from the trajectory based on free energy?
+
+ 1) Yes
+ 2) No
+
+extractMoreStructs
+
+			read -p ' Enter a response here (1 or 2): ' getMoreStructure
+			
+			while [[ "$getMoreStructure" != 1 && "$getMoreStructure" != 2 ]]
+			do
+				echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+				echo $' Extract a structure from the trajectory based on free energy??\n  1) Yes\n  2) No\n'
+				read -p ' Enter 1 or 2 here: ' getMoreStructure
+			done
+		
+			while [[ "$getMoreStructure" == 1 ]]
+			do
+
+				read -p ' Specify the time (in ns) at which to extract a structure: ' frameTime
+
+				frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
+
+				echo "$demA"$' Extracting structure at the specified from the trajectory...\n\n'
+				sleep 2
+
+				if [[ $flw == 1 && $sysType == 1 ]]; then
+					echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				elif [[ $flw == 0 && $sysType == 1 ]]; then
+					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+					echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				elif [[ $flw == 0 && $sysType == 2 ]]; then
+					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				elif [[ $flw == 1 && $sysType == 2 ]]; then
+					echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				fi
+				echo "$demA"$' Extract structure at the specified from the trajectory...DONE'"$demB"
+
+				mv "${filenm}"_Structure_at_Time"$frameTime_ps".pdb ./"$results_folder"/collect_mappings/ || true
+
+				echo "$demA"$'\n The structure has been saved to the folder '"$results_folder""/collect_mappings"
+
+cat << extractMoreStructs
+
+ Do you want to extract an additional structure from the trajectory based
+ on free energy?
+
+ 1) Yes
+ 2) No
+
+extractMoreStructs
+
+				read -p ' Enter a response here (1 or 2): ' getMoreStructure
+				
+				while [[ "$getMoreStructure" != 1 && "$getMoreStructure" != 2 ]]
+				do
+					echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+					echo $' Extract a structure from the trajectory based on free energy??\n  1) Yes\n  2) No\n'
+					read -p ' Enter 1 or 2 here: ' getMoreStructure
+				done
+			done
+		elif [[ "$getMoreStructs" != 1 ]] ; then echo ""
+		fi
 	elif [[ "$getEnergyMin" == "no" || "$getEnergyMin" == '"no"' ]] ; then echo ""
 	fi
-
-	mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat collect_mappings SimTime_OrderParameters1_2.dat ./"$results_folder" || true
-	rm $OrderParameter1 $OrderParameter2
-
 }
 
 if [[ "$analysis" == *" 12 "* ]]; then analyser12 ; fi
