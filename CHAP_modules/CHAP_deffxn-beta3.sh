@@ -2201,12 +2201,12 @@ umbre_s15_findIniConf()
 		touch configuratns_list.txt
 	fi
 
-	#run extract_spaced_frame_dist.py script
-	echo " Running the extract_spaced_frame_dist.py script..."
+	#run CHAP_extract_spaced_frame_dist.py script
+	echo " Running the CHAP_extract_spaced_frame_dist.py script..."
 	sleep 2
-	python3 extract_spaced_frame_dist.py || python extract_spaced_frame_dist.py
+	python3 CHAP_extract_spaced_frame_dist.py || python CHAP_extract_spaced_frame_dist.py
 
-	echo " Run extract_spaced_frame_dist.py...DONE""$demB"
+	echo " Run CHAP_extract_spaced_frame_dist.py...DONE""$demB"
 	sleep 2
 }
 

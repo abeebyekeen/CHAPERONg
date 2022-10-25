@@ -71,11 +71,12 @@ Option  Analysis
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
   11    Construct free energy landscape with gmx sham
   12    Construct free energy surface using an external free energy function
-  13    Construct free energy landscape using md-davis
-  14    Extract frames from the trajectory
-  15    Make index groups (make_ndx)
-  16    All but 14 and 15
-  17    All but 0, 14 and 15
+  13    Construct an interactive 3D free energy landscape using md-davis
+  14    Plot an interactive hydrogen bond matrix with md-davis
+  15    Extract frames from the trajectory
+  16    Make index groups (make_ndx)
+  17    All analyses but 15 and 16
+  18    All analyses but 0, 15 and 16
   
 AnalysisList
 
@@ -148,6 +149,7 @@ createDIR()
 		done
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
+		sleep 1
 			mv ${coordinates}*"$filesuffx".png ${coordinates}*"$filesuffx".xvg ${coordinates}_"$filesuffx".png ./$AnaName || true
 		mv ${coordinates}_"$filesuffx".xvg ${coordinates}_*"$filesuffx".png ./$AnaName || true
 		mv ${coordinates}_*"$filesuffx".xvg ${coordinates}*"$filesuffx"*.xvg ${coordinates}*"$filesuffx"*.png ./$AnaName || true
@@ -335,21 +337,6 @@ gracebat ${filenm}_Rg_ns.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_Rg_
 AnaName="Rg"
 filesuffx="Rg"
 createDIR
-#currentAnadir="$(pwd)""/$AnaName"
-#	nDir=1
-#	bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
-#	if [[ -d "$currentAnadir" ]]; then
-#		echo "$currentAnadir" "exists, backing it up as $bkupAnadir"
-#		while [[ -d "$bkupAnadir" ]]; do
-#		nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
-#		done
-#		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
-#		echo "Backing up the last $AnaName folder and its contents as $bkupAnadir"
-#		mv ${coordinates}_"$filesuffx"*.png ${coordinates}_"$filesuffx".xvg ${coordinates}_"$filesuffx"*.xvg ./$AnaName || true
-#	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
-#mv ${filenm}_Rg_ns.png ${filenm}_Rg_ns.xvg ${filenm}_Rg.xvg ./$AnaName || true
-#fi
-#mv *"_Rg_ns.png" *"_Rg_ns.xvg" ./$AnaName || true
 echo "$demA"$' Generate a finished figure of the Rg plot... DONE'"$demB"
 sleep 2
 }
@@ -367,39 +354,44 @@ echo "$demA""CHAPERONg: Selecting group 13 for ""$ligname""."\
 $'\nIf this is wrong, terminate and re-run hbond analysis without the automation flag!'"$demB"
 
 sleep 2
-echo 1 13 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_ProLig_${coordinates}.xvg -tu ns $hbthread
+echo 1 13 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
+	-hbm hb_matrix_ProLig_${filenm}.xpm -hbn hb_index_ProLig_${filenm}.ndx -tu ns $hbthread
 }
 
 hbond_DNA1()
 {
-echo "$demA"$' Now executing Intra-protein hydrogen bonding analysis...\n'
-sleep 2
+	echo "$demA"$' Now executing Intra-protein hydrogen bonding analysis...\n'
+	sleep 2
 
-echo "Protein" "Protein" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_Pro_${coordinates}.xvg -tu ns $hbthread
+	echo "Protein" "Protein" | eval $gmx_exe_path hbond -f "${filenm}"_${wraplabel}.xtc -s ${filenm}.tpr -n index.ndx \
+		-num hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 
-echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
-sleep 2
+	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
+	sleep 2
 
-echo "$demA"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
-sleep 2
+	echo "$demA"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
+	sleep 2
 
-echo "DNA" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_DNA_${coordinates}.xvg -tu ns $hbthread
+	echo "DNA" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx \
+		-num hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 
-echo "$demA"$' Intra-DNA hydrogen bonding analysis...DONE'"$demB"
-sleep 2
+	echo "$demA"$' Intra-DNA hydrogen bonding analysis...DONE'"$demB"
+	sleep 2
 
-echo "$demA"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
-echo "Protein" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_Pro_DNA_${coordinates}.xvg -tu ns $hbthread
+	echo "$demA"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
+	echo "Protein" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num \
+		hbnum_Pro_DNA_${filenm}.xvg -hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 
-echo "$demA"$' Protein-DNA hydrogen bonding analysis... DONE'"$demB"
-sleep 2
+	echo "$demA"$' Protein-DNA hydrogen bonding analysis... DONE'"$demB"
+	sleep 2
 }
 hbond_DNA2()
 {
 echo "$demA"$' Now executing Intra-protein hydrogen bonding analysis...\n'
 sleep 2
 
-echo "Protein" "Protein" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_Pro_${coordinates}.xvg -tu ns $hbthread
+echo "Protein" "Protein" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num \
+	hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
 echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
@@ -408,14 +400,16 @@ sleep 2
 echo "$demA"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
 sleep 2
 
-echo "DNA" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_DNA_${coordinates}.xvg -tu ns $hbthread
+echo "DNA" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num \
+	hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_DNA_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_DNA_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
 echo "$demA"$' Intra-DNA hydrogen bonding analysis...DONE'"$demB"
 sleep 2
 
 echo "$demA"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
-echo "Protein" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_Pro_DNA_${coordinates}.xvg -tu ns $hbthread
+echo "Protein" "DNA" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_Pro_DNA_${filenm}.xvg \
+	-hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_DNA_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_DNA_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
 echo "$demA"$' Protein-DNA hydrogen bonding analysis... DONE'"$demB"
@@ -426,46 +420,52 @@ analyser5()
 {
 echo "$demA"$' Now executing H-bond analysis...\n'
 if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
-	echo 1 1 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_intraPro_${coordinates}.xvg -tu ns $hbthread
+	echo 1 1 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
+	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
-	echo 1 "SOL" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num \
-	hbnum_Pro-SOL_${coordinates}.xvg -tu ns $hbthread || \
+	echo 1 "SOL" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_Pro-SOL_${filenm}.xvg \
+	-hbm hb_matrix_Pro-SOL_${filenm}.xpm -hbn hb_index_Pro-SOL_${filenm}.ndx -tu ns $hbthread || \
 	echo " There are multiple groups with the name SOL. Skipping..."
 	echo "$demA"$' Protein-SOL hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
-	gracebat hbnum_intraPro_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_intraPro_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
-	gracebat hbnum_Pro-SOL_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_Pro-SOL_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
-	gracebat hbnum_intraPro_${coordinates}.xvg hbnum_Pro-SOL_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_intraPro_Pro-SOL_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_Pro-SOL_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_Pro-SOL_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_intraPro_${filenm}.xvg hbnum_Pro-SOL_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_intraPro_Pro-SOL_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 
 elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
-	echo 1 "$ligname" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_ProLig_${coordinates}.xvg -tu ns $hbthread || altHBOND
+	echo 1 "$ligname" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
+	-hbm hb_matrix_ProLig_${filenm}.xpm -hbn hb_index_ProLig_${filenm}.ndx -tu ns $hbthread || altHBOND
 	echo "$demA"$' Protein-ligand hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
 
-	echo 1 1 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_intraPro_${coordinates}.xvg -tu ns $hbthread
+	echo 1 1 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
+	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
-	gracebat hbnum_ProLig_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_ProLig_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
-	gracebat hbnum_intraPro_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_intraPro_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_ProLig_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_ProLig_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 elif [[ $sysType == 1 ]] && [[ $flw == 0 ]] ; then
-	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${coordinates}.xvg -tu ns $hbthread
+	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
+	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
-	gracebat hbnum_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail	
+	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
 elif [[ $sysType == 2 || "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
-	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_${coordinates}.xvg -tu ns $hbthread || \
-	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${coordinates}.xvg -tu ns $hbthread
+	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_${filenm}.xvg \
+	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread || \
+	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
+	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
-	gracebat hbnum_${coordinates}.xvg -hdevice PNG -autoscale xy -printfile \
-	hbnum_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 elif [[ "$sysType" == 3 ]] && [[ $flw == 1 ]] ; then
 	hbond_DNA1 || hbond_DNA2
 	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
@@ -477,14 +477,16 @@ nhbond=1
 bkuphbonddir="$(pwd)""/#hbond"".""backup.""$nhbond"
 if [[ -d "$currenthbonddir" ]]; then
 	echo $'\n'"$currenthbonddir"$' folder exists,\n'"backing it up as $bkuphbonddir"
+	sleep 1
 	while [[ -d "$bkuphbonddir" ]]; do
 	nhbond=$(( nhbond + 1 )); bkuphbonddir="$(pwd)""/#hbond"".""backup.""$nhbond"
 	done
 	mv "$currenthbonddir" "$bkuphbonddir" && mkdir ./hbond || true
 	echo $'\n'"Backing up the last hbond folder and its contents as $bkuphbonddir"
-	mv hbnum_*.png hbnum_*.xvg hbnum*.png ./hbond || true
+	sleep 1
+	mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 elif [[ ! -d "$currenthbonddir" ]]; then
-	mkdir ./hbond; mv hbnum_*.png hbnum_*.xvg hbnum*.png ./hbond || true
+	mkdir ./hbond; mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 fi
 echo "$demA"$'Generate finished figure(s) of the hbond plot(s)... DONE'"$demB"
 }
@@ -530,21 +532,25 @@ elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
 	sasa_${coordinates}.png -fixed 7500 4000 -legend load || notifyImgFail
 fi
 echo "$demA"$' Compute solvent accessible surface area (SASA)...DONE'"$demB"
+sleep 2
 currentSASAdir="$(pwd)""/SASA"
 nSASA=1
 bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
 if [[ -d "$currentSASAdir" ]]; then
 	echo $'\n'"$currentSASAdir"$' folder exists,\n'"backing it up as $bkupSASAdir"
+	sleep 1
 	while [[ -d "$bkupSASAdir" ]]; do
 	nSASA=$(( nSASA + 1 )); bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
 	done
 	mv "$currentSASAdir" "$bkupSASAdir" && mkdir ./SASA || true
 	echo $'\n'"Backing up the last SASA folder and its contents as $bkupSASAdir"
+	sleep 1
 	mv sasa*${coordinates}.png sasa*${coordinates}.xvg ./SASA || true
 elif [[ ! -d "$currentSASAdir" ]]; then
 	mkdir ./SASA; mv sasa*${coordinates}.png sasa*${coordinates}.xvg ./SASA || true
 fi
 	echo "$demA"$' Generate a finished figure of the SASA plot... DONE'"$demB"
+	sleep 2
 }
 
 if [[ "$analysis" == *" 6 "* ]]; then analyser6 ; fi
@@ -592,22 +598,26 @@ elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
 	-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg	
 fi
 echo "$demA"$' Principal component analysis (PCA)...DONE'"$demB"
+sleep 2
 currentPCAdir="$(pwd)""/PCA"
 nPCA=1
 bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
 if [[ -d "$currentPCAdir" ]]; then
 	echo $'\n'"$currentPCAdir"$' folder exists,\n'"backing it up as $bkupPCAdir"
+	sleep 1
 	while [[ -d "$bkupPCAdir" ]]; do
 	nPCA=$(( nPCA + 1 )); bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
 	done
 	mv "$currentPCAdir" "$bkupPCAdir" && mkdir ./PCA
 	echo $'\n'"Backing up the last PCA folder and its contents as $bkupPCAdir"
+	sleep 1
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb ./PCA || true
 elif [[ ! -d "$currentPCAdir" ]]; then
 	mkdir ./PCA
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb dd?????? ./PCA || true
 fi
 echo "$demA"$'Generate finished figures of the PCA plots... DONE'"$demB"
+sleep 2
 }
 
 if [[ "$analysis" == *" 7 "* ]]; then analyser7 ; fi
@@ -700,16 +710,19 @@ if [[ "$dsspCheck" == "Avail" ]] ; then
 	bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
 	if [[ -d "$currentSecStrdir" ]]; then
 		echo $'\n'"$currentSecStrdir"$' folder exists,\n'"backing it up as $bkupSecStrdir"
+		sleep 1
 		while [[ -d "$bkupSecStrdir" ]]; do
 		nSecStr=$(( nSecStr + 1 )); bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
 		done
 		mv "$currentSecStrdir" "$bkupSecStrdir" && mkdir ./Secondary_structure || true
 		echo $'\n'"Backing up the last Secondary_structure folder and its contents as $bkupSecStrdir"
+		sleep 1
 		mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
 	elif [[ ! -d "$currentSecStrdir" ]]; then
 		mkdir Secondary_structure; mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
 	fi
 	echo "$demA"$' Secondary structure analysis...DONE'"$demB"
+	sleep 2
 fi
 }
 
@@ -809,11 +822,13 @@ nMOVIE=1
 bkupMOVIEdir="$(pwd)""/#MOVIE"".""backup.""$nMOVIE"
 if [[ -d "$currentMOVIEdir" ]]; then
 	echo $'\n'"$currentMOVIEdir"$' folder exists,\n'"backing it up as $bkupMOVIEdir"
+	sleep 1
 	while [[ -d "$bkupMOVIEdir" ]]; do
 	nMOVIE=$(( nMOVIE + 1 )); bkupMOVIEdir="$(pwd)""/#MOVIE"".""backup.""$nMOVIE"
 	done
 	mv "$currentMOVIEdir" "$bkupMOVIEdir" && mkdir ./MOVIE || true
 	echo $'\n'"Backing up the last MOVIE folder and its contents as $bkupMOVIEdir"
+	sleep 1
 elif [[ ! -d "$currentMOVIEdir" ]]; then mkdir MOVIE
 fi	
 	
@@ -888,11 +903,13 @@ if [[ -f "$currentMOVIEgif" ]]; then
 	base_currentMOVIEgif=$(basename "$currentMOVIEgif")
 	base_bkupMOVIEgif=$(basename "$bkupMOVIEgif")
 	echo $'\n'"$base_currentMOVIEgif" "exists, backing it up as $base_bkupMOVIEgif"$'\n'
+	sleep 1
 	while [[ -f "$bkupMOVIEgif" ]]; do
 	nMOVIE=$(( nMOVIE + 1 )); bkupMOVIEgif="$(pwd)""/MOVIE/dynamics_movie_""backup""$nMOVIE"".gif"
 	done
 	mv "$currentMOVIEgif" "$bkupMOVIEgif" || true
 	echo $'\n'"Backing up the last .gif MOVIE as $base_bkupMOVIEgif"
+	sleep 1
 fi	
 
 nMOVIE=1
@@ -902,11 +919,13 @@ if [[ -f "$currentMOVIEmp4" ]]; then
 	base_currentMOVIEmp4=$(basename "$currentMOVIEmp4")
 	base_bkupMOVIEmp4=$(basename "$bkupMOVIEmp4")
 	echo $'\n'"$base_currentMOVIEmp4"" exists, backing it up as $base_bkupMOVIEmp4"$'\n'
+	sleep 1
 	while [[ -f "$bkupMOVIEmp4" ]]; do
 	nMOVIE=$(( nMOVIE + 1 )); bkupMOVIEmp4="$(pwd)""/MOVIE/dynamics_movie_""backup""$nMOVIE"".mp4"
 	done
 	mv "$currentMOVIEmp4" "$bkupMOVIEmp4" || true
 	echo $'\n'"Backing up the last .mp4 MOVIE as $base_bkupMOVIEmp4"
+	sleep 1
 fi	
 	
 echo $'cd ./MOVIE\nload PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
@@ -1044,10 +1063,10 @@ if [[ $mmGMXpath != '' ]] ; then
 
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
-			echo 1 "$ligname" | ./utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
+			echo 1 "$ligname" | ./CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
-			./utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
+			./CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		fi
 		echo "$demA"$'Run g_MMPBSA calculations...DONE'"$demB"
@@ -1062,17 +1081,17 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 	fi
 	echo "$demA"$'Now calculating average binding energy & contribution of residues...\n'
-	python ./utilities/g_mmpbsa_pkg/MmPbSaStat.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
-	python3 ./utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
+	python ./CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
+	python3 ./CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
 
-	python ./utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
-	python3 ./utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
+	python ./CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
+	python3 ./CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
 
 	if [[ "$mmGMX" == "1" ]] ; then
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
-			echo 1 "$ligname" | ./utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+			echo 1 "$ligname" | ./CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
-			./utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+			./CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		fi
 	elif [[ "$mmGMX" == '' ]] ; then
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
@@ -1085,6 +1104,7 @@ if [[ $mmGMXpath != '' ]] ; then
 	fi
 
 	echo "$demA"$'Calculate average binding energy & contribution of residues...DONE'"$demB"
+	sleep 2
 
 	AnaName="MMPBSA"
 	currentAnadir="$(pwd)""/$AnaName"
@@ -1094,11 +1114,13 @@ if [[ $mmGMXpath != '' ]] ; then
 		base_currentAnadir=$(basename "$currentAnadir")
 		base_bkupAnadir=$(basename "$bkupAnadir")
 		echo $'\n'"$base_currentAnadir"$' folder exists,\n'"backing it up as $base_bkupAnadir"
+		sleep 1
 		while [[ -d "$bkupAnadir" ]]; do
 			nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
 		done
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
+		sleep 1
 		rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
 		mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
 		mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
@@ -1143,16 +1165,19 @@ nFELpca=1
 bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 if [[ -d "$currentFELPCAdir" ]]; then
 	echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $bkupFELpcadir"
+	sleep 1
 	while [[ -d "$bkupFELpcadir" ]]; do
 	nFELpca=$(( nFELpca + 1 )); bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 	done
 	mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
 	echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $bkupFELpcadir"
+	sleep 1
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 fi
 echo "$demA"$' Prepare Gibbs FEL with gmx sham...DONE'"$demB"
+sleep 2
 }
 
 useFoundRgRMSData_sham()
@@ -1179,16 +1204,19 @@ nFELRgVsRMSD=1
 bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
 if [[ -d "$currentFELshamRgVsRMSDdir" ]]; then
 	echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFELshamRgVsRMSDdir"
+	sleep 1
 	while [[ -d "$bkupFELshamRgVsRMSDdir" ]]; do
 	nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 )); bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
 	done
 	mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
 	echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $bkupFELshamRgVsRMSDdir"
+	sleep 1
 	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
 	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 fi
 echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
+sleep 2
 }
 
 order_parameters()
@@ -1238,6 +1266,7 @@ askFELuseexist
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated PCA_2d projection data found!\n File found:'" $exist2dPCA"\
 			$'\n *CHAPERONg in auto mode\n'" $exist2dPCA will be used for FEL plotting"
+			sleep 2
 		fi
 	elif [[ ! -f "$exist2dPCA" ]] ; then analyser7		
 	fi
@@ -1268,6 +1297,7 @@ askFELuseexist
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated Rg data found!\nFile found:'" $existRg"\
 			$'\n *CHAPERONg in auto mode\n'" $existRg will be used for FEL plotting"
+			sleep 2
 		fi
 	elif [[ ! -f "$existRg" ]] ; then analyser4
 	fi
@@ -1300,6 +1330,7 @@ askFELuseexist
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"\
 			$'\n *CHAPERONg in auto mode\n'" $existRMSD will be used for FEL plotting"
+			sleep 2
 		fi
 	elif [[ ! -f "$existRMSD" ]] ; then analyser2		
 	fi
@@ -1346,19 +1377,23 @@ analyser11()
 				bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 				if [[ -d "$currentFELPCAdir" ]]; then
 					echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $bkupFELpcadir"
+					sleep 1
 					while [[ -d "$bkupFELpcadir" ]]; do
 						nFELpca=$(( nFELpca + 1 )); bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 					done
 					mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
 					echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $bkupFELpcadir"
+					sleep 1
 					mv FEL_PCA_sham_*.xpm enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg FEL_PCA_sham_*.eps FEL_PCA_sham_*.pdf ./PCA_FEL_sham || true
 				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
 					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 				fi
 				echo "$demA"$' Prepare PCA-based FEL using gmx sham...DONE'"$demB"
+				sleep 2
 			
 			elif [[ "$felcal" == 1 ]] ; then
 				echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
+				sleep 1
 			fi
 		fi			
 	elif [[ $orderPair_choice == 1 && $flw == 1 ]] ; then useFoundPCA_sham
@@ -1384,6 +1419,7 @@ inputFormat
 			if [[ "$inFormat" == 1 ]]; then
 				read -p ' Provide the path to the pre-calculated Rg.xvg data: ' precalcRg
 				inputRg_xvgData="$precalcRg"
+				echo ""
 
 				read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
 				inputRMSD_xvgData="$precalcRMSD"
@@ -1428,19 +1464,23 @@ inputFormat
 				bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
 				if [[ -d "$currentFELshamRgVsRMSDdir" ]]; then
 					echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFELshamRgVsRMSDdir"
+					sleep 1
 					while [[ -d "$bkupFELshamRgVsRMSDdir" ]]; do
 						nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 )); bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
 					done
 					mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
 					echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $bkupFELshamRgVsRMSDdir"
+					sleep 1
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				fi
 				echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
+				sleep 2
 
 			elif [[ "$felcal" == 1 ]] ; then
 				echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
+				sleep 1
 			fi
 		fi
  	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then useFoundRgRMSData_sham
@@ -1463,6 +1503,7 @@ inputFormat
 
 		if [[ "$inFormat" == 1 ]]; then
 			read -p ' Provide the path to the 1st order_parameter.xvg data: ' precalcOrderPar1
+			echo ""
 			read -p ' Provide the path to the 2nd order_parameter.xvg data: ' precalcOrderPar2
 				
 			echo "$demA"$'Preprocessing user-provided order parameter data files...\n\n'
@@ -1504,21 +1545,26 @@ inputFormat
 			bkupFELshamOrderParameterPairdir="$(pwd)""/#OrderParameterPair_FEL_sham"".""backup.""$nFELOrderParameterPair"
 			if [[ -d "$currentFELshamOrderParameterPairdir" ]]; then
 				echo $'\n'"$currentFELshamOrderParameterPairdir"$' folder exists,\n'"backing it up as $bkupFELshamOrderParameterPairdir"
+				sleep 1
 				while [[ -d "$bkupFELshamOrderParameterPairdir" ]]; do
 					nFELOrderParameterPair=$(( nFELOrderParameterPair + 1 )); bkupFELshamOrderParameterPairdir="$(pwd)""/#OrderParameterPair_FEL_sham"".""backup.""$nFELOrderParameterPair"
 				done
 				mv "$currentFELshamOrderParameterPairdir" "$bkupFELshamOrderParameterPairdir" && mkdir ./OrderParameterPair_FEL_sham || true
 				echo $'\n'"Backing up the last OrderParameterPair_FEL_sham folder and its contents as $bkupFELshamOrderParameterPairdir"
+				sleep 1
 				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			elif [[ ! -d "$currentFELshamOrderParameterPairdir" ]]; then mkdir OrderParameterPair_FEL_sham
 				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			fi
 			echo "$demA"$' Prepare FEL with gmx sham...DONE'"$demB"
+			sleep 2
 		elif [[ "$felcal" == 1 ]] ; then
 			echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
+			sleep 1
 		fi
 	fi
 	echo "$demA"$' Construct free energy landscape with gmx sham...DONE'"$demB"
+	sleep 2
 
 }
 
@@ -1555,21 +1601,24 @@ useFoundPCA_FESPy()
 
 	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
 	sleep 2
-	python3 ./utilities/CHAP_construct_free_en_surface.py || python3 ./utilities/CHAP_construct_free_en_surface.py
+	python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py || python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py
 
 	echo $'\n Run construct_free_en_surface.py...DONE'
 	sleep 2
 	echo "$demA"$' Cleaning up...\n'
+	sleep 1
 
 	currentFESchapPCAdir="$(pwd)""/PCA_FES_chap"
 	nFESPCA=1
 	bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
 	if [[ -d "$currentFESchapPCAdir" ]]; then
 		echo $'\n'"$currentFESchapPCAdir"$' folder exists,\n'"backing it up as $bkupFESchapPCAdir"
+		sleep 1
 		while [[ -d "$bkupFESchapPCAdir" ]]; do
 			nFESPCA=$(( nFESPCA + 1 )); bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
 		done
 		echo $'\n'"Backing up the last PCA_FES_chap folder and its contents as $bkupFESchapPCAdir"
+		sleep 1
 		mv "$currentFESchapPCAdir" "$bkupFESchapPCAdir" && mkdir ./PCA_FES_chap || true
 	elif [[ ! -d "$currentFESchapPCAdir" ]]; then mkdir PCA_FES_chap
 	fi
@@ -1578,9 +1627,24 @@ useFoundPCA_FESPy()
 	OrderParameter2="PC2.dat"
 	fesFigure="PCA_FES.png"
 	results_folder="PCA_FES_chap"
-	#fetch simulation time from the .xvg file
-	cat "$exist2dPCA" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
-
+	# cat "$exist2dPCA" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
+	# fetch simulation time from the trajectory using the ScanTRAJ fxn
+	checksimtime="SimTime.dat"
+	if [[ ! -f "$checksimtime" ]] ; then
+		echo "$demA"$' Extracting the simulation time-points from the trajectory...\n'
+		ScanTRAJ
+		increment_factor=$(awk "BEGIN {print $simDuratnINTns / $No_of_frames}")
+		simtimeRecorded=0
+		echo "$simtimeRecorded" > SimTime.dat
+		while [[ "$simtimeRecorded" != "$simDuratnINTns" ]]; do
+			simtimeRecorded=$(awk "BEGIN {print $simtimeRecorded + $increment_factor}")
+			echo "$simtimeRecorded" >> SimTime.dat
+			if [[ "$simtimeRecorded" == "$simDuratnINTns" ]]; then
+				break
+			fi
+		done
+		echo $' Extract simulation time-points from the trajectory...DONE'"$demB"
+	fi
 }
 
 useFoundRgRMSData_FESPy()
@@ -1608,7 +1672,7 @@ useFoundRgRMSData_FESPy()
 
 	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
 	sleep 2
-	python3 ./utilities/CHAP_construct_free_en_surface.py || python3 ./utilities/CHAP_construct_free_en_surface.py
+	python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py || python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py
 
 	echo $'\n Run construct_free_en_surface.py...DONE'"$demB"
 	sleep 2
@@ -1620,10 +1684,12 @@ useFoundRgRMSData_FESPy()
 	bkupFESchapRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FES_chap"".""backup.""$nFESRgVsRMSD"
 	if [[ -d "$currentFESchapRgVsRMSDdir" ]]; then
 		echo $'\n'"$currentFESchapRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFESchapRgVsRMSDdir"
+		sleep 1
 		while [[ -d "$bkupFESchapRgVsRMSDdir" ]]; do
 			nFESRgVsRMSD=$(( nFESRgVsRMSD + 1 )); bkupFESchapRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FES_chap"".""backup.""$nFESRgVsRMSD"
 		done
 		echo $'\n'"Backing up the last RgVsRMSD_FES_chap folder and its contents as $bkupFESchapRgVsRMSDdir"
+		sleep 1
 		mv "$currentFESchapRgVsRMSDdir" "$bkupFESchapRgVsRMSDdir" && mkdir ./RgVsRMSD_FES_chap || true
 	elif [[ ! -d "$currentFESchapRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FES_chap
 	fi
@@ -1634,6 +1700,7 @@ useFoundRgRMSData_FESPy()
 	results_folder="RgVsRMSD_FES_chap"
 	#fetch simulation time from one of the .xvg files
 	cat "$inputRg_xvgData" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
+	mv RgVsRMSD.xvg ./"$results_folder" || true
 
 }
 
@@ -1653,50 +1720,31 @@ analyser12()
 		if [[ "$PCFile" == 1 ]]; then useFoundRgRMSData_FESPy
 		elif [[ "$PCFile" == 2 ]]; then analyser2; analyser4; useFoundRgRMSData_FESPy	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
-cat << inputFormat
-
-Do you want to provide individual order parameter or a pre-combined pair?
-  1) Individual Rg and RMSD data
-  2) Pre-combined Rg Vs RMSD pair
-
-inputFormat
-
-			read -p ' Enter 1 or 2 here: ' inFormat
-			while [[ "$inFormat" != 1 && "$inFormat" != 2 ]]; do
-				echo $'\nYou entered: '"$inFormat"
-				echo $'Please enter a valid number (1 or 2)!!\n'
-				read -p ' Enter 1 or 2 here: ' inFormat
-			done
-
-			if [[ "$inFormat" == 1 ]]; then
-				read -p ' Provide the path to the pre-calculated Rg.xvg data: ' precalcRg
-				read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
-				
-				echo "$demA"$' Pre-processing user-provided Rg Vs RMSD data files...\n\n'
-				sleep 1
-				cat "$precalcRg" | grep -v "^[@#]" | awk '{print $2}' > RgData.dat
-				RgData="$precalcRg"
-				cat "$precalcRMSD" | grep -v "^[@#]" | awk '{print $2}' > RMSData.dat
-				echo "# This file contains the RMSD and Rg values extracted by CHAPERONg"
-				echo "# from the data generated by GROMACS..."
-				echo "#"
-				echo "@    title "$'"Plot of Rg against RMSD"' > RgVsRMSD.xvg
-				echo "@    xaxis  label "$'"RMSD (nm)"' >> RgVsRMSD.xvg
-				echo "@    yaxis  label "$'"Rg (nm)"' >> RgVsRMSD.xvg
-				echo "@TYPE xy" >> RgVsRMSD.xvg
-				paste -d "        " RMSData.dat RgData.dat >> RgVsRMSD.xvg
-				
-				RMSData="$precalcRMSD"
-				precalcRgRMS="./RgVsRMSD.xvg"
-			elif [[ "$inFormat" == 2 ]]; then
-				read -p ' Provide the absolute path to a pre-calculated RgVsRMSD.xvg: ' precalcRgRMS
-			fi
-
-			exist2dPCA="$precalcPCfile"
+			read -p ' Provide the path to the pre-calculated Rg.xvg data: ' precalcRg
+			read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
+			
+			echo "$demA"$' Pre-processing user-provided Rg Vs RMSD data files...\n\n'
+			sleep 1
+			cat "$precalcRg" | grep -v "^[@#]" | awk '{print $2}' > RgData.dat
+			RgData="$precalcRg"
+			cat "$precalcRMSD" | grep -v "^[@#]" | awk '{print $2}' > RMSData.dat
+			echo "# This file contains the RMSD and Rg values extracted by CHAPERONg"
+			echo "# from the data generated by GROMACS..."
+			echo "#"
+			echo "@    title "$'"Plot of Rg against RMSD"' > RgVsRMSD.xvg
+			echo "@    xaxis  label "$'"RMSD (nm)"' >> RgVsRMSD.xvg
+			echo "@    yaxis  label "$'"Rg (nm)"' >> RgVsRMSD.xvg
+			echo "@TYPE xy" >> RgVsRMSD.xvg
+			paste -d "        " RMSData.dat RgData.dat >> RgVsRMSD.xvg
+			
+			RMSData="$precalcRMSD"
+			precalcRgRMS="./RgVsRMSD.xvg"
 			useFoundRgRMSData_FESPy
 		fi
 
-	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then useFoundRgRMSData_FESPy
+	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then
+		useFoundRgRMSData_FESPy
+		# mv RgVsRMSD.xvg ./"$results_folder" || true
 	elif [[ $orderPair_choice == 3 ]] ; then
 cat << inputFormat
 
@@ -1716,6 +1764,8 @@ inputFormat
 		if [[ "$inFormat" == 1 ]]; then
 			read -p ' Provide the path to the 1st order_parameter.xvg data: ' precalcOrderPar1
 			inputprecalcOrderPar1="$precalcOrderPar1"
+
+			echo ""
 
 			read -p ' Provide the path to the 2nd order_parameter.xvg data: ' precalcOrderPar2
 			inputprecalcOrderPar2="$precalcOrderPar2"
@@ -1759,7 +1809,7 @@ inputFormat
 
 		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
 		sleep 2
-		python3 ./utilities/CHAP_construct_free_en_surface.py || python3 ./utilities/CHAP_construct_free_en_surface.py
+		python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py || python3 ./CHAP_utilities/CHAP_construct_free_en_surface.py
 
 		echo $'\n Run construct_free_en_surface.py...DONE'
 		sleep 2
@@ -1770,10 +1820,12 @@ inputFormat
 		bkupFESchapdir="$(pwd)""/#FES_chap"".""backup.""$nFES"
 		if [[ -d "$currentFESchapdir" ]]; then
 			echo $'\n'"$currentFESchapdir"$' folder exists,\n'"backing it up as $bkupFESchapdir"
+			sleep 1
 			while [[ -d "$bkupFESchapdir" ]]; do
 				nFES=$(( nFES + 1 )); bkupFESchapdir="$(pwd)""/#FES_chap"".""backup.""$nFES"
 			done
 			echo $'\n'"Backing up the last FES_chap folder and its contents as $bkupFESchapdir"
+			sleep 1
 			mv "$currentFESchapdir" "$bkupFESchapdir" && mkdir ./FES_chap || true
 			
 		elif [[ ! -d "$currentFESchapdir" ]]; then mkdir FES_chap
@@ -1784,6 +1836,7 @@ inputFormat
 		results_folder="FES_chap"
 		#fetch simulation time from one of the .xvg files
 		cat "$inputprecalcOrderPar1" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
+		mv OrderParameterPair.xvg ./"$results_folder" || true
 
 	fi
 
@@ -1793,7 +1846,7 @@ inputFormat
 	# cat SimTime_OrderParameters1_2_dG.dat | sort -k 4,4 -n > SimTime_OrderParameters1_2_dG-sorted.dat
 	cat OrderParameters1_2_dG_nogap.dat | sort -k 3,3 -n > OrderParameters1_2_dG_nogap-sorted.dat
 	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in OrderParameters1_2_dG.dat ./"$results_folder" || true
-	mv RgVsRMSD.xvg OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
+	mv OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
 
 	echo "$demA"$' Construct free energy surface...DONE'"$demB"
 	
@@ -1812,7 +1865,7 @@ inputFormat
 		paste SimTime.dat $OrderParameter1 $OrderParameter2 > SimTime_OrderParameters1_2.dat
 		echo "$demA"$' Mapping landscape data point to simulation time...\n'
 		sleep 2
-		python3 ./utilities/CHAP_map_fes_parameter_to_simTime.py || python ./utilities/CHAP_map_fes_parameter_to_simTime.py
+		python3 ./CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py || python ./CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py
 
 		echo $' Map landscape data point to simulation time...DONE\n'
 		sleep 2
@@ -1823,9 +1876,10 @@ inputFormat
 
 		echo $' Identifying the corresponding time for the lowest energy structure...\n'
 		sleep 2
-		python3 ./utilities/CHAP_get_lowest_en_datapoint.py || python ./utilities/CHAP_get_lowest_en_datapoint.py
+		python3 ./CHAP_utilities/CHAP_get_lowest_en_datapoint.py || python ./CHAP_utilities/CHAP_get_lowest_en_datapoint.py
 		lowEn_time=$(tail -n 1 ./collect_mappings/lowest_energy_datapoints_timed.dat | awk '{print $1}')
 		lowEn_time_ps=$(awk "BEGIN {print $lowEn_time * 1000}")
+		rm ./collect_mappings/1.txt ./collect_mappings/sorted_1.txt
 
 		echo $' Identify the corresponding time for the lowest energy structure...DONE'
 		sleep 1
@@ -1876,8 +1930,8 @@ extractMoreStructs
 			cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
 			cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
 			mkdir collect_mappings_extra
-			python3 ./utilities/CHAP_map_all_dataPoint_to_simTime.py || \
-			python ./utilities/CHAP_map_all_dataPoint_to_simTime.py
+			python3 ./CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py || \
+			python ./CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py
 
 			echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
 			sleep 2
@@ -1901,13 +1955,13 @@ extractMoreStructs
 			done
 			cd ../
 			echo $' Generating approximated simulation times mapped with free energy...\n'
-			python3 ./utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
-			python ./utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
+			python3 ./CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
+			python ./CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
 
-			sort ./collect_mappings_extra/mappedFESdataPoints_timed.dat -k1,1n -k4,4n > \
-			./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
-			sort ./collect_mappings_extra/mappedFESdataPoints_timed.dat -k4,4n -k2,2n > \
-			./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
+			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 ./collect_mappings_extra/mappedFESdataPoints_timed.dat  \
+			| sort -k1,1n -k4,4n) > ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
+			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 ./collect_mappings_extra/mappedFESdataPoints_timed.dat  \
+			| sort -k4,4n -k2,2n) > ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
 			
 			mv ./collect_mappings_extra/mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
 			mv ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
@@ -1965,7 +2019,7 @@ extractMoreStructs
 
 				mv "${filenm}"_Structure_at_Time"$frameTime_ps".pdb ./"$results_folder"/collect_mappings/ || true
 
-				echo "$demA"$'\n The structure has been saved to the folder '"$results_folder""/collect_mappings"
+				echo "$demA"$'\n The structure has been saved to the folder '"./$results_folder""/collect_mappings"
 
 cat << extractMoreStructs
 
@@ -1994,15 +2048,306 @@ extractMoreStructs
 
 if [[ "$analysis" == *" 12 "* ]]; then analyser12 ; fi
 
+useFoundPCA_mdDavis()
+{
+	echo "$demA"$' Extracting principal components from 2d_projection data...\n\n'
+	sleep 2
+	
+	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $1}' > PC1_datapoints.dat
+	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $2}' > PC2_datapoints.dat
+
+	echo $' Extract principal components from 2d_projection data...DONE'"$demB"
+	sleep 2
+
+	echo "$demA"$' Preparing parameters for free energy landscape calculations...\n'
+	sleep 2
+
+	checksimtime="SimTime.dat"
+	if [[ ! -f "$checksimtime" ]] ; then
+		# fetch simulation time from the trajectory using the ScanTRAJ fxn
+		echo $' Extracting the simulation time-points from the trajectory...\n'
+		ScanTRAJ
+		increment_factor=$(awk "BEGIN {print $simDuratnINTns / $No_of_frames}")
+		simtimeRecorded=0
+		echo "$simtimeRecorded" > SimTime.dat
+		while [[ "$simtimeRecorded" != "$simDuratnINTns" ]]; do
+			simtimeRecorded=$(awk "BEGIN {print $simtimeRecorded + $increment_factor}")
+			echo "$simtimeRecorded" >> SimTime.dat
+			if [[ "$simtimeRecorded" == "$simDuratnINTns" ]]; then
+				break
+			fi
+		done
+		echo $' Extract simulation time-points from the trajectory...DONE'"$demB" ; sleep 2
+	fi
+
+	currentFELmdDavisPCAdir="$(pwd)""/PCA_3D-FEL_mdDavis"
+	nFELPCA=1
+	bkupFELmdDavisPCAdir="$(pwd)""/#PCA_3D-FEL_mdDavis"".""backup.""$nFELPCA"
+	if [[ -d "$currentFELmdDavisPCAdir" ]]; then
+		echo $'\n'"$currentFELmdDavisPCAdir"$' folder exists,\n'"backing it up as $bkupFELmdDavisPCAdir" ; sleep 1
+		while [[ -d "$bkupFELmdDavisPCAdir" ]]; do
+			nFELPCA=$(( nFELPCA + 1 )); bkupFELmdDavisPCAdir="$(pwd)""/#PCA_3D-FEL_mdDavis"".""backup.""$nFELPCA"
+		done
+		echo $'\n'"Backing up the last PCA_3D-FEL_mdDavis folder and its contents as $bkupFELmdDavisPCAdir" ; sleep 1
+		mv "$currentFELmdDavisPCAdir" "$bkupFELmdDavisPCAdir" && mkdir ./PCA_3D-FEL_mdDavis || true
+	elif [[ ! -d "$currentFELmdDavisPCAdir" ]]; then mkdir PCA_3D-FEL_mdDavis
+	fi
+
+	# fesFigure="PCA_FES.png"
+	results_folder="PCA_3D-FEL_mdDavis"
+	outName="PCA_"
+
+	# cat $exist2dPCA | grep "^[@#]" > ./"$results_folder"/PC1.xvg
+	# cat $exist2dPCA | grep "^[@#]" > ./"$results_folder"/PC2.xvg
+
+	paste SimTime.dat PC1_datapoints.dat > PC1.dat
+	paste SimTime.dat PC2_datapoints.dat > PC2.dat
+
+	cat PC1.dat >> ./"$results_folder"/PC1.xvg
+	cat PC2.dat >> ./"$results_folder"/PC2.xvg
+
+	rm PC1_datapoints.dat PC2_datapoints.dat PC1.dat PC2.dat
+	OrderParameter1="${results_folder}/PC1.xvg"
+	OrderParameter2="${results_folder}/PC2.xvg"
+}
+
+useFoundRgRMSData_mdDavis()
+{
+	echo "$demA"$' Preparing parameters for 3D free energy landscape calculations...\n'
+	sleep 2
+
+	currentFELmdDavisRgVsRMSDdir="$(pwd)""/RgVsRMSD_3D-FEL_mdDavis"
+	nFELRgVsRMSD=1
+	bkupFELmdDavisRgVsRMSDdir="$(pwd)""/#RgVsRMSD_3D-FEL_mdDavis"".""backup.""$nFELRgVsRMSD"
+	if [[ -d "$currentFELmdDavisRgVsRMSDdir" ]]; then
+		echo $'\n'"$currentFELmdDavisRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFELmdDavisRgVsRMSDdir" ; sleep 1
+		while [[ -d "$bkupFELmdDavisRgVsRMSDdir" ]]; do
+			nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 )); bkupFELmdDavisRgVsRMSDdir="$(pwd)""/#RgVsRMSD_3D-FEL_mdDavis"".""backup.""$nFELRgVsRMSD"
+		done
+		echo $'\n'"Backing up the last RgVsRMSD_3D-FEL_mdDavis folder and its contents as $bkupFELmdDavisRgVsRMSDdir" ; sleep 1
+		mv "$currentFELmdDavisRgVsRMSDdir" "$bkupFELmdDavisRgVsRMSDdir" && mkdir ./RgVsRMSD_3D-FEL_mdDavis || true
+	elif [[ ! -d "$currentFELmdDavisRgVsRMSDdir" ]]; then mkdir RgVsRMSD_3D-FEL_mdDavis
+	fi
+
+	OrderParameter1="$existRg"
+	OrderParameter2="$existRMSD"
+	results_folder="RgVsRMSD_3D-FEL_mdDavis"
+	outName="RgVsRMSD_"
+
+}
+
 analyser13()
 {	
-echo $'CHAPERONg: Program still under development. Check for an update later!\n   Thanks!!'	
+	order_parameters
+ 	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
+		if [[ "$PCFile" == 1 ]]; then useFoundPCA_mdDavis
+		elif [[ "$PCFile" == 2 ]]; then analyser7; useFoundPCA_mdDavis	
+		elif [[ "$PCFile" == 3 ]]; then echo ""
+			read -p ' Provide the path to the pre-calculated 2d_PCA projection file: ' precalcPCfile
+			exist2dPCA="$precalcPCfile"
+			useFoundPCA_mdDavis
+		fi			
+ 	elif [[ $orderPair_choice == 1 && $flw == 1 ]] ; then useFoundPCA_mdDavis
+	elif [[ $orderPair_choice == 2 && $flw == 0 ]] ; then
+		if [[ "$PCFile" == 1 ]]; then useFoundRgRMSData_mdDavis
+		elif [[ "$PCFile" == 2 ]]; then analyser2; analyser4; useFoundRgRMSData_mdDavis
+		elif [[ "$PCFile" == 3 ]]; then echo ""
+
+			read -p ' Provide the path to the pre-calculated Rg.xvg data: ' precalcRg
+			echo ""
+			read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
+
+			existRg="$precalcRg"
+			existRMSD="$precalcRMSD"	
+			useFoundRgRMSData_mdDavis
+ 		fi
+	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then
+		useFoundRgRMSData_mdDavis
+ 	elif [[ $orderPair_choice == 3 ]] ; then
+		read -p ' Provide the path to the 1st order_parameter.xvg data: ' OrderParameter1
+		echo ""
+		read -p ' Provide the path to the 2nd order_parameter.xvg data: ' OrderParameter2
+		
+		echo "$demA"$' Preparing parameters for 3D free energy landscape calculations...\n'
+		sleep 2
+		
+		results_folder="3D-FEL_mdDavis"
+		outName=""
+
+		currentFELmdDavisdir="$(pwd)""/3D-FEL_mdDavis"
+		nFEL=1
+		bkupFELmdDavisdir="$(pwd)""/#3D-FEL_mdDavis"".""backup.""$nFEL"
+		if [[ -d "$currentFELmdDavisdir" ]]; then
+			echo $'\n'"$currentFELmdDavisdir"$' folder exists,\n'"backing it up as $bkupFELmdDavisdir"
+			sleep 1
+			while [[ -d "$bkupFELmdDavisdir" ]]; do
+				nFEL=$(( nFEL + 1 )); bkupFELmdDavisdir="$(pwd)""/#3D-FEL_mdDavis"".""backup.""$nFEL"
+			done
+			echo $'\n'"Backing up the last 3D-FEL_mdDavis folder and its contents as $bkupFELmdDavisdir"
+			sleep 1
+			mv "$currentFELmdDavisdir" "$bkupFELmdDavisdir" && mkdir ./3D-FEL_mdDavis || true
+		elif [[ ! -d "$currentFELmdDavisdir" ]]; then mkdir 3D-FEL_mdDavis
+		fi
+	fi
+
+	Temp=300
+
+	echo "$demA"$' Constructing 3D free energy landscape...\n'
+	sleep 2
+
+	md-davis landscape_xvg -T $Temp -x ${OrderParameter1} -y ${OrderParameter2} -n "3D_FEL_for_${filenm}" -l "3D_FEL_for_${filenm}" -o ${results_folder}/${filenm}_3D_${outName}FEL.html
+
+	if [[ $orderPair_choice == 2 ]] ; then
+		rm RgVsRMSD.xvg RgData.dat RMSData.dat
+	fi
+	echo $'\n Construct 3D free energy landscape...DONE'"$demB"
+	sleep 2
 }
 
 if [[ "$analysis" == *" 13 "* ]]; then analyser13 ; fi
 
+getHBdataforMatrix()
+{
+	if [[ $sysType == 1 ]]; then
+        existXVGin="$(pwd)""/hbond/hbnum_intraPro_${filenm}.xvg"
+        existMATRIXin="$(pwd)""/hbond/hb_matrix_intraPro_${filenm}.xpm"
+        existINDEXin="$(pwd)""/hbond/hb_index_intraPro_${filenm}.ndx"
+    elif [[ $sysType == 2 ]]; then
+        existXVGin="$(pwd)""/hbond/hbnum_ProLig_${filenm}.xvg"
+        existMATRIXin="$(pwd)""/hbond/hb_matrix_ProLig_${filenm}.xpm"
+        existINDEXin="$(pwd)""/hbond/hb_index_ProLig_${filenm}.ndx"
+    elif [[ $sysType == 3 ]]; then
+        existXVGin="$(pwd)""/hbond/hbnum_Pro_DNA_${filenm}.xvg"
+        existMATRIXin="$(pwd)""/hbond/hb_matrix_Pro_DNA_${filenm}.xpm"
+        existINDEXin="$(pwd)""/hbond/hb_index_Pro_DNA_${filenm}.ndx"
+    fi
+}
+
+hbondMatrix_useFoundData()
+{
+	currentHBmatrixdir="$(pwd)""/hbond_matrix"
+	nHBmatrix=1
+	bkupHBmatrixdir="$(pwd)""/#hbond_matrix"".""backup.""$nHBmatrix"
+	if [[ -d "$currentHBmatrixdir" ]]; then
+		echo $'\n'"$currentHBmatrixdir"$' folder exists,\n'"backing it up as $bkupHBmatrixdir"
+		sleep 1
+		while [[ -d "$bkupHBmatrixdir" ]]; do
+			nHBmatrix=$(( nHBmatrix + 1 )); bkupHBmatrixdir="$(pwd)""/#hbond_matrix"".""backup.""$nHBmatrix"
+		done
+		echo $'\n'"Backing up the last hbond_matrix folder and its contents as $bkupHBmatrixdir"
+		sleep 1
+		mv "$currentHBmatrixdir" "$bkupHBmatrixdir" && mkdir ./hbond_matrix || true
+	elif [[ ! -d "$currentHBmatrixdir" ]]; then mkdir hbond_matrix
+	fi
+
+	echo "$demA"$' Extracting a reference structure from the trajectory...\n\n'
+		sleep 2
+	if [[ $flw == 1 && $sysType == 1 ]]; then
+		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
+	elif [[ $flw == 0 && $sysType == 1 ]]; then
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
+	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
+	elif [[ $flw == 0 && $sysType == 2 ]]; then
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
+	elif [[ $flw == 1 && $sysType == 2 ]]; then
+		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
+	fi
+	echo ' Extract a reference structure from the trajectory...DONE'"$demA"
+	echo "$demA"$' Preparing the H-bond matrix...\n'
+	sleep 2
+	echo " Detecting the list of H-bonds from the gmx index file..."
+	sleep 2
+	hbondList=$(grep "hbond" ${existINDEXin} | awk '{print $2}')
+	echo " Calculating and saving the H-bond data..."
+	sleep 2
+	md-davis hbond -x ${existMATRIXin} -i ${existINDEXin} -s hbond_matrix/${filenm}_referenceStructure.pdb --save_pickle hbond_matrix/hb_data.p -g ${hbondList} > hbond_matrix/hb_counts.dat
+
+cat << hbcutAsk
+
+Do you want to proceed to plotting the H-bond matrix with a 33 % occurrence cut-off?
+
+  1) Yes, set 33 % as the cut-off for the H-bonds to be included in the plot
+  2) No, I want to set a different percentage cut-off
+
+hbcutAsk
+	
+	read -p ' Enter 1 or 2 here: ' HBcutOff_ask
+		while [[ "$HBcutOff_ask" != 1 && "$HBcutOff_ask" != 2 ]]; do
+			echo $'\nYou entered: '"$HBcutOff_ask"
+			echo $'Please enter a valid number (1 or 2)!!\n'
+			read -p ' Enter 1 or 2 here: ' HBcutOff_ask
+		done
+		
+	if [[ $HBcutOff_ask == 1 ]] ; then
+		echo $'\n Plotting the hydrogen bonds matrix...\n'
+		sleep 2
+
+		md-davis plot_hbond --percent --total_frames 101 --cutoff 33 \
+		-o hbond_matrix/hbond_matrix_${filenm}.html hbond_matrix/hb_data.p
+	elif [[ $HBcutOff_ask == 2 ]] ; then
+		read -p ' Enter the percentage occurrence cut-off to use: ' HBcutOff
+		echo $'\n Plotting the hydrogen bonds matrix...\n'
+		sleep 2
+
+		md-davis plot_hbond --percent --total_frames 101 --cutoff ${HBcutOff} \
+		-o hbond_matrix/hbond_matrix_${filenm}.html hbond_matrix/hb_data.p
+	fi
+}
+
 
 analyser14()
+{
+	getHBdataforMatrix
+	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
+		then
+		if [[ "$flw" == 0 ]] ; then
+			echo $'CHAPERONg: Pre-calculated H-bond data found!\n\nFiles found:'\
+			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"
+			sleep 2
+cat << askFELuseexist
+
+ Do you want to use these data for plotting H-bond matrix?
+
+   1) Yes, use the data above
+   2) No, repeat H-dond analysis with gmx and use the new output
+   3) No, I want to provide some other files to be used
+
+askFELuseexist
+
+			read -p ' Enter 1, 2 or 3 here: ' PCFile
+			while [[ "$PCFile" != 1 && "$PCFile" != 2 && "$PCFile" != 3 ]]; do
+				echo $'\nYou entered: '"$PCFile"
+				echo $'Please enter a valid number (1, 2 or 3)!!\n'
+				read -p ' Enter 1, 2 or 3 here: ' PCFile
+			done
+
+			if [[ $PCFile == 1 ]] ; then echo ""
+			elif [[ $PCFile == 2 ]] ; then analyser5 ; getHBdataforMatrix
+			elif [[ $PCFile == 3 ]] ; then
+				read -p ' Provide the path to the pre-calculated H-bond .xvg data file: ' existXVGin
+				echo ""
+				read -p ' Provide the path to the pre-calculated H-bond matrix file: ' existMATRIXin
+				echo ""
+				read -p ' Provide the path to the pre-calculated H-bond index file: ' existINDEXin
+			fi
+		elif [[ "$flw" == 1 ]] ; then
+			echo $'CHAPERONg: Pre-calculated H-bond data found!\n\nFiles found:'\
+			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"\
+			$'\n\n *CHAPERONg in auto mode; the data will be used for plotting H-bond matrix'
+			sleep 2
+			getHBdataforMatrix
+		fi
+	elif [[ -f "$existXVGin" ]] || [[ -f "$existMATRIXin" ]] || [[ -f "$existINDEXin" ]]
+		then analyser5
+	fi
+	hbondMatrix_useFoundData
+
+}
+
+if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
+
+analyser15()
 {	
 read -p '*Please enter the number of frames to skip at intervals: ' ski
 if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
@@ -2043,11 +2388,15 @@ echo "$demA"" Make index group ${nameForIndex}... DONE""$demB"
 
 if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
 
-if [[ "$analysis" == *" 15 "* ]]; then makeNDXGroup2 ; fi
+if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
 
-if [[ "$analysis" == *" 16 "* ]]; then analyser0; ScanTRAJ; analyser1; analyser2; analyser3
-	analyser4; analyser5; analyser6; analyser7; analyser8; analyser9; analyser10; analyser11; analyser12 
-elif [[ "$analysis" == *" 17 "* ]]; then ScanTRAJ; analyser1; analyser2; analyser3
-	analyser4; analyser5; analyser6; analyser7; analyser8; analyser9; analyser10; analyser11; analyser12 	
+if [[ "$analysis" == *" 16 "* ]]; then makeNDXGroup2 ; fi
+
+if [[ "$analysis" == *" 17 "* ]]; then analyser0; ScanTRAJ; analyser1; analyser2
+	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser9
+	analyser10; analyser11; analyser12; analyser13; analyser14
+elif [[ "$analysis" == *" 18 "* ]]; then ScanTRAJ; analyser1; analyser2; analyser3
+	analyser4; analyser5; analyser6; analyser7; analyser8; analyser9; analyser10
+	analyser11; analyser12; analyser13; analyser14
 fi
 }

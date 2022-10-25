@@ -29,12 +29,12 @@ gmx_exe_path="gmx"
 Credit()
 {
 	echo \
-  $'\n#############################################################################'\
-  $'\n#-------------------------------- CHAPERONg --------------------------------#'\
-  $'\n#  An automated pipeline for GROMACS MD simulation and end-point analysis   #'\
-  $'\n#      If you find this program useful please cite the relevant paper:      #'\
-  $'\n#                   Yekeen, A.A. et al. To be published...                  #'\
-  $'\n#############################################################################'
+  $'\n###############################################################################'\
+  $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
+  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analysis   #'\
+  $'\n#       If you find this program useful please cite the relevant paper:       #'\
+  $'\n#                   Yekeen, A.A. et al. To be published...                    #'\
+  $'\n###############################################################################'
 }
 
 Help()
@@ -198,11 +198,11 @@ fi
 
 #if test "$nb" == 1; then nbn='-nb gpu'; else nbn=''; fi
 
-if test "$wat" != ""; then wmodel="-water ""${wat}"
-elif test "$wat" == ""; then
-	echo "$demA"" No water model is provided. You will be prompted to choose later.$demB"
-	sleep 1
-fi
+# if test "$wat" != ""; then wmodel="-water ""${wat}"
+# elif test "$wat" == ""; then
+# 	echo "$demA"" No water model is provided. You maybe be prompted to choose later.$demB"
+# 	sleep 1
+# fi
 
 
 if [[ "${filenm}" == '' ]]; then filenm="md_${coordinates}"; fi
@@ -238,12 +238,12 @@ fi
 
 
 echo \
-  $'\n#############################################################################'\
-  $'\n#-------------------------------- CHAPERONg --------------------------------#'\
-  $'\n#  An automated pipeline for GROMACS MD simulation and end-point analysis   #'\
-  $'\n#      If you find this program useful please cite the relevant paper:      #'\
-  $'\n#                   Yekeen, A.A. et al. To be published...                  #'\
-  $'\n#############################################################################'
+  $'\n###############################################################################'\
+  $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
+  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analysis   #'\
+  $'\n#       If you find this program useful please cite the relevant paper:       #'\
+  $'\n#                    Yekeen, A.A. et al. To be published...                   #'\
+  $'\n###############################################################################'
 
 sleep 1
 cat << usageSt
