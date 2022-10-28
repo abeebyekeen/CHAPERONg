@@ -1,0 +1,13 @@
+name: CHAPERONg
+
+dependencies:
+  - main::python=3.8
+# - anaconda::networkx=2.3
+  - conda-forge::pymol-open-source=2.5.0
+  - conda-forge::imagemagick
+  - pip
+  - pip:
+    - scipy
+    - numpy
+    - matplotlib
+    - networkx==2.3

@@ -11,7 +11,11 @@ def get_spaced_frame_dist(phrase='smd_pull_spacing'):
 	with open("parFile.par") as par:
 		for parameter in par.readlines():
 			if phrase in parameter:
-				paraData = str(parameter).split(" ")
+				paraData=[]
+				paraData_temp = str(parameter).strip().split(" ")
+				for paraTemp in paraData_temp:
+					if paraTemp != ' ' and paraTemp != '' and paraTemp != '\t' and paraTemp != '\n':
+						paraData.append(paraTemp)
 				spacing = float(paraData[2])
 	with open("distances_summary.txt") as alldata:
 		alldataLines = alldata.readlines()

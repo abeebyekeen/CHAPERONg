@@ -9,8 +9,11 @@
 set -e
 set -o pipefail
 
+#set version
+CHAPERONg_version="v0.1"
+
 #Initialize (default) parameters
-btype='cubic' ; edgeDist="1.0"; mw=0; nt=0
+btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
 THREA="-nt ""${nt}"; hbthread="-nthreads ""0"
 wmodel=""; wat=""; nb='' ; indexer=''
 flw=0; ffUse=""; gpid=''; filenm=''
@@ -31,8 +34,8 @@ Credit()
 	echo \
   $'\n###############################################################################'\
   $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analysis   #'\
-  $'\n#       If you find this program useful please cite the relevant paper:       #'\
+  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
+  $'\n#    If you use this program in your work, please cite the relevant paper:    #'\
   $'\n#                   Yekeen, A.A. et al. To be published...                    #'\
   $'\n###############################################################################'
 }
@@ -76,9 +79,8 @@ chmod +x ./setup_CHAPERONg-<version>
 Required (int=integer; str=string):
 -i, --input <str>   Input coordinate file (.pdb or .gro)
 Optional (int=integer; str=string):
--h, --help          Print this help
--b, --bt <str>      Box type i.e. cubic, dodecahedron, triclinic, octahedron
-                    (default: cubic)
+-h, --help          Print the shorter version of this help
+-b, --bt <str>      Box type: cubic (default), dodecahedron, triclinic, octahedron
 -T, --nt <int>      Number of threads to use (default is 0: allow gmx to guess)
 -g, --nb gpu        Calculate non-bonded interactions on gpu
 -G, --gpu_id <str>  List ID(s) of unique GPU devices available for use
@@ -87,7 +89,6 @@ Optional (int=integer; str=string):
                     do common analyses
 --parFile <str>     Name of the CHAPERONg input parameter file
 -H, --Help          Print more, advanced options
-More Options:
 -s, --water <str>   Water model to use i.e. tip3p, spc, etc. (ff-dependent)
 -f, --ff <str>      Force-field e.g. charmm27, amber94, etc.
                     Enter "wd" if ff in working directory
@@ -100,16 +101,15 @@ More Options:
 -M, --mmgpath <str> Absolute path to gmx binary to use for g_mmpbsa
 -E, --gmx_exe <str> Path to gmx to use for all gmx runs except g_mmpbsa
                     (Default is to use the gmx set in the environment)
+-v, --version       Print the installed version of CHAPERONg
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
---trFrac <int>      Fraction of trajectory to use for mmpbsa
-                    (e.g. enter 2 for the 2nd half, 3 for the last 3rd, etc.)
+--trFrac <int>      Fraction of trajectory to use for g_mmpbsa calculations
+                    (e.g. enter 2 for 2nd half, 3 for last 3rd, etc.)
 --dist <float>      Solute-box distance i.e. distance to box edge (default is 1.0)
 --bg                Run production mdrun with nohup ("no hang up")
---inputtraj <str>   Corrected trajectory to use for analyses (options: noPBC,
-                    nojump, fit)
+--inputtraj <str>   Corrected trajectory to use for analyses (noPBC, nojump, fit)
 --ter <prompt>      Interactively choose the N- & C-termini protonation states
                     (default: ionized with NH3+ & COO-)
-
 guide_lg
 }
 
@@ -147,7 +147,7 @@ while [ "$1" != "" ]; do
 	-p | --deffnm) shift; filenm="$1";;
 	-E | --gmx_exe) shift; gmx_exe_path="$1";;
 	-f | --ff) shift; ffUse="$1";;
-	-F | --mmFrame) shift;  mmpbframesNo="$1";;
+	-F | --mmFrame) shift; mmpbframesNo="$1";;
 	-g | --nb) nb=1;;
 	-G | --gpu_id) shift; gpid="$1";;
 	-h | --help) Help; Credit; exit 0;;
@@ -164,7 +164,8 @@ while [ "$1" != "" ]; do
 	--trFrac) shift; trajFraction="$1";;	
 	-T | --nt) shift; nt="$1";;
 	--ter) termini=1;;
-	-W | --maxwarn) shift; mw="$1";;
+	-v | --version) echo "$demA"$' CHAPERON version: '"$CHAPERONg_version"; Credit; echo $''; exit 0 ;;
+	-W | --maxwarn) shift; WarnMax="$1";;
 	*) echo "Invalid option: $1"; Help; echo $''; exit 1;;
 	esac
 	shift
@@ -196,13 +197,11 @@ elif [[ $coordinates_raw == *".gro" ]]; then
 else coordinates=$coordinates_raw
 fi
 
-#if test "$nb" == 1; then nbn='-nb gpu'; else nbn=''; fi
-
-# if test "$wat" != ""; then wmodel="-water ""${wat}"
+if test "$wat" != ""; then wmodel="-water ""${wat}"
 # elif test "$wat" == ""; then
 # 	echo "$demA"" No water model is provided. You maybe be prompted to choose later.$demB"
 # 	sleep 1
-# fi
+fi
 
 
 if [[ "${filenm}" == '' ]]; then filenm="md_${coordinates}"; fi
@@ -240,38 +239,37 @@ fi
 echo \
   $'\n###############################################################################'\
   $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analysis   #'\
-  $'\n#       If you find this program useful please cite the relevant paper:       #'\
+  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
+  $'\n#    If you use this program in your work, please cite the relevant paper:    #'\
   $'\n#                    Yekeen, A.A. et al. To be published...                   #'\
   $'\n###############################################################################'
 
-sleep 1
-cat << usageSt
-
-#-----------------------------------------------------------------------------#
-######## ======================== BASIC USAGE ======================== ########
-#-----------------------------------------------------------------------------#
-
-chmod +x ./run_CHAPERONg-<version>
-./run_CHAPERONg-<version> -i inputStructure_filename [-More options]
-
-#-----------------------------------------------------------------------------#
-######## ========================= IMPORTANT ========================= ########
-#-----------------------------------------------------------------------------#
- MAKE SURE the following are in the current working directory:
-  (1) Input structure (.pdb or .gro)
-  (2) mdp files (named as minim.mdp/em.mdp, nvt.mdp, npt.md, ions.mdp, md.mdp)
-    *PLEASE READ THE HIGHLIGHTED NOTES PRINTED ON THE TERMINAL DURING RUNS!!
-       *THIS WAY, YOU WON'T MISS ANY INFO YOU MAY FIND IMPORTANT... ENJOY!
-#-----------------------------------------------------------------------------#
-
-usageSt
-
 sleep 2
+# cat << usageSt
+
+# #-----------------------------------------------------------------------------#
+# ######## ======================== BASIC USAGE ======================== ########
+# #-----------------------------------------------------------------------------#
+
+# chmod +x ./run_CHAPERONg-<version>
+# ./run_CHAPERONg-<version> -i inputStructure_filename [-More options]
+
+# #-----------------------------------------------------------------------------#
+# ######## ========================= IMPORTANT ========================= ########
+# #-----------------------------------------------------------------------------#
+#  MAKE SURE the following are in the current working directory:
+#   (1) Input structure (.pdb or .gro)
+#   (2) mdp files (named as minim.mdp/em.mdp, nvt.mdp, npt.md, ions.mdp, md.mdp)
+#     *PLEASE READ THE HIGHLIGHTED NOTES PRINTED ON THE TERMINAL DURING RUNS!!
+#        *THIS WAY, YOU WON'T MISS ANY INFO YOU MAY FIND IMPORTANT... ENJOY!
+# #-----------------------------------------------------------------------------#
+
+# usageSt
+
+# sleep 2
 
 if [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'noPBC' ]] ; then touch pbcmol
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'nojump' ]] ; then touch pbcjump
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'fit' ]] ; then touch pbcfit
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'center' ]] ; then touch pbccenter
 fi
-

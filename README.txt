@@ -1,20 +1,26 @@
-#############################################################################
-#-------------------------------- CHAPERONg --------------------------------#
-#  An automated pipeline for GROMACS MD simulation and end-point analysis   #
-#      If you find this program useful please cite the relevant paper:      #
-#                   Yekeen, A.A. et al. To be published...                  #
-#############################################################################
+###############################################################################
+#--------------------------------- CHAPERONg ---------------------------------#
+#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #
+#    If you use this program in your work, please cite the relevant paper:    #
+#                   Yekeen, A.A. et al. To be published...                    #
+###############################################################################
 
-#---------------------------------------------------------------------------#
-#### ================== SETTING UP & RUNNING CHAPERONg ================= ####
-#---------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+#### ========================= INSTALLATION GUIDE ======================== ####
+#-----------------------------------------------------------------------------#
 
-1) After extracting the compressed file CHAPERONg-<version>, you will find a
-   folder CHAPERONg-<version> and this README.txt file.
+1) Downloaded the CHAPERONg package (if you haven't done so)
+   wget ""
 
-2) Go into the CHAPERONg-<version> folder and you will find the binary
-   "setup_CHAPERONg-<version>", a folder "CHAP_modules" and another
-   copy of this README.txt file.
+2) Extract the downloaded CHAPERONg package
+   tar xfz CHAPERONg-v0.1.tar.gz
+   OR
+   gunzip CHAPERONg-v0.1.zip
+
+3) Change into the CHAPERONg-v1.0 and run the installation script
+   cd CHAPERONg-v1.0
+   chmod +x install_CHAPERONg.sh
+   ./install_CHAPERONg.sh
 
 3) Copy "setup_CHAPERONg-<version>" and the folder "CHAP_modules" into
    your md simulation working directory (i.e the directory where you have

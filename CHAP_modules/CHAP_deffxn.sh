@@ -121,6 +121,10 @@ s0GenTop()
 		echo "$demA"" gmx will use the specified $ffUse force-field""$demB"
 		sleep 2
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr -ff $ffUse ${wmodel}
+	elif [[ "$ffUse" != "" ]] && [[ "$ffUse" == "wd" || "$ffUse" != '"wd"' ]] && [[ "$wat" == "" ]]; then
+		echo "$demA"" gmx will use the specified $ffUse force-field""$demB"
+		sleep 2
+		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr
 	elif [[ "$ffUse" == "" ]]; then
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	fi
@@ -247,10 +251,12 @@ s0CharmmSta()
 	}
 
 	echo "$demA"" Will now convert CHARMM topology to GROMACS format...""$demB"
+	sleep 2
 
 	cgenff_charmm2gmxTry1 || cgenff_charmm2gmxTry2 || cgenff_charmm2gmxTry3
 
 	echo "$demA"" Convert CHARMM topology to GROMACS format... DONE""$demB"
+	sleep 2
 
 }
 
@@ -278,6 +284,7 @@ done
 ligPDB=$(basename "$LigINIpdb" _ini.pdb)
 
 echo "$demA"" Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
+sleep 2
 
 eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
 
@@ -314,6 +321,7 @@ s0CharmmStc()
 		fi
 	done < "$ligPDB"".gro"
 	echo " Your ""$ligPDB"".gro"" file contains $atomCountLig atoms""$demB"
+	sleep 2
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
@@ -343,6 +351,7 @@ s0CharmmStc()
 
 	rm tempLigGro
 	echo "$demA"" Prepare protein-ligand complex...DONE""$demB"
+	sleep 2
 
 	coordinates="$coordinates""-$ligname"
 }
@@ -372,15 +381,15 @@ s0CharmmStd()
 
 	for ligtop in *.itp; do
 		if [[ "$ligtop" == '' ]]; then
-			echo "$demA""The current directory contains no ligand topology (.itp) file. \
-			Perhaps cgenff_charmm2gmx.py has not been run on your stream file (.str) yet."
+			echo "$demA""The current directory contains no ligand topology (.itp) file. "\
+			"Perhaps cgenff_charmm2gmx.py has not been run on your stream file (.str) yet."
 			exit 1
 		else
-			if [[ "$ligtop" == 'posre.itp' ]] ; then continue ; fi
+			if [[ $ligtop == 'posre.itp' || $ligtop == "posre_"*".itp" ]] ; then continue ; fi
 			Ligtopcount=$(( Ligtopcount + 1))
 			if [[ $Ligtopcount == 2 ]] ; then 
-				echo "$demA""Multiple ligand topology (.prm) files found in the working \
-				directory! Please keep only the required one and try again!!"
+				echo "$demA""Multiple ligand topology (.itp) files found in the working "\
+				"directory! Please keep only the required one and try again!!"
 				exit 1 ; fi
 			LigitpTop="$ligtop"
 			echo " Ligand topology file found in the current directory: $LigitpTop"
@@ -429,7 +438,7 @@ s0CharmmStd()
 	echo " Modify topol.top file to include the ligand parameters...DONE"
 
 	echo $'\n\n'" Prepare the topology for the complex...DONE""$demB"
-	sleep 1
+	sleep 2
 	echo "$demA"$'To prepare the topology for the complex, topol.top has been modified as follows:\n\n'\
 	$'    **THE LINES\n\n'\
 	$'; Include ligand parameters\n#include "'"$LigprmTop"$'"'\
@@ -538,6 +547,7 @@ s0PrdrgSta()
 	done < "$ligname"".gro"
 
 	echo " Your ""$ligname"".gro"" file contains $atomCountLig atoms""$demB"
+	sleep 2
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
@@ -567,6 +577,7 @@ s0PrdrgSta()
 
 	rm tempLigGro
 	echo " Prepare protein-ligand complex...DONE""$demB"
+	sleep 2
 
 	coordinates="$coordinates""-$ligname"
 }
@@ -743,6 +754,7 @@ s0AcpypeSta()
 	done < "$ligname"".gro"
 
 	echo " Your ""$ligname"".gro"" file contains $atomCountLig atoms""$demB"
+	sleep 2
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
@@ -772,6 +784,7 @@ s0AcpypeSta()
 
 	rm tempLigGro
 	echo " Prepare protein-ligand complex...DONE""$demB"
+	sleep 2
 
 	coordinates="$coordinates""-$ligname"
 }
@@ -1015,6 +1028,7 @@ s0ligpargenSta()
 	done < "$ligname"".gro"
 
 	echo " Your ""$ligname"".gro"" file contains $atomCountLig atoms""$demB"
+	sleep 2
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
@@ -1044,6 +1058,7 @@ s0ligpargenSta()
 
 	rm tempLigGro
 	echo " Prepare protein-ligand complex...DONE""$demB"
+	sleep 2
 
 	coordinates="$coordinates""-$ligname"
 }
@@ -1346,7 +1361,8 @@ ListStageGenLigTop
 
 s1DefBox()
 {
-	echo "$demA"" Define box...""$demB"
+	echo "$demA"" Defining simulation box...""$demB"
+	sleep 2
 	if [[ "$mdType" == 1 ]] && [[ $sysType == 1 || $sysType == 3 ]] ; then
 		eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	elif [[ "$mdType" == 1 && "$sysType" == 2 ]]; then
@@ -1358,9 +1374,10 @@ s1DefBox()
 	fi
 
 	if [[ "$mdType" == 2 ]] ; then
-		echo "$demA"$'\n'"A placeholder unit cell of the type ${btype} has been generated."\
-		$'\nInspect the unit cell and/or provide dimensions for a new box and the'\
-		$'\nplacement of the center of mass of your protein.\n'
+		sleep 2
+		echo "$demA"$'\n'" A placeholder unit cell of the type "$'"'"${btype}"$'"'" has been generated. Inspect the"\
+		$'\n unit cell (you may check '"${coordinates}_newbox.gro"') and/or provide'\
+		$'\n dimensions for a new box and the placement of the COM of your protein.\n'
 
 		echo "Provide dimensions or proceed to solvation?"
 		echo $'\n    1.  Provide dimensions\n    2.  Proceed\n'
@@ -1385,7 +1402,7 @@ s1DefBox()
 		done
 	fi
 	echo "$demA"" Define box... DONE""$demB"
-sleep 2
+	sleep 2
 }
 
 s2Solvat()
@@ -1402,7 +1419,7 @@ s3AddIons1()
 echo "$demA"" Adding ions...""$demB"
 sleep 2
 #1. Assemble .tpr file with grompp, using ions.mdp
-eval $gmx_exe_path grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $mw
+eval $gmx_exe_path grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $WarnMax
 }
 
 s4AddIons2()
@@ -1438,7 +1455,7 @@ elif [[ "$Minmdp" == 0 ]] && [[ "$Enmdp" == 1 ]]; then
 	
 fi
 sleep 1	
-eval $gmx_exe_path grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $mw
+eval $gmx_exe_path grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $WarnMax
 
 }
 
@@ -1469,6 +1486,7 @@ s6EnMin2()
 	done < tempNDXfile
 	rm tempNDXfile temp.ndx
 	echo "$demA"" Checking completed...""$demB"
+	sleep 2
 	echo "$demA""CHAPERONg will now make a Protein-DNA index group...""$demB"
 	sleep 2
 
@@ -1478,6 +1496,7 @@ q
 ProvProDNAMakNdx
 
 	echo "$demA"" Make a Protein-DNA index group...DONE""$demB"
+	sleep 2
 
 if [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
 	echo "$demA""CHAPERONg will now check your mdp files and make corrections on the tc-grps if needed...""$demB" 
@@ -1496,11 +1515,12 @@ if [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
 			done
 			echo $'\nCHAPERONg will back that up as'\
 			"$currentmdpbak and the $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
+			sleep 1
 			mv "$prevmdpbak" "$currentmdpbak"
 			cp "$mdparafile" "$mdparafile"".backup.1"
 		elif [[ ! -f "$prevmdpbak" ]]; then
 			echo "$demA"" Backing up $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
-			sleep 2
+			sleep 1
 			cp "$mdparafile" "$mdparafile"".backup.1"
 		fi
 		
@@ -1544,8 +1564,8 @@ fi
 
 elif [[ "$sysType" == 2 ]] ; then
 
-	echo "$demA"$'Confirm if you want to make custom index group(s) before proceeding.'\
-	$'\n\nYou should respond with a "yes" or a "no" below.'\
+	echo "$demA"$' Confirm if you want to make custom index group(s) before proceeding.'\
+	$'\n\n You should respond with a "yes" or a "no" below.'\
 	$'\n\n *If you are unsure, enter "no" and CHAPERONg will make appropriate index for'\
 	$'\n you while automatically updating topol.top accordingly.'"$demB"
 	sleep 3
@@ -1686,7 +1706,7 @@ q
 TempCoupIN3
 
 		if [[ "$sysType" == 2 && "$flw" == 1 ]] ; then
-			echo $'\n'"$demA"$'Running a check to detect the type(s) of'\
+			echo $'\n'"$demA"$' Running a check to detect the type(s) of'\
 			$'ions that GMX added to your system...\n\n'
 			sleep 2
 			tail -n 15 topol.top > tempMolcfile
@@ -1707,15 +1727,15 @@ TempCoupIN3
 			done < tempMolcfile
 			rm tempMolcfile
 			if [[ "$ionAdded1" != '' && "$ionAdded2" != '' ]] ; then
-				echo $' Checking completed...\n The ions'\
+				echo $'  Checking completed...\n  The ions'\
 				$''"$ionAdded1 and $ionAdded2 were detected in your topol.top file..."$'\n\n'
 				sleep 2
 			elif [[ "$ionAdded1" != '' || "$ionAdded2" != '' ]] ; then
-				echo $' Checking completed...\n The ion'\
+				echo $'  Checking completed...\n  The ion'\
 				$''"$ionAdded1""$ionAdded2 was detected in your topol.top file"$'\n'
 				sleep 2
 			fi	
-			echo $'\nChecking your mdp files to make corrections to the tc-grps if needed...\n'
+			echo $'\n Checking your mdp files to make corrections to the tc-grps if needed...\n'
 			sleep 2
 			if [[ "$mdType" == 1 ]] ; then
 				for mdparafile in nvt.mdp npt.mdp md.mdp; do
@@ -1730,7 +1750,7 @@ TempCoupIN3
 							nbkUP=$(( nbkUP + 1 ))
 							currentmdpbak="$mdpbak""$nbkUP"
 						done
-						echo $'\nCHAPERONg will back that up as '"$currentmdpbak"$' and'\
+						echo $'\n CHAPERONg will back that up as '"$currentmdpbak"$' and'\
 						$'the '"$mdparafile used in the last run as $mdparafile"".backup.1"$'\n'
 						mv "$prevmdpbak" "$currentmdpbak"
 						cp "$mdparafile" "$mdparafile"".backup.1"
@@ -1775,7 +1795,7 @@ TempCoupIN3
 							nbkUP=$(( nbkUP + 1 ))
 							currentmdpbak="$mdpbak""$nbkUP"
 						done
-						echo $'\nCHAPERONg will back that up as '"$currentmdpbak"$' and'\
+						echo $'\n CHAPERONg will back that up as '"$currentmdpbak"$' and'\
 						$'the '"$mdparafile used in the last run as $mdparafile"".backup.1"$'\n'
 						mv "$prevmdpbak" "$currentmdpbak"
 						cp "$mdparafile" "$mdparafile"".backup.1"
@@ -1821,7 +1841,7 @@ TempCoupIN3
 							nbkUP=$(( nbkUP + 1 ))
 							currentmdpbak="$mdpbak""$nbkUP"
 						done
-						echo $'\nCHAPERONg will back that up as '"$currentmdpbak"$' and'\
+						echo $'\n CHAPERONg will back that up as '"$currentmdpbak"$' and'\
 						$'the '"$mdparafile used in the last run as $mdparafile"".backup.1"$'\n'
 						mv "$prevmdpbak" "$currentmdpbak"
 						cp "$mdparafile" "$mdparafile"".backup.1"
@@ -1849,7 +1869,7 @@ TempCoupIN3
 					rm "$mdparafile" && mv "$filname1" "$mdparafile"
 				done
 				rm temp_mdpfile
-				echo "$demB""$demA""The files nvt.mdp, npt.mdp, md_pull.mdp, npt_umbrella.mdp, and md_umbrella.mdp"\
+				echo "$demA""The files nvt.mdp, npt.mdp, md_pull.mdp, npt_umbrella.mdp, and md_umbrella.mdp"\
 				$'\nhave been checked and/or modified accorgingly.'
 				sleep 2
 			fi
@@ -1891,15 +1911,18 @@ s7NVTeq1()
 		done
 	elif [[ $mdType == 1 ]] ; then runNVTeq="yes"
 	fi
-	echo "$demA"" Now running NVT Equilibration...""$demB"
-	sleep 2
 
 	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
-		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -maxwarn $mw
+		echo "$demA"" Now running NVT Equilibration...""$demB"
+		sleep 2
+		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -maxwarn $WarnMax
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
-		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr -maxwarn $mw
+		echo "$demA"" Now running NVT Equilibration...""$demB"
+		sleep 2
+		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr -maxwarn $WarnMax
 	elif [[ $runNVTeq == "no" || $runNVTeq != '"no"' ]] ; then
 		echo "$demA"$' Skipping NVT equilibration, proceeding to NPT equilibration'"$demB"
+		sleep 2
 	fi
 }
 
@@ -1915,15 +1938,16 @@ s8NVTeq2()
 s9NPTeq1()
 {
 	echo "$demA"" Now running NPT Equilibration...""$demB"
+	sleep 2
 	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
-		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $WarnMax
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
-		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
 	#if NVT equilibration was skipped
 	elif [[ $sysType == 1 && $runNVTeq == "no" ]] ; then
-		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $WarnMax
 	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "no" ]] ; then
-		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
 	fi
 }
 
@@ -1946,6 +1970,7 @@ s10NPTeq2()
 			sleep 2
 			eval $gmx_exe_path make_ndx -f npt.gro
 			echo "$demA"" Make an index for the pulling groups...DONE""$demB"
+			sleep 2
 		fi
 	fi
 }
@@ -1955,9 +1980,9 @@ s11RelPosRe()
 	echo "$demA"" Releasing position restraints...""$demB"
 	sleep 2
 	if [[ $sysType == 1 ]]; then
-		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o ${filenm}.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o ${filenm}.tpr -maxwarn $WarnMax
 	elif [[ $sysType == 2 || $sysType == 3 ]] ; then
-		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $mw
+		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $WarnMax
 	fi
 	echo "$demA"" Release position restraints... DONE""$demB"
 	sleep 2
@@ -1967,7 +1992,7 @@ umbre_s11_SMD1()
 {
 	echo "$demA"" Now executing grompp for steered MD simulation...""$demB"
 	sleep 2
-	eval $gmx_exe_path grompp -f md_pull.mdp -c npt.gro -p topol.top -r npt.gro -n index.ndx -t npt.cpt -o pull.tpr -maxwarn $mw
+	eval $gmx_exe_path grompp -f md_pull.mdp -c npt.gro -p topol.top -r npt.gro -n index.ndx -t npt.cpt -o pull.tpr -maxwarn $WarnMax
 }
 
 umbre_s12_SMD2()
@@ -1976,7 +2001,7 @@ umbre_s12_SMD2()
 	sleep 2
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm pull -pf pullf.xvg -px pullx.xvg
 
-	echo "$demA"$'Generating finished figures of key results of the pulling simulation...'"$demB"
+	echo "$demA"$' Generating finished figures of key results of the pulling simulation...'"$demB"
 	sleep 2
 	cat pullx.xvg | grep -v "^[@#]" | awk '{ print $2 }' > displacementAxis
 	cat pullf.xvg | grep -v "^[@#]" | awk '{ print $2 }' > pullforceAxis
@@ -2004,6 +2029,7 @@ umbre_s12_SMD2()
 		echo "$base_currentAnadir" "exists, backing it up as $base_bkupAnadir"
 		while [[ -d "$bkupAnadir" ]]; do
 			nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
+			base_bkupAnadir=$(basename "$bkupAnadir")
 		done
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo "Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
@@ -2023,6 +2049,7 @@ umbre_s12_SMD2()
 s12MDrun()
 {
 	echo "$demA"" Now running production MD...""$demB"
+	sleep 2
 	if [[ $nohp == '' ]]; then
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	elif [[ $nohp == 1 ]]; then
@@ -2033,7 +2060,9 @@ s12MDrun()
 		nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
 		echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
+		sleep 3
 		Credit
+		sleep 2
 		echo $'\n'
 		read -p ' Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
@@ -2049,7 +2078,9 @@ s12MDrun()
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
 		echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
+		sleep 3
 		Credit
+		sleep 2
 		echo $'\n'
 		read -p '*Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
@@ -2062,7 +2093,9 @@ s12MDrun()
 
 	fi
 	echo $'\n'"$demA""CHAPERONg: Simulation Completed...""$demB"
+	sleep 3
 	Credit
+	sleep 2
 	echo $'\n'
 	read -p 'Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
@@ -2077,6 +2110,7 @@ s12MDrun()
 s13MDappend()
 {
 	echo "$demA"" CHAPERONg will now run an extended production MD...""$demB"
+	sleep 2
 
 if [[ $nohp == 1 ]]; then
 	
@@ -2087,7 +2121,9 @@ if [[ $nohp == 1 ]]; then
 	nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
 	
 	echo $'\n'"$demA"" Simulation extended/appended successfully...""$demB"
+	sleep 2
 	Credit
+	sleep 2
 	echo $'\n'
 	read -p '**Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
@@ -2116,7 +2152,9 @@ elif [[ $nohp == '' ]]; then
 
 fi
 echo $'\n'"$demA""Simulation extended/appended successfully""$demB"
+sleep 2
 Credit
+sleep 2
 echo $'\n'
 read -p '*Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
@@ -2148,12 +2186,17 @@ umbre_s14_calcCOMdist()
 	StructNo=0
 	mkdir coordinates_SMD
 	mkdir distances_SMD
+	com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
 
 	for Structure in ./"coordinate"*".gro" ; do
 		#calculate distance between the groups
-		eval $gmx_exe_path distance -s pull.tpr -f coordinate"$StructNo".gro -n index.ndx -select \
-		"com of group $group1_name plus com of group $group2_name" -oall dist${StructNo}.xvg
-		if [[ $StructNo == 50 ]] ; then sleep 2 ; fi
+		eval $gmx_exe_path distance -s pull.tpr -f coordinate"$StructNo".gro -n index.ndx \
+		-select "$com_groups" -oall dist${StructNo}.xvg
+		sleep 1
+		if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
+			$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
+		then sleep 2
+		fi
 		#extract the distances into a summary file
 		distanc=$(tail -n 1 dist${StructNo}.xvg | awk '{print $2}')
 		if [[ $StructNo == 0 ]] ; then
@@ -2172,6 +2215,7 @@ umbre_s14_calcCOMdist()
 umbre_s15_findIniConf()
 {
 	echo "$demA"" Now identifying initial configurations for umbrella sampling...""$demB"
+	sleep 2
 	#create a new configuratns_list.txt file and backup existing one
 	if [[ ! -f "configuratns_list.txt" ]]; then
 		touch configuratns_list.txt
@@ -2191,6 +2235,7 @@ umbre_s15_findIniConf()
 			done
 			echo $'\nCHAPERONg will back that up as '"$currentconfigListbak"$' and'\
 			$'the '"$configList used in the last run as $configList"".backup.1""$demB"
+			sleep 2
 			mv "$prevconfigListbak" "$currentconfigListbak"
 			cp "$configList" "$configList"".backup.1"
 		elif [[ ! -f "$prevconfigListbak" ]]; then
@@ -2204,7 +2249,8 @@ umbre_s15_findIniConf()
 	#run CHAP_extract_spaced_frame_dist.py script
 	echo " Running the CHAP_extract_spaced_frame_dist.py script..."
 	sleep 2
-	python3 CHAP_extract_spaced_frame_dist.py || python CHAP_extract_spaced_frame_dist.py
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_extract_spaced_frame_dist.py || \
+	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_extract_spaced_frame_dist.py
 
 	echo " Run CHAP_extract_spaced_frame_dist.py...DONE""$demB"
 	sleep 2
@@ -2213,26 +2259,31 @@ umbre_s15_findIniConf()
 umbre_s16_USampling()
 {
 	echo "$demA"" Initiating umbrella sampling...""$demB"
+	sleep 2
 	window=0
 	while IFS= read -r line; do
 		if [[ $line == *"#"* ]] ; then continue
 		elif [[ $line != *"#"* ]] ; then
 			us_frame=$(echo "$line" | awk '{print $1}')
 			echo "$demA""Now running NPT equilibration for configuration $us_frame"
+			sleep 1
 			eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
-			./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $mw
+			./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
 
 			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
 			echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
+			sleep 1
 		
 			echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
+			sleep 1
 			eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 			topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
 			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
 			echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
+			sleep 1
 		fi
 		if [[ $window == 0 ]] ; then
 			echo "umbrella_win"$window"_conf"$us_frame".tpr" > tpr_files.dat
@@ -2253,6 +2304,7 @@ umbre_s16_USampling()
 	$'These files list, respectively, the names of the .tpr, pullf.xvg and\n'\
 	$'pullx.xvg files for the windows.\n'\
 	$'*The files tpr_files.dat and pullf_files.dat will be used for data analysis...'"$demB"
+	sleep 2
 	#mv npt_win*_pull*.xvg umbrella_sampling/equilibration/
 	#mv umbrella_win*_pullx.xvg ./umbrella_sampling/data_collection
 
@@ -2263,11 +2315,23 @@ umbre_s17_WHAM()
 	echo "$demA"" Now extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o -hist -unit kCal
+	sleep 2
 
-	echo "$demA"$'Generating finished figures of key results of WHAM analysis...'"$demB"
+	minPMFdG=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | head -1 | awk '{print $2}')
+	maxPMFdG=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | tail -1 | awk '{print $2}')
+	displacentATdGmin=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | head -1 | awk '{print $1}')
+
+	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o profile_YminAdjusted.xvg \
+	-hist -unit kCal -zprof0 $displacentATdGmin || true
+
+	echo "$demA"$' Generating finished figures of key results of WHAM analysis...'"$demB"
 	sleep 2
 	gracebat -nxy histo.xvg -hdevice PNG -autoscale xy -printfile histograms.png -fixed 7500 4000 || true
-	gracebat profile.xvg -hdevice PNG -autoscale xy -printfile profile_PMF.png -fixed 7500 4000 -legend load || true
+	gracebat profile.xvg -hdevice PNG -autoscale xy -printfile profile.png -fixed 7500 4000 -legend load || true
+	gracebat profile_YminAdjusted.xvg -hdevice PNG -autoscale xy -printfile profile_YminAdjusted.png \
+	-fixed 7500 4000 -legend load || true
+	dG_PMF=$(awk "BEGIN {print $minPMFdG - $maxPMFdG}")
+	echo $'Binding Free Energy (dG) = '"$dG_PMF"$' kCal/mol' > summary_dG.dat
 
 	AnaName="Data_Analysis_PMF"
 	currentAnadir="$(pwd)""/$AnaName"
@@ -2277,22 +2341,24 @@ umbre_s17_WHAM()
 		base_currentAnadir=$(basename "$currentAnadir")
 		base_bkupAnadir=$(basename "$bkupAnadir")
 		echo "$base_currentAnadir" "exists, backing it up as $base_bkupAnadir"
+		sleep 2
 		while [[ -d "$bkupAnadir" ]]; do
 			nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
+			base_bkupAnadir=$(basename "$bkupAnadir")
 		done
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo "Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
-		mv histo.xvg histograms.png ./$AnaName || true
-		mv profile.xvg profile_PMF.png ./$AnaName || true
+		sleep 2
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
-		mv histo.xvg histograms.png ./$AnaName || true
-		mv profile.xvg profile_PMF.png ./$AnaName || true
 	fi
+	mv histo.xvg histograms.png profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
+	mv profile.xvg profile.png profile_YminAdjusted.png ./$AnaName || true
 
-	echo "$demA"$'Generate finished figures of results of WHAM analysis...DONE'
+	echo "$demA"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
 	echo "$demA"" Extract the PMF and plot the umbrella histograms...DONE""$demB"
 	sleep 2
+	
 }
 
 umbre_s18_MoreWin()
@@ -2309,20 +2375,24 @@ umbre_s18_MoreWin()
 	done
 		
 	echo "$demA""Now running NPT equilibration for configuration $us_frame"
+	sleep 1
 	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
-	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $mw
+	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
 	echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
+	sleep 1
 
 	echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
+	sleep 1
 	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
 	echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
+	sleep 1
 	echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
 	echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
 	echo "umbrella_win"$window"_conf"$us_frame"_pullx.xvg" >> pullx_files.dat
@@ -2330,6 +2400,7 @@ umbre_s18_MoreWin()
 	$' The names of the .tpr, pullf.xvg and pullx.xvg files have been appended to the\n'\
 	$' tpr_files.dat, pullf_files.dat and pullx_files.dat, respectively.\n'\
 	$'*The files tpr_files.dat and pullf_files.dat will be used in the data analysis step...'"$demB"
+	sleep 2
 
 	read -p ' Do you want to proceed to PMF calculation? (yes/no): ' procd2pmf
 

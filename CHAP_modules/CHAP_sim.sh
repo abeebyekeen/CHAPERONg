@@ -10,7 +10,6 @@
 set -e
 set -o pipefail
 
-
 #set version
 CHAPERONg_version="beta3"
 
@@ -24,16 +23,16 @@ if [[ $initiator1 != 'avail' ]] ; then
 	echo "$demA"$' Do not run modules independently!\n'\
 	$' Launch CHAPERONg with run_CHAPERONg-<version>!!'"$demB"	
 	exit 1
-fi	
+fi
 
 #call module to collect parameters
-. CHAP_modules/CHAP_colPar-${CHAPERONg_version}.sh
+. "$CHAPERONg_PATH/CHAP_modules/CHAP_colPar.sh"
 
 #call module with defined fxns
-. CHAP_modules/CHAP_deffxn-${CHAPERONg_version}.sh
+. "$CHAPERONg_PATH/CHAP_modules/CHAP_deffxn.sh"
 
 #call module for traj_ana
-. CHAP_modules/CHAP_ana-${CHAPERONg_version}.sh
+. "$CHAPERONg_PATH/CHAP_modules/CHAP_ana.sh"
 
 
 md_proOnly()
@@ -361,7 +360,7 @@ system_typeReg()
 #check if protein-only or complex mds
 cat << SystemType
 
-#**********************************CHAPERONg**********************************#
+##*********************************CHAPERONg**********************************##
 
  What type of system are we simulating?
   (1)  Protein-only (including protein-protein complex)
@@ -402,7 +401,7 @@ system_typeUS()
 #check if protein-only or complex mds
 cat << SystemType
 
-#******************************** CHAPERONg *********************************#
+##*********************************CHAPERONg**********************************##
 
  What type of system are we simulating?
   (1)  Protein-protein complex
@@ -433,7 +432,8 @@ fi
 
 #check for sampling biasedness
 cat << Biasedness
-#******************************** CHAPERONg *********************************#
+
+##*********************************CHAPERONg**********************************##
 
  What type of simulation do you want to run?
   (1)  Conventional MD simulation -- Unbiased/Regular
