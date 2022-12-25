@@ -15,7 +15,7 @@ cat << seekConsent
 
  This action will allow CHAPERONg to safely modify your environment for installation.
  This is a one-time process. For details, visit:
- https://abeebyekeen.com/resources/chaperong/installation
+ https://abeebyekeen.com/resources/comp-tools/chaperong/chaperong-docs/#3-installation
 
 seekConsent
 

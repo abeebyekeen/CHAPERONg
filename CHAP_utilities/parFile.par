@@ -2,7 +2,7 @@
 ; lines beginning with ";" are comments
 ; lines beginning with "#" are disabled parameters
 ; delete the "#" to activate and set a parameter
-
+####################################################
 
 ; Input coordinate file (.pdb or .gro)
 # input            =      x
@@ -56,9 +56,9 @@
 # inputtraj        =      x
 
 ; Parameter for umbrella sampling window spacing
-# smd_pull_spacing =      x
+# smd_pull_spacing =      0.2
 
 ; Absolute path to the gmx executable to use for all gmx runs except those involving mmpbsa
 # gmx_exe          =      x
 
-  
+

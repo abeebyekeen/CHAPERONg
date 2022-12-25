@@ -119,7 +119,7 @@ demB=$'\n'"#====================================================================
 #demB=$'\n'"#*****************************************************************************#"$'\n\n'
 
 
-#function to check if the parFile flag is used and then read the provided CHAPERONg parFile
+# check if the parFile flag is used and then read the provided parameter file
 read_parFile()
 {
 	if [[ "$parfilename" != '' ]] ; then 
@@ -272,4 +272,5 @@ if [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'noPBC' ]] ; then touch pb
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'nojump' ]] ; then touch pbcjump
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'fit' ]] ; then touch pbcfit
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'center' ]] ; then touch pbccenter
+elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'combo' ]] ; then touch pbccombo
 fi

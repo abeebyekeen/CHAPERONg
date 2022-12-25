@@ -48,10 +48,16 @@ fi
 Analysis()
 {
 #check the type of corrected trajectory file to use for analysis
-if [[ -f "pbcmol" ]] && [[ ! -f "pbcjump" && ! -f "pbcfit" &&  ! -f "pbccenter" ]] ; then wraplabel="noPBC" ; rm pbcmol
-elif [[ -f "pbcjump" ]] && [[ ! -f "pbcmol" && ! -f "pbcfit" &&  ! -f "pbccenter" ]] ; then wraplabel="nojump" ; rm pbcjump
-elif [[ -f "pbcfit" ]] && [[ ! -f "pbcmol" && ! -f "pbcjump" &&  ! -f "pbccenter" ]] ; then wraplabel="fit" ; rm pbcfit
-elif [[ -f "pbccenter" ]] && [[ ! -f "pbcmol" && ! -f "pbcjump" &&  ! -f "pbcfit" ]] ; then wraplabel="center" ; rm pbccenter
+if [[ -f "pbcmol" ]] && [[ ! -f "pbcjump" && ! -f "pbcfit" &&  ! -f "pbccenter" &&  ! -f "pbccombo" ]]
+	then wraplabel="noPBC" ; rm pbcmol
+elif [[ -f "pbcjump" ]] && [[ ! -f "pbcmol" && ! -f "pbcfit" &&  ! -f "pbccenter" &&  ! -f "pbccombo" ]]
+	then wraplabel="nojump" ; rm pbcjump
+elif [[ -f "pbcfit" ]] && [[ ! -f "pbcmol" && ! -f "pbcjump" &&  ! -f "pbccenter" &&  ! -f "pbccombo" ]]
+	then wraplabel="fit" ; rm pbcfit
+elif [[ -f "pbccenter" ]] && [[ ! -f "pbcmol" && ! -f "pbcjump" &&  ! -f "pbcfit" &&  ! -f "pbccombo" ]]
+	then wraplabel="center" ; rm pbccenter
+elif [[ -f "pbccombo" ]] && [[ ! -f "pbcmol" && ! -f "pbcjump" &&  ! -f "pbcfit" &&  ! -f "pbccenter" ]]
+	then wraplabel="combo" ; rm pbccombo
 fi
 
 cat << AnalysisList
@@ -153,7 +159,7 @@ createDIR()
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
 		sleep 1
-			mv ${filenm}*"$filesuffx".png ${filenm}*"$filesuffx".xvg ${filenm}_"$filesuffx".png ./$AnaName || true
+		mv ${filenm}*"$filesuffx".png ${filenm}*"$filesuffx".xvg ${filenm}_"$filesuffx".png ./$AnaName || true
 		mv ${filenm}_"$filesuffx".xvg ${filenm}_*"$filesuffx".png ./$AnaName || true
 		mv ${filenm}_*"$filesuffx".xvg ${filenm}*"$filesuffx"*.xvg ${filenm}*"$filesuffx"*.png ./$AnaName || true
 		mv *"$filesuffx"*.png *"$filesuffx".png *"$filesuffx".xvg *"$filesuffx"*.xvg ./$AnaName || true
@@ -181,40 +187,114 @@ analyser0()
 {	
 echo "$demA"$' Now recentering the protein and rewrapping molecules within the unit cell...\n'
 if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
-	echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
-	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
-	sleep 1
-	echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump
+		echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -pbc mol -center
+		rm "${filenm}"_"nojump".xtc "${filenm}"_"nojump_fitTrans".xtc
+	else
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
+		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		sleep 1
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	fi
 				
 elif [[ $flw != 1 ]] && [[ $sysType == 1 ]]; then
-	echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-	eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
-	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
-	sleep 1
-	echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-	sleep 1
-	eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 1
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 1
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -pbc mol -center
+	else
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
+		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		sleep 1
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 1
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+	fi
 		
 elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
-	echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
-	echo "$demA"$' Now performing rotational and translational fitting...\n'
-	echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o "${filenm}"_fit.xtc -fit rot+trans
-	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
-	sleep 1
-	echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
+	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'fit' ]] ; then
+		echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"fit".xtc -fit rot+trans
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump
+		echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -center -pbc mol -ur compact
+		rm "${filenm}"_"nojump".xtc "${filenm}"_"nojump_fitTrans".xtc
+	else
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
+		echo "$demA"$' Now performing rotational and translational fitting...\n'
+		echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o "${filenm}"_fit.xtc -fit rot+trans
+		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		sleep 1
+		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
+	fi
 
 elif [[ $flw != 1 ]] && [[ $sysType == 2 ]]; then
-	echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-	eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
-	echo "$demA"$' Now performing rotational and translational fitting...\n'
-	echo $'**Choose "Backbone" (4) to perform lsq fitting to protein backbone, and "System" (0) for output when prompted\n'
+	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 1
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 1
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'fit' ]] ; then	
+		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"fit".xtc -fit rot+trans
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
+		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		sleep 2
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -center -pbc mol -ur compact
+	else
+		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
+		echo "$demA"$' Now performing rotational and translational fitting...\n'
+		echo $'**Choose "Backbone" (4) to perform lsq fitting to protein backbone, and "System" (0) for output when prompted\n'
 		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o "${filenm}"_fit.xtc -fit rot+trans
+	fi
 
 elif [[ $flw == 1 ]] && [[ $sysType == 3 ]]; then
-	echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact || DNAwrapAlt
-	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
-	sleep 1
-	echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
+	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
+		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact || DNAwrapAlt
+	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
+		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
+	else
+		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact || DNAwrapAlt
+		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		sleep 1
+		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
+	fi
 elif [[ $flw != 1 ]] && [[ $sysType == 3 ]]; then
 	echo $'**Choose "Protein_DNA" for centering and "System" (0) for output when prompted\n'
 	eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
@@ -229,7 +309,64 @@ if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
 analyser1()
 {
-	echo $'CHAPERONg: Program still under development. Check for an update later!\n   Thanks!!'
+	echo "$demA"$' Now calculating post-simulation thermodynamic parameters...\n'
+	sleep 2
+
+	echo "Temperature" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Temperature.xvg
+	gracebat postMD_Temperature.xvg -hdevice PNG -autoscale xy -printfile postMD_Temperature.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Temperature progression...DONE\n' ; sleep 2
+
+	echo "Pressure" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Pressure.xvg
+	gracebat postMD_Pressure.xvg -hdevice PNG -autoscale xy -printfile postMD_Pressure.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Pressure progression...DONE\n' ; sleep 2
+
+	echo "Density" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Density.xvg
+	gracebat postMD_Density.xvg -hdevice PNG -autoscale xy -printfile postMD_Density.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Density progression...DONE\n' ; sleep 2
+
+	echo "Total-Energy" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_TotalEnergy.xvg
+	gracebat postMD_TotalEnergy.xvg -hdevice PNG -autoscale xy -printfile postMD_TotalEnergy.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Total energy...DONE\n' ; sleep 2
+
+	echo "Potential" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Potential.xvg
+	gracebat postMD_Potential.xvg -hdevice PNG -autoscale xy -printfile postMD_Potential.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Potential energy...DONE\n' ; sleep 2
+
+	echo "Kinetic-En." | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_KineticEn.xvg
+	gracebat postMD_KineticEn.xvg -hdevice PNG -autoscale xy -printfile postMD_KineticEn.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo 'Calculate Kinetic energy...DONE\n' ; sleep 2
+
+	currentMDthermodyndir="$(pwd)""/postMD_thermodynamics"
+	nMDtherm=1
+	bkupMDtherm="$(pwd)""/#postMD_thermodynamics"".""backup.""$nMDtherm"
+	base_bkupMDtherm=$(basename "$bkupMDtherm")
+	if [[ -d "$currentMDthermodyndir" ]]; then
+		echo $'\n'"$currentMDthermodyndir"$' folder exists,\n'"backing it up as $base_bkupMDtherm"
+		sleep 1
+		while [[ -d "$bkupMDtherm" ]]; do
+			nMDtherm=$(( nMDtherm + 1 ))
+			bkupMDtherm="$(pwd)""/#postMD_thermodynamics"".""backup.""$nMDtherm"
+			base_bkupMDtherm=$(basename "$bkupMDtherm")
+		done
+		mv "$currentMDthermodyndir" "$bkupMDtherm" && mkdir ./postMD_thermodynamics || true
+		echo $'\n'"Backing up the last postMD_thermodynamics folder and its contents as $base_bkupMDtherm"
+		sleep 1
+	elif [[ ! -d "$currentMDthermodyndir" ]]; then mkdir postMD_thermodynamics
+	fi
+	mv postMD_Temperature.xvg postMD_KineticEn.xvg postMD_Potential.xvg ./postMD_thermodynamics || true
+	mv postMD_Density.xvg postMD_Pressure.xvg postMD_TotalEnergy.xvg ./postMD_thermodynamics || true
+	mv postMD_Temperature.png postMD_KineticEn.png postMD_Potential.png ./postMD_thermodynamics || true
+	mv postMD_Density.png postMD_Pressure.png postMD_TotalEnergy.png ./postMD_thermodynamics || true
+
+	echo "$demA"$' Calculate post-MD thermodynamics parameters...DONE'"$demB"
+	sleep 2
+
 }
 if [[ "$analysis" == *" 1 "* ]]; then analyser1; fi
 
@@ -247,40 +384,41 @@ altRMSD()
 
 analyser2()
 {
-echo "$demA"$' Now calculating RMSD...\n'
-if [[ $sysType == 1 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
-	echo "Backbone" "Backbone" | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
-		
-	gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
-	-fixed 7500 4000 -legend load || notifyImgFail
-	
-elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
-	echo 4 4 | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
-		
-	gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
-	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$'Protein RMSD calculation... DONE\n  Now calculating ligand RMSD...\n'
+	echo "$demA"$' Now calculating RMSD...\n'
 	sleep 2
+	if [[ $sysType == 1 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
+		echo "Backbone" "Backbone" | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
+			
+		gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
+		-fixed 7500 4000 -legend load || notifyImgFail
 		
-	echo "$ligname" "$ligname" | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o \
-	${filenm}_"$ligname"-rmsd.xvg -tu ns || altRMSD
-				
-	gracebat ${filenm}_"$ligname"-rmsd.xvg -hdevice PNG -autoscale xy -printfile \
-	${filenm}_"$ligname"-rmsd.png -fixed 7500 4000 -legend load || notifyImgFail
-		
-else
-	eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_rmsd.xvg -tu ns
-		
-	gracebat ${filenm}_rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_rmsd.png \
-	-fixed 7500 4000 -legend load || notifyImgFail
-fi
-echo "$demA"$' Compute RMSD... DONE'"$demB"
-sleep 2
-AnaName="RMSD"
-filesuffx="rmsd"
-createDIR
-echo "$demA"$' Generate a finished figure of the RMSD plot... DONE'"$demB"
-sleep 2
+	elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+		echo 4 4 | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
+			
+		gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
+		-fixed 7500 4000 -legend load || notifyImgFail
+		echo "$demA"$'Protein RMSD calculation... DONE\n  Now calculating ligand RMSD...\n'
+		sleep 2
+			
+		echo "$ligname" "$ligname" | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o \
+		${filenm}_"$ligname"-rmsd.xvg -tu ns || altRMSD
+					
+		gracebat ${filenm}_"$ligname"-rmsd.xvg -hdevice PNG -autoscale xy -printfile \
+		${filenm}_"$ligname"-rmsd.png -fixed 7500 4000 -legend load || notifyImgFail
+			
+	else
+		eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_rmsd.xvg -tu ns
+			
+		gracebat ${filenm}_rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_rmsd.png \
+		-fixed 7500 4000 -legend load || notifyImgFail
+	fi
+	echo "$demA"$' Compute RMSD... DONE'"$demB"
+	sleep 2
+	AnaName="RMSD"
+	filesuffx="rmsd"
+	createDIR
+	echo "$demA"$' Generate a finished figure of the RMSD plot... DONE'"$demB"
+	sleep 2
 }
 
 if [[ "$analysis" == *" 2 "* ]]; then analyser2 ; fi
@@ -486,14 +624,17 @@ fi
 currenthbonddir="$(pwd)""/hbond"
 nhbond=1
 bkuphbonddir="$(pwd)""/#hbond"".""backup.""$nhbond"
+base_bkuphbonddir=$(basename "$bkuphbonddir")
 if [[ -d "$currenthbonddir" ]]; then
-	echo $'\n'"$currenthbonddir"$' folder exists,\n'"backing it up as $bkuphbonddir"
+	echo $'\n'"$currenthbonddir"$' folder exists,\n'"backing it up as $base_bkuphbonddir"
 	sleep 1
 	while [[ -d "$bkuphbonddir" ]]; do
-	nhbond=$(( nhbond + 1 )); bkuphbonddir="$(pwd)""/#hbond"".""backup.""$nhbond"
+		nhbond=$(( nhbond + 1 ))
+		bkuphbonddir="$(pwd)""/#hbond"".""backup.""$nhbond"
+		base_bkuphbonddir=$(basename "$bkuphbonddir")
 	done
 	mv "$currenthbonddir" "$bkuphbonddir" && mkdir ./hbond || true
-	echo $'\n'"Backing up the last hbond folder and its contents as $bkuphbonddir"
+	echo $'\n'"Backing up the last hbond folder and its contents as $base_bkuphbonddir"
 	sleep 1
 	mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 elif [[ ! -d "$currenthbonddir" ]]; then
@@ -547,14 +688,17 @@ sleep 2
 currentSASAdir="$(pwd)""/SASA"
 nSASA=1
 bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
+base_bkupSASAdir=$(basename "$bkupSASAdir")
 if [[ -d "$currentSASAdir" ]]; then
-	echo $'\n'"$currentSASAdir"$' folder exists,\n'"backing it up as $bkupSASAdir"
+	echo $'\n'"$currentSASAdir"$' folder exists,\n'"backing it up as $base_bkupSASAdir"
 	sleep 1
 	while [[ -d "$bkupSASAdir" ]]; do
-	nSASA=$(( nSASA + 1 )); bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
+		nSASA=$(( nSASA + 1 ))
+		bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
+		base_bkupSASAdir=$(basename "$bkupSASAdir")
 	done
 	mv "$currentSASAdir" "$bkupSASAdir" && mkdir ./SASA || true
-	echo $'\n'"Backing up the last SASA folder and its contents as $bkupSASAdir"
+	echo $'\n'"Backing up the last SASA folder and its contents as $base_bkupSASAdir"
 	sleep 1
 	mv sasa*${filenm}.png sasa*${filenm}.xvg ./SASA || true
 elif [[ ! -d "$currentSASAdir" ]]; then
@@ -568,67 +712,67 @@ if [[ "$analysis" == *" 6 "* ]]; then analyser6 ; fi
 
 analyser7()
 {
-echo "$demA"$' Now running principal component analysis (PCA)...\n'
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
-	echo 4 4 | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-	-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-	echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-	echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
-	echo 4 4 | eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig \
-	"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
-		
-	gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
-	PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
-	echo $'**Choose "Backbone" (4) twice when prompted\n'
-	eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-	echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-	echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
-	$'**Choose "Backbone" (4) twice when prompted\n'
-	eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig "${filenm}"_eigenval.xvg \
-	-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
-	gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
-	PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 1 ]] ; then
-	echo "Backbone" "Backbone" | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx \
-	-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-	echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-	echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
-	echo "Backbone" "Backbone" | eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig \
-	"${filenm}"_eigenval.xvg -s "${filenm}".tpr -n index.ndx -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
-	gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
-	PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
-	echo $'**Choose "Backbone" (4) twice when prompted\n'
-	eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_eigenval.xvg \
-	-v "${filenm}"_eigenvec.trr
-	echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-	echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
-	$'**Choose "Backbone" (4) twice when prompted\n'
-	eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig "${filenm}"_eigenval.xvg \
-	-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg	
-fi
-echo "$demA"$' Principal component analysis (PCA)...DONE'"$demB"
-sleep 2
-currentPCAdir="$(pwd)""/PCA"
-nPCA=1
-bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
-if [[ -d "$currentPCAdir" ]]; then
-	echo $'\n'"$currentPCAdir"$' folder exists,\n'"backing it up as $bkupPCAdir"
-	sleep 1
-	while [[ -d "$bkupPCAdir" ]]; do
-	nPCA=$(( nPCA + 1 )); bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
-	done
-	mv "$currentPCAdir" "$bkupPCAdir" && mkdir ./PCA
-	echo $'\n'"Backing up the last PCA folder and its contents as $bkupPCAdir"
-	sleep 1
-	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb ./PCA || true
-elif [[ ! -d "$currentPCAdir" ]]; then
-	mkdir ./PCA
+	echo "$demA"$' Now running principal component analysis (PCA)...\n'
+	if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+		echo 4 4 | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
+		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
+		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
+		echo 4 4 | eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig \
+		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
+			
+		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
+		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
+	elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
+		echo $'**Choose "Backbone" (4) twice when prompted\n'
+		eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
+		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
+		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
+		$'**Choose "Backbone" (4) twice when prompted\n'
+		eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig "${filenm}"_eigenval.xvg \
+		-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
+		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
+		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
+	elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 1 ]] ; then
+		echo "Backbone" "Backbone" | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx \
+		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
+		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
+		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
+		echo "Backbone" "Backbone" | eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig \
+		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -n index.ndx -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
+		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
+		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
+	elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
+		echo $'**Choose "Backbone" (4) twice when prompted\n'
+		eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+		-n index.ndx -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
+		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
+		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
+		$'**Choose "Backbone" (4) twice when prompted\n'
+		eval $gmx_exe_path anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_"${wraplabel}".xtc -eig \
+		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg	
+	fi
+	echo "$demA"$' Principal component analysis (PCA)...DONE'"$demB"
+	sleep 2
+	currentPCAdir="$(pwd)""/PCA"
+	nPCA=1
+	bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
+	base_bkupPCAdir=$(basename "$bkupPCAdir")
+	if [[ -d "$currentPCAdir" ]]; then
+		echo $'\n'"$currentPCAdir"$' folder exists,\n'"backing it up as $base_bkupPCAdir"
+		sleep 1
+		while [[ -d "$bkupPCAdir" ]]; do
+			nPCA=$(( nPCA + 1 )); bkupPCAdir="$(pwd)""/#PCA"".""backup.""$nPCA"
+			base_bkupPCAdir=$(basename "$bkupPCAdir")
+		done
+		mv "$currentPCAdir" "$bkupPCAdir" && mkdir ./PCA
+		echo $'\n'"Backing up the last PCA folder and its contents as $base_bkupPCAdir"
+		sleep 1
+	elif [[ ! -d "$currentPCAdir" ]]; then mkdir ./PCA
+	fi
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb dd?????? ./PCA || true
-fi
-echo "$demA"$'Generate finished figures of the PCA plots... DONE'"$demB"
-sleep 2
+	echo "$demA"$'Generate finished figures of the PCA plots... DONE'"$demB"
+	sleep 2
 }
 
 if [[ "$analysis" == *" 7 "* ]]; then analyser7 ; fi
@@ -719,14 +863,17 @@ if [[ "$dsspCheck" == "Avail" ]] ; then
 	currentSecStrdir="$(pwd)""/Secondary_structure"
 	nSecStr=1
 	bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
+	base_bkupSecStrdir=$(basename "$bkupSecStrdir")
 	if [[ -d "$currentSecStrdir" ]]; then
-		echo $'\n'"$currentSecStrdir"$' folder exists,\n'"backing it up as $bkupSecStrdir"
+		echo $'\n'"$currentSecStrdir"$' folder exists,\n'"backing it up as $base_bkupSecStrdir"
 		sleep 1
 		while [[ -d "$bkupSecStrdir" ]]; do
-		nSecStr=$(( nSecStr + 1 )); bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
+			nSecStr=$(( nSecStr + 1 ))
+			bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
+			base_bkupSecStrdir=$(basename "$bkupSecStrdir")
 		done
 		mv "$currentSecStrdir" "$bkupSecStrdir" && mkdir ./Secondary_structure || true
-		echo $'\n'"Backing up the last Secondary_structure folder and its contents as $bkupSecStrdir"
+		echo $'\n'"Backing up the last Secondary_structure folder and its contents as $base_bkupSecStrdir"
 		sleep 1
 		mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
 	elif [[ ! -d "$currentSecStrdir" ]]; then
@@ -831,14 +978,17 @@ fi
 currentMOVIEdir="$(pwd)""/MOVIE"
 nMOVIE=1
 bkupMOVIEdir="$(pwd)""/#MOVIE"".""backup.""$nMOVIE"
+base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
 if [[ -d "$currentMOVIEdir" ]]; then
-	echo $'\n'"$currentMOVIEdir"$' folder exists,\n'"backing it up as $bkupMOVIEdir"
+	echo $'\n'"$currentMOVIEdir"$' folder exists,\n'"backing it up as $base_bkupMOVIEdir"
 	sleep 1
 	while [[ -d "$bkupMOVIEdir" ]]; do
-	nMOVIE=$(( nMOVIE + 1 )); bkupMOVIEdir="$(pwd)""/#MOVIE"".""backup.""$nMOVIE"
+		nMOVIE=$(( nMOVIE + 1 ))
+		bkupMOVIEdir="$(pwd)""/#MOVIE"".""backup.""$nMOVIE"
+		base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
 	done
 	mv "$currentMOVIEdir" "$bkupMOVIEdir" && mkdir ./MOVIE || true
-	echo $'\n'"Backing up the last MOVIE folder and its contents as $bkupMOVIEdir"
+	echo $'\n'"Backing up the last MOVIE folder and its contents as $base_bkupMOVIEdir"
 	sleep 1
 elif [[ ! -d "$currentMOVIEdir" ]]; then mkdir MOVIE
 fi	
@@ -1098,11 +1248,15 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 	fi
 	echo "$demA"$'Now calculating average binding energy & contribution of residues...\n'
-	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py -m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
+	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
+	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
+	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
 
-	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs -nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
+	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs \
+	-nbs 2000 \-m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs \
+	-nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
 
 	if [[ "$mmGMX" == "1" ]] ; then
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
@@ -1138,17 +1292,13 @@ if [[ $mmGMXpath != '' ]] ; then
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
 		sleep 1
-		rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
-		mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
-		mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
-		mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
-
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
-		rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
-		mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
-		mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
-		mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
 	fi
+	rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc \
+	"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
+	mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
+	mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
+	mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
 
 elif [[ $mmGMXpath == '' ]] ; then
 	echo "$demA"$'GMX path for g_mmpbsa not set. Use the parFile option!\n'
@@ -1160,80 +1310,88 @@ if [[ "$analysis" == *" 10 "* ]]; then ScanTRAJ; analyser10 ; fi
 
 useFoundPCA_sham()
 {
-echo "$demA"$' Preparing PCA-derived FEL with gmx sham...\n'
-sleep 1
-			
-eval $gmx_exe_path sham -f ./PCA/PCA_2dproj_$filenm.xvg -ls ./PCA/FEL_PCA_sham_$filenm.xpm -notime || true
-		
-eval $gmx_exe_path xpm2ps -f ./PCA/FEL_PCA_sham_$filenm.xpm -o ./PCA/FEL_PCA_sham_$filenm.eps -rainbow red || true
-	
-ps2pdf -sPAPERSIZE=ledger ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_landscape.pdf || true
-		
-ps2pdf ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_portrait.pdf || true
-
-pdf2ppm -png -r 600 ./PCA/FEL_PCA_sham_${filenm}_portrait.pdf ./PCA/FEL_PCA_sham_${filenm}_portrait.png || true
-
-convert ./PCA/FEL_PCA_sham_$filenm.eps -trim -bordercolor white ./PCA/FEL_PCA_sham_${filenm}_convertps2png.png || true
-
-convert ./PCA/FEL_PCA_sham_$filenm.eps -trim -bordercolor white -units pixelsperinch -density 600 -resize 3000x5000 ./PCA/FEL_PCA_sham_${filenm}_convertps2pngfull.png || true
-			
-currentFELPCAdir="$(pwd)""/PCA_FEL_sham"
-nFELpca=1
-bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
-if [[ -d "$currentFELPCAdir" ]]; then
-	echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $bkupFELpcadir"
+	echo "$demA"$' Preparing PCA-derived FEL with gmx sham...\n'
 	sleep 1
-	while [[ -d "$bkupFELpcadir" ]]; do
-	nFELpca=$(( nFELpca + 1 )); bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
-	done
-	mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
-	echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $bkupFELpcadir"
-	sleep 1
+				
+	eval $gmx_exe_path sham -f ./PCA/PCA_2dproj_$filenm.xvg -ls ./PCA/FEL_PCA_sham_$filenm.xpm -notime || true
+			
+	eval $gmx_exe_path xpm2ps -f ./PCA/FEL_PCA_sham_$filenm.xpm -o ./PCA/FEL_PCA_sham_$filenm.eps -rainbow red || true
+		
+	ps2pdf -sPAPERSIZE=ledger ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_landscape.pdf || true
+			
+	ps2pdf ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_portrait.pdf || true
+
+	pdf2ppm -png -r 600 ./PCA/FEL_PCA_sham_${filenm}_portrait.pdf ./PCA/FEL_PCA_sham_${filenm}_portrait.png || true
+
+	convert ./PCA/FEL_PCA_sham_$filenm.eps -trim -bordercolor white ./PCA/FEL_PCA_sham_${filenm}_convertps2png.png || true
+
+	convert ./PCA/FEL_PCA_sham_$filenm.eps -trim -bordercolor white -units pixelsperinch \
+	-density 600 -resize 3000x5000 ./PCA/FEL_PCA_sham_${filenm}_convertps2pngfull.png || true
+				
+	currentFELPCAdir="$(pwd)""/PCA_FEL_sham"
+	nFELpca=1
+	bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
+	base_bkupFELpcadir=$(basename "$bkupFELpcadir")
+	if [[ -d "$currentFELPCAdir" ]]; then
+		echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $base_bkupFELpcadir"
+		sleep 1
+		while [[ -d "$bkupFELpcadir" ]]; do
+			nFELpca=$(( nFELpca + 1 ))
+			bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
+			base_bkupFELpcadir=$(basename "$bkupFELpcadir")
+		done
+		mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
+		echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $base_bkupFELpcadir"
+		sleep 1
+	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
+	fi
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
-elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
-	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
-fi
-echo "$demA"$' Prepare Gibbs FEL with gmx sham...DONE'"$demB"
-sleep 2
+	echo "$demA"$' Prepare Gibbs FEL with gmx sham...DONE'"$demB"
+	sleep 2
 }
 
 useFoundRgRMSData_sham()
 {
-echo "$demA"$' Preparing Rg Vs RMSD FEL using gmx sham...\n\n'
-sleep 1
-			
-eval $gmx_exe_path sham -f RgVsRMSD.xvg -ls FEL_sham_RgVsRMSD_$filenm.xpm -notime || true
-		
-eval $gmx_exe_path xpm2ps -f FEL_sham_RgVsRMSD_$filenm.xpm -o FEL_sham_RgVsRMSD_$filenm.eps -rainbow red || true
-	
-ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
-		
-ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_portrait.pdf || true
-
-pdf2ppm -png -r 600 FEL_sham_RgVsRMSD_${filenm}_portrait.pdf FEL_sham_RgVsRMSD_${filenm}_portrait.png || true
-
-convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white FEL_sham_RgVsRMSD_${filenm}_convertps2png.png || true
-
-convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white -units pixelsperinch -density 600 -resize 3000x5000 FEL_sham_RgVsRMSD_${filenm}_convertps2pngfull.png || true
-			
-currentFELshamRgVsRMSDdir="$(pwd)""/RgVsRMSD_FEL_sham"
-nFELRgVsRMSD=1
-bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
-if [[ -d "$currentFELshamRgVsRMSDdir" ]]; then
-	echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFELshamRgVsRMSDdir"
+	echo "$demA"$' Preparing Rg Vs RMSD FEL using gmx sham...\n\n'
 	sleep 1
-	while [[ -d "$bkupFELshamRgVsRMSDdir" ]]; do
-	nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 )); bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
-	done
-	mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
-	echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $bkupFELshamRgVsRMSDdir"
-	sleep 1
-	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
-elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
-	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
-fi
-echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
-sleep 2
+				
+	eval $gmx_exe_path sham -f RgVsRMSD.xvg -ls FEL_sham_RgVsRMSD_$filenm.xpm -notime || true
+			
+	eval $gmx_exe_path xpm2ps -f FEL_sham_RgVsRMSD_$filenm.xpm -o FEL_sham_RgVsRMSD_$filenm.eps -rainbow red || true
+		
+	ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
+			
+	ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_portrait.pdf || true
+
+	pdf2ppm -png -r 600 FEL_sham_RgVsRMSD_${filenm}_portrait.pdf FEL_sham_RgVsRMSD_${filenm}_portrait.png || true
+
+	convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white FEL_sham_RgVsRMSD_${filenm}_convertps2png.png || true
+
+	convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white -units pixelsperinch \
+	-density 600 -resize 3000x5000 FEL_sham_RgVsRMSD_${filenm}_convertps2pngfull.png || true
+				
+	currentFELshamRgVsRMSDdir="$(pwd)""/RgVsRMSD_FEL_sham"
+	nFELRgVsRMSD=1
+	bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
+	base_bkupFELshamRgVsRMSDdir=$(basename "$bkupFELshamRgVsRMSDdir")
+	if [[ -d "$currentFELshamRgVsRMSDdir" ]]; then
+		echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $base_bkupFELshamRgVsRMSDdir"
+		sleep 1
+		while [[ -d "$bkupFELshamRgVsRMSDdir" ]]; do
+			nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 ))
+			bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
+			base_bkupFELshamRgVsRMSDdir=$(basename "$bkupFELshamRgVsRMSDdir")
+		done
+		mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
+		echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $base_bkupFELshamRgVsRMSDdir"
+		sleep 1
+	elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
+	fi
+	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm \
+	entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
+
+	echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
+	sleep 2
 }
 
 order_parameters()
@@ -1392,14 +1550,17 @@ analyser11()
 				currentFELPCAdir="$(pwd)""/PCA_FEL_sham"
 				nFELpca=1
 				bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
+				base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 				if [[ -d "$currentFELPCAdir" ]]; then
-					echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $bkupFELpcadir"
+					echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $base_bkupFELpcadir"
 					sleep 1
 					while [[ -d "$bkupFELpcadir" ]]; do
-						nFELpca=$(( nFELpca + 1 )); bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
+						nFELpca=$(( nFELpca + 1 ))
+						bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
+						base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 					done
 					mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
-					echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $bkupFELpcadir"
+					echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $base_bkupFELpcadir"
 					sleep 1
 					mv FEL_PCA_sham_*.xpm enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg FEL_PCA_sham_*.eps FEL_PCA_sham_*.pdf ./PCA_FEL_sham || true
 				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
@@ -1479,14 +1640,17 @@ inputFormat
 				currentFELshamRgVsRMSDdir="$(pwd)""/RgVsRMSD_FEL_sham"
 				nFELRgVsRMSD=1
 				bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
+				base_bkupFELshamRgVsRMSDdir=$(basename "$bkupFELshamRgVsRMSDdir")
 				if [[ -d "$currentFELshamRgVsRMSDdir" ]]; then
-					echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $bkupFELshamRgVsRMSDdir"
+					echo $'\n'"$currentFELshamRgVsRMSDdir"$' folder exists,\n'"backing it up as $base_bkupFELshamRgVsRMSDdir"
 					sleep 1
 					while [[ -d "$bkupFELshamRgVsRMSDdir" ]]; do
-						nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 )); bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
+						nFELRgVsRMSD=$(( nFELRgVsRMSD + 1 ))
+						bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
+						base_bkupFELshamRgVsRMSDdir=$(basename "$bkupFELshamRgVsRMSDdir")
 					done
 					mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
-					echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $bkupFELshamRgVsRMSDdir"
+					echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $base_bkupFELshamRgVsRMSDdir"
 					sleep 1
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
@@ -1560,14 +1724,17 @@ inputFormat
 			currentFELshamOrderParameterPairdir="$(pwd)""/OrderParameterPair_FEL_sham"
 			nFELOrderParameterPair=1
 			bkupFELshamOrderParameterPairdir="$(pwd)""/#OrderParameterPair_FEL_sham"".""backup.""$nFELOrderParameterPair"
+			base_bkupFELshamOrderParameterPairdir=$(basename "$bkupFELshamOrderParameterPairdir")
 			if [[ -d "$currentFELshamOrderParameterPairdir" ]]; then
-				echo $'\n'"$currentFELshamOrderParameterPairdir"$' folder exists,\n'"backing it up as $bkupFELshamOrderParameterPairdir"
+				echo $'\n'"$currentFELshamOrderParameterPairdir"$' folder exists,\n'"backing it up as $base_bkupFELshamOrderParameterPairdir"
 				sleep 1
 				while [[ -d "$bkupFELshamOrderParameterPairdir" ]]; do
-					nFELOrderParameterPair=$(( nFELOrderParameterPair + 1 )); bkupFELshamOrderParameterPairdir="$(pwd)""/#OrderParameterPair_FEL_sham"".""backup.""$nFELOrderParameterPair"
+					nFELOrderParameterPair=$(( nFELOrderParameterPair + 1 ))
+					bkupFELshamOrderParameterPairdir="$(pwd)""/#OrderParameterPair_FEL_sham"".""backup.""$nFELOrderParameterPair"
+					base_bkupFELshamOrderParameterPairdir=$(basename "$bkupFELshamOrderParameterPairdir")
 				done
 				mv "$currentFELshamOrderParameterPairdir" "$bkupFELshamOrderParameterPairdir" && mkdir ./OrderParameterPair_FEL_sham || true
-				echo $'\n'"Backing up the last OrderParameterPair_FEL_sham folder and its contents as $bkupFELshamOrderParameterPairdir"
+				echo $'\n'"Backing up the last OrderParameterPair_FEL_sham folder and its contents as $base_bkupFELshamOrderParameterPairdir"
 				sleep 1
 				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			elif [[ ! -d "$currentFELshamOrderParameterPairdir" ]]; then mkdir OrderParameterPair_FEL_sham
@@ -2268,13 +2435,16 @@ hbondMatrix_useFoundData()
 	currentHBmatrixdir="$(pwd)""/hbond_matrix"
 	nHBmatrix=1
 	bkupHBmatrixdir="$(pwd)""/#hbond_matrix"".""backup.""$nHBmatrix"
+	base_bkupHBmatrixdir=$(basename "$bkupHBmatrixdir")
 	if [[ -d "$currentHBmatrixdir" ]]; then
-		echo $'\n'"$currentHBmatrixdir"$' folder exists,\n'"backing it up as $bkupHBmatrixdir"
+		echo $'\n'"$currentHBmatrixdir"$' folder exists,\n'"backing it up as $base_bkupHBmatrixdir"
 		sleep 1
 		while [[ -d "$bkupHBmatrixdir" ]]; do
-			nHBmatrix=$(( nHBmatrix + 1 )); bkupHBmatrixdir="$(pwd)""/#hbond_matrix"".""backup.""$nHBmatrix"
+			nHBmatrix=$(( nHBmatrix + 1 ))
+			bkupHBmatrixdir="$(pwd)""/#hbond_matrix"".""backup.""$nHBmatrix"
+			base_bkupHBmatrixdir=$(basename "$bkupHBmatrixdir")
 		done
-		echo $'\n'"Backing up the last hbond_matrix folder and its contents as $bkupHBmatrixdir"
+		echo $'\n'"Backing up the last hbond_matrix folder and its contents as $base_bkupHBmatrixdir"
 		sleep 1
 		mv "$currentHBmatrixdir" "$bkupHBmatrixdir" && mkdir ./hbond_matrix || true
 	elif [[ ! -d "$currentHBmatrixdir" ]]; then mkdir hbond_matrix

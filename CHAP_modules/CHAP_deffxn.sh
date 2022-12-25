@@ -31,41 +31,41 @@ fi
 
 modTop1()
 {
-catchLigTOPO="; Include ligand topology"
-ligtopSt=0
-while IFS= read -r line; do
-	if [[ "$ligtopSt" == 1 ]] ; then
-		ligtopSt=$(( ligtopSt + 1 ))
-		lignamFile=$(echo "$line" | awk '{print $2}' | tr -d '"' | tr -d '.itp')
-	elif [[ "$line" == "$catchLigTOPO" ]]; then
-		ligtopSt=$(( ligtopSt + 1 ))
-	fi
-done < topol.top
+	catchLigTOPO="; Include ligand topology"
+	ligtopSt=0
+	while IFS= read -r line; do
+		if [[ "$ligtopSt" == 1 ]] ; then
+			ligtopSt=$(( ligtopSt + 1 ))
+			lignamFile=$(echo "$line" | awk '{print $2}' | tr -d '"' | tr -d '.itp')
+		elif [[ "$line" == "$catchLigTOPO" ]]; then
+			ligtopSt=$(( ligtopSt + 1 ))
+		fi
+	done < topol.top
 }
 
 modTop2()
 {
-catchLigITP="#include "$'"'"${lignamFile}.itp"$'"'
-catchWaterTOP="; Include water topology"
-lnum=0
-ff_pos=0
-#echo "$catchy"
-while IFS= read -r line; do
-	lnum=$(( lnum + 1 ))
-	echo "$line" >> topol.top.temp
-		if [[ "$line" == "$catchLigITP" ]]; then
-			echo $'\n; Ligand position restraints\n#ifdef POSRES\n'\
-$'#include '$'"'$'posre_'"$lignamFile"$'.itp'$'"\n#endif' >> topol.top.temp
-		elif [[ "$ff_pos" == 1 ]]; then
-			incl_ffWatMod_statement=$(echo "$line")
-			ff_pos=$(( ff_pos + 1 ))
-		elif [[ "$line" == "$catchWaterTOP" ]]; then
-			ff_pos=$(( ff_pos + 1 ))
-		fi
-done < topol.top
-ff_watMod_dir=$(echo "$incl_ffWatMod_statement" | awk '{print $2}')
+	catchLigITP="#include "$'"'"${lignamFile}.itp"$'"'
+	catchWaterTOP="; Include water topology"
+	lnum=0
+	ff_pos=0
+	#echo "$catchy"
+	while IFS= read -r line; do
+		lnum=$(( lnum + 1 ))
+		echo "$line" >> topol.top.temp
+			if [[ "$line" == "$catchLigITP" ]]; then
+				echo $'\n; Ligand position restraints\n#ifdef POSRES\n'\
+	$'#include '$'"'$'posre_'"$lignamFile"$'.itp'$'"\n#endif' >> topol.top.temp
+			elif [[ "$ff_pos" == 1 ]]; then
+				incl_ffWatMod_statement=$(echo "$line")
+				ff_pos=$(( ff_pos + 1 ))
+			elif [[ "$line" == "$catchWaterTOP" ]]; then
+				ff_pos=$(( ff_pos + 1 ))
+			fi
+	done < topol.top
+	ff_watMod_dir=$(echo "$incl_ffWatMod_statement" | awk '{print $2}')
 
-mv topol.top topolPreResmod.top && mv topol.top.temp topol.top
+	mv topol.top topolPreResmod.top && mv topol.top.temp topol.top
 
 }
 
@@ -104,7 +104,8 @@ makeNDXGroup()
 }
 
 
-#defining functions for different steps of the md pipeline
+# Defining functions for different steps of the md pipeline
+# Generate protein topo
 s0GenTop()
 {
 	echo "$demA"$' Generating protein topology...'"$demB"
@@ -151,7 +152,8 @@ s0GenTop()
 }
 
 s0CharmmSta()
-{ ffcount=0
+{
+	ffcount=0
 	for ffd in charmm*.ff; do
 		if [[ "$ffd" == '' ]]; then
 			echo "$demA"" Provide below the path/name of the charmm forcefield to be used"$'\n'
@@ -262,33 +264,33 @@ s0CharmmSta()
 
 s0CharmmStb()
 {
-LigINIcount=0
-for LigINI in *_ini.pdb; do
-	if [[ "$LigINI" == '' ]]; then
-		echo "$demA"$'The current directory contains no ligand_ini.pdb file.'\
-		$'\nPerhaps cgenff_charmm2gmx.py has not been run on your stream file (.str) yet.'
-		exit 1
-	else
-	LigINIcount=$(( LigINIcount + 1))
-		if [[ $LigINIcount == 2 ]] ; then 
-			echo "$demA"$'Multiple ligand_ini.pdb files found in the working directory!'\
-			$'\nPlease keep only the required one and try again!!'
+	LigINIcount=0
+	for LigINI in *_ini.pdb; do
+		if [[ "$LigINI" == '' ]]; then
+			echo "$demA"$'The current directory contains no ligand_ini.pdb file.'\
+			$'\nPerhaps cgenff_charmm2gmx.py has not been run on your stream file (.str) yet.'
 			exit 1
-		fi
-	LigINIpdb="$LigINI"
-	echo "$demA"" Ligand_ini.pdb file found in the current directory: $LigINIpdb""$demB"
-	sleep 3
-	fi	
-done
+		else
+		LigINIcount=$(( LigINIcount + 1))
+			if [[ $LigINIcount == 2 ]] ; then 
+				echo "$demA"$'Multiple ligand_ini.pdb files found in the working directory!'\
+				$'\nPlease keep only the required one and try again!!'
+				exit 1
+			fi
+		LigINIpdb="$LigINI"
+		echo "$demA"" Ligand_ini.pdb file found in the current directory: $LigINIpdb""$demB"
+		sleep 3
+		fi	
+	done
 
-ligPDB=$(basename "$LigINIpdb" _ini.pdb)
+	ligPDB=$(basename "$LigINIpdb" _ini.pdb)
 
-echo "$demA"" Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
-sleep 2
+	echo "$demA"" Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
+	sleep 2
 
-eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
+	eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
 
-echo "$demA"" Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
+	echo "$demA"" Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
 }
 
 s0CharmmStc()
@@ -1407,55 +1409,55 @@ s1DefBox()
 
 s2Solvat()
 {
-echo "$demA"" Solvating the system...""$demB"
-sleep 2
-eval $gmx_exe_path solvate -cp ${coordinates}_newbox.gro -cs spc216.gro -o ${coordinates}_solv.gro -p topol.top
-echo "$demA"" Solvate system... DONE""$demB"
-sleep 2
+	echo "$demA"" Solvating the system...""$demB"
+	sleep 2
+	eval $gmx_exe_path solvate -cp ${coordinates}_newbox.gro -cs spc216.gro -o ${coordinates}_solv.gro -p topol.top
+	echo "$demA"" Solvate system... DONE""$demB"
+	sleep 2
 }
 
 s3AddIons1()
 {
-echo "$demA"" Adding ions...""$demB"
-sleep 2
-#1. Assemble .tpr file with grompp, using ions.mdp
-eval $gmx_exe_path grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $WarnMax
+	echo "$demA"" Adding ions...""$demB"
+	sleep 2
+	#1. Assemble .tpr file with grompp, using ions.mdp
+	eval $gmx_exe_path grompp -f ions.mdp -c ${coordinates}_solv.gro -p topol.top -o ions.tpr -maxwarn $WarnMax
 }
 
 s4AddIons2()
 {
-#2. Pass .tpr file to genion to add ions
-echo 'SOL' | eval $gmx_exe_path genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
-echo "$demA"" Add ions... DONE""$demB"
-sleep 2
+	#2. Pass .tpr file to genion to add ions
+	echo 'SOL' | eval $gmx_exe_path genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
+	echo "$demA"" Add ions... DONE""$demB"
+	sleep 2
 }
 
 s5EnMin1()
 {
-echo "$demA"" Now running energy minimization...""$demB"
-sleep 2
-#1. Assemble the binary input with grompp
-for param in *m.mdp; do
-	if [[ "${param}" == "minim.mdp" ]] ; then Minmdp=1
-	elif [[ "${param}" == "em.mdp" ]] ; then Enmdp=1
-	fi
-done
-if [[ "$Minmdp" == 1 ]] && [[ "$Enmdp" == 1 ]]; then
-	EnMmdp="minim.mdp"
-	echo "$demA"$' Parameter files "minim.mdp" and "em.mdp" found.\n *Choosing "minim.mdp" for energy minimization.'"$demB"
+	echo "$demA"" Now running energy minimization...""$demB"
 	sleep 2
-elif [[ "$Minmdp" == 1 ]] && [[ "$Enmdp" == 0 ]]; then
-	EnMmdp="minim.mdp"
-	echo "$demA"" Parameter file $EnMmdp found."$'\n'" *Using $EnMmdp for energy minimization.""$demB"
-	sleep 2
-elif [[ "$Minmdp" == 0 ]] && [[ "$Enmdp" == 1 ]]; then
-	EnMmdp="em.mdp"
-	echo "$demA"" Parameter file $EnMmdp found."$'\n'" *Using $EnMmdp for energy minimization.""$demB"
-	sleep 2
+	#1. Assemble the binary input with grompp
+	for param in *m.mdp; do
+		if [[ "${param}" == "minim.mdp" ]] ; then Minmdp=1
+		elif [[ "${param}" == "em.mdp" ]] ; then Enmdp=1
+		fi
+	done
+	if [[ "$Minmdp" == 1 ]] && [[ "$Enmdp" == 1 ]]; then
+		EnMmdp="minim.mdp"
+		echo "$demA"$' Parameter files "minim.mdp" and "em.mdp" found.\n *Choosing "minim.mdp" for energy minimization.'"$demB"
+		sleep 2
+	elif [[ "$Minmdp" == 1 ]] && [[ "$Enmdp" == 0 ]]; then
+		EnMmdp="minim.mdp"
+		echo "$demA"" Parameter file $EnMmdp found."$'\n'" *Using $EnMmdp for energy minimization.""$demB"
+		sleep 2
+	elif [[ "$Minmdp" == 0 ]] && [[ "$Enmdp" == 1 ]]; then
+		EnMmdp="em.mdp"
+		echo "$demA"" Parameter file $EnMmdp found."$'\n'" *Using $EnMmdp for energy minimization.""$demB"
+		sleep 2
 	
-fi
-sleep 1	
-eval $gmx_exe_path grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $WarnMax
+	fi
+	sleep 1	
+	eval $gmx_exe_path grompp -f $EnMmdp -c ${coordinates}_solv_ions.gro -p topol.top -o em.tpr -maxwarn $WarnMax
 
 }
 
@@ -1470,25 +1472,25 @@ s6EnMin2()
 	if [[ "$sysType" == 3 ]] ; then
 		echo "$demA""CHAPERONg will run a check to detect the group numbers of protein and DNA...""$demB"
 		sleep 2
-	echo q | eval $gmx_exe_path make_ndx -f em.gro -o temp.ndx  > tempNDXfile
+		echo q | eval $gmx_exe_path make_ndx -f em.gro -o temp.ndx  > tempNDXfile
 
-	while IFS= read -r tNDXline; do
-		if [[ "$tNDXline" == *"DNA"*":"*"atoms"* ]] ; then
-			dnaNDXno=$(echo "$tNDXline" | awk '{print $1}')
-			#echo $tNDXline >> check
-			#echo $dnaNDXno >> check
-		elif [[ "$tNDXline" == *"Protein"*":"*"atoms"* ]] ; then
-			proNDXno=$(echo "$tNDXline" | awk '{print $1}')
-			#echo $tNDXline >> check
-			#echo $proNDXno >> check
-			break
-		fi
-	done < tempNDXfile
-	rm tempNDXfile temp.ndx
-	echo "$demA"" Checking completed...""$demB"
-	sleep 2
-	echo "$demA""CHAPERONg will now make a Protein-DNA index group...""$demB"
-	sleep 2
+		while IFS= read -r tNDXline; do
+			if [[ "$tNDXline" == *"DNA"*":"*"atoms"* ]] ; then
+				dnaNDXno=$(echo "$tNDXline" | awk '{print $1}')
+				#echo $tNDXline >> check
+				#echo $dnaNDXno >> check
+			elif [[ "$tNDXline" == *"Protein"*":"*"atoms"* ]] ; then
+				proNDXno=$(echo "$tNDXline" | awk '{print $1}')
+				#echo $tNDXline >> check
+				#echo $proNDXno >> check
+				break
+			fi
+		done < tempNDXfile
+		rm tempNDXfile temp.ndx
+		echo "$demA"" Checking completed...""$demB"
+		sleep 2
+		echo "$demA""CHAPERONg will now make a Protein-DNA index group...""$demB"
+		sleep 2
 
 eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << ProvProDNAMakNdx
 $proNDXno | $dnaNDXno
@@ -1498,88 +1500,88 @@ ProvProDNAMakNdx
 	echo "$demA"" Make a Protein-DNA index group...DONE""$demB"
 	sleep 2
 
-if [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
-	echo "$demA""CHAPERONg will now check your mdp files and make corrections on the tc-grps if needed...""$demB" 
-	sleep 2
-	for mdparafile in nvt.mdp npt.mdp md.mdp; do
-		nbkUP=1
-		mdpbak="$mdparafile"".backup."
-		prevmdpbak="$mdpbak""$nbkUP"
-		if [[ -f "$prevmdpbak" ]]; then
-			echo "$demA""$prevmdpbak"" exists!"
-			nbkUP=$(( nbkUP + 1 ))
-			currentmdpbak="$mdpbak""$nbkUP"
-			while [[ -f "$currentmdpbak" ]]; do
+	if [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
+		echo "$demA""CHAPERONg will now check your mdp files and make corrections on the tc-grps if needed...""$demB" 
+		sleep 2
+		for mdparafile in nvt.mdp npt.mdp md.mdp; do
+			nbkUP=1
+			mdpbak="$mdparafile"".backup."
+			prevmdpbak="$mdpbak""$nbkUP"
+			if [[ -f "$prevmdpbak" ]]; then
+				echo "$demA""$prevmdpbak"" exists!"
 				nbkUP=$(( nbkUP + 1 ))
 				currentmdpbak="$mdpbak""$nbkUP"
-			done
-			echo $'\nCHAPERONg will back that up as'\
-			"$currentmdpbak and the $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
-			sleep 1
-			mv "$prevmdpbak" "$currentmdpbak"
-			cp "$mdparafile" "$mdparafile"".backup.1"
-		elif [[ ! -f "$prevmdpbak" ]]; then
-			echo "$demA"" Backing up $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
-			sleep 1
-			cp "$mdparafile" "$mdparafile"".backup.1"
-		fi
-		
-		filname1="$mdparafile"".1"
-		cat $mdparafile > temp_mdpfile
-		while IFS= read -r mdpline; do
-			checktcG=$(echo "$mdpline" | awk '{print $1}')
-			if [[ "$checktcG" == "tc-grps" ]] ; then
-				echo "; tc-grps below has been checked and/or modified by CHAPERONg for Protein-DNA simulation" >> "$filname1"
-				echo "tc-grps                = Protein_DNA Water_and_ions    ; two coupling groups - modified by CHAPERONg" \
-				>> "$filname1"
-			
-			elif [[ "$checktcG" == ";" ]] | [[ "$checktcG" == "title" ]]; then echo $mdpline >> "$filname1"
-			elif [[ "$checktcG" == "nsteps" ]] ; then
-				echo $mdpline | awk '{print $1"\t\t\t"$2,$3}'  >> "$filname1"
-			else
-				echo $mdpline | awk '{print $1"\t\t\t"$2,$3"\t",$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14}' >> "$filname1"
+				while [[ -f "$currentmdpbak" ]]; do
+					nbkUP=$(( nbkUP + 1 ))
+					currentmdpbak="$mdpbak""$nbkUP"
+				done
+				echo $'\nCHAPERONg will back that up as'\
+				"$currentmdpbak and the $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
+				sleep 1
+				mv "$prevmdpbak" "$currentmdpbak"
+				cp "$mdparafile" "$mdparafile"".backup.1"
+			elif [[ ! -f "$prevmdpbak" ]]; then
+				echo "$demA"" Backing up $mdparafile used in the last run as $mdparafile"".backup.1""$demB"
+				sleep 1
+				cp "$mdparafile" "$mdparafile"".backup.1"
 			fi
-		done < temp_mdpfile
-		rm "$mdparafile" && mv "$filname1" "$mdparafile"
-	done
-	rm temp_mdpfile
-	echo "$demA""npt.mdp, nvt.mdp and md.mdp successfully checked and/or modified accorgingly."
-	sleep 2
-	echo $'\nYou may want to check these files to ensure they have been modified to your satisfaction.\n'
-	$'If not, you may re-modify them accordingly or restore the backups made by CHAPERONg.\n'
-	
-	echo $'When you are done, enter "yes" below to proceed to equilibration...'"$demB"
+			
+			filname1="$mdparafile"".1"
+			cat $mdparafile > temp_mdpfile
+			while IFS= read -r mdpline; do
+				checktcG=$(echo "$mdpline" | awk '{print $1}')
+				if [[ "$checktcG" == "tc-grps" ]] ; then
+					echo "; tc-grps below has been checked and/or modified by CHAPERONg for Protein-DNA simulation" >> "$filname1"
+					echo "tc-grps                = Protein_DNA Water_and_ions    ; two coupling groups - modified by CHAPERONg" \
+					>> "$filname1"
+				
+				elif [[ "$checktcG" == ";" ]] | [[ "$checktcG" == "title" ]]; then echo $mdpline >> "$filname1"
+				elif [[ "$checktcG" == "nsteps" ]] ; then
+					echo $mdpline | awk '{print $1"\t\t\t"$2,$3}'  >> "$filname1"
+				else
+					echo $mdpline | awk '{print $1"\t\t\t"$2,$3"\t",$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14}' >> "$filname1"
+				fi
+			done < temp_mdpfile
+			rm "$mdparafile" && mv "$filname1" "$mdparafile"
+		done
+		rm temp_mdpfile
+		echo "$demA""npt.mdp, nvt.mdp and md.mdp successfully checked and/or modified accorgingly."
+		sleep 2
+		echo $'\nYou may want to check these files to ensure they have been modified to your satisfaction.\n'
+		$'If not, you may re-modify them accordingly or restore the backups made by CHAPERONg.\n'
+		
+		echo $'When you are done, enter "yes" below to proceed to equilibration...'"$demB"
 
-	read -p 'Do you want to proceed? (yes/no): ' procd2EQ
-
-	while [[ "$procd2EQ" != "yes" ]] && [[ "$procd2EQ" != "no" ]] && \
-	[[ "$procd2EQ" != '"yes"' ]] && [[ "$procd2EQ" != '"no"' ]] ; do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procd2EQ
-	done
-	if [[ "$procd2EQ" == "yes" || "$procd2EQ" == '"yes"' ]] ; then echo ""
-	elif [[ "$procd2EQ" == "no" || "$procd2EQ" == '"no"' ]] ; then exit 0
-	fi
-fi	
 
-elif [[ "$sysType" == 2 ]] ; then
+		while [[ "$procd2EQ" != "yes" ]] && [[ "$procd2EQ" != "no" ]] && \
+		[[ "$procd2EQ" != '"yes"' ]] && [[ "$procd2EQ" != '"no"' ]] ; do
+			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+			read -p 'Do you want to proceed? (yes/no): ' procd2EQ
+		done
+		if [[ "$procd2EQ" == "yes" || "$procd2EQ" == '"yes"' ]] ; then echo ""
+		elif [[ "$procd2EQ" == "no" || "$procd2EQ" == '"no"' ]] ; then exit 0
+		fi
+	fi	
 
-	echo "$demA"$' Confirm if you want to make custom index group(s) before proceeding.'\
-	$'\n\n You should respond with a "yes" or a "no" below.'\
-	$'\n\n *If you are unsure, enter "no" and CHAPERONg will make appropriate index for'\
-	$'\n you while automatically updating topol.top accordingly.'"$demB"
-	sleep 3
-	read -p 'Do you need to make custom index group(s) before proceeding? (yes/no): ' customNDXask
+	elif [[ "$sysType" == 2 ]] ; then
 
-	while [[ "$customNDXask" != "yes" && "$customNDXask" != "no" && "$customNDXask" != '"yes"' && "$customNDXask" != '"no"' ]]
-	do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		echo "$demA"$' Confirm if you want to make custom index group(s) before proceeding.'\
+		$'\n\n You should respond with a "yes" or a "no" below.'\
+		$'\n\n *If you are unsure, enter "no" and CHAPERONg will make appropriate index for'\
+		$'\n you while automatically updating topol.top accordingly.'"$demB"
+		sleep 3
 		read -p 'Do you need to make custom index group(s) before proceeding? (yes/no): ' customNDXask
-	done
 
-	if [[ "$customNDXask" == "yes" || "$customNDXask" == $'"yes"' ]] ; then makeNDXGroup
-	elif [[ "$customNDXask" == "no" || "$customNDXask" == $'"no"' ]] ; then echo ""; fi
-fi
+		while [[ "$customNDXask" != "yes" && "$customNDXask" != "no" && "$customNDXask" != '"yes"' && "$customNDXask" != '"no"' ]]
+		do
+			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+			read -p 'Do you need to make custom index group(s) before proceeding? (yes/no): ' customNDXask
+		done
+
+		if [[ "$customNDXask" == "yes" || "$customNDXask" == $'"yes"' ]] ; then makeNDXGroup
+		elif [[ "$customNDXask" == "no" || "$customNDXask" == $'"no"' ]] ; then echo ""; fi
+	fi
 }
 
 s6aLigRes()
@@ -1588,7 +1590,7 @@ s6aLigRes()
 	#if user did not create an index manually
 	if [[ "$customNDXask" == "no" || "$customNDXask" == $'"no"' || "$customNDXask" == '' ]] ; then
 		echo "$demA"" Restraining the ligand...""$demB""$demA"$'**"In the coming steps, '\
-		$'CHAPERONg will create an index group for the non-hydrogen atoms of $ligname'"$demB"
+		$'CHAPERONg will create an index group for the non-hydrogen atoms of '"$ligname $demB"
 		sleep 2
 
 eval $gmx_exe_path make_ndx -f "$lignamFile".gro -o index_"$lignamFile".ndx << ProvMakNdx

@@ -9,11 +9,12 @@
 set -e
 set -o pipefail
 
-# conda deactivate
-# conda deactivate
-# conda activate base
+
 # conda config --add channels conda-forge
 
+# detect the path to the anaconda base environment
 baseENV=$(conda env list | grep "base" | awk '{print $3}')
+conda config --append envs_dirs "${baseENV}/envs"
 
-conda env create --prefix "${baseENV}/CHAPERONg" --file ./conda_dependencies.yml
+# create the chaperong conda environment
+conda env create --prefix "${baseENV}/envs/CHAPERONg" --file ./conda_dependencies.yml
