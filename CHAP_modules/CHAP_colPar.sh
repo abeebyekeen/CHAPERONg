@@ -25,7 +25,7 @@ extr="-ignh" ; customNDXask=''
 PBCcorrectType='' ; trajFraction=''
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; mmpbframesNo=''
-gmx_exe_path="gmx"
+gmx_exe_path="gmx" ; customframeNo=''
 #gmxV=''
 
 #Defining primary functions
@@ -91,7 +91,7 @@ Optional (int=integer; str=string):
 -H, --Help          Print more, advanced options
 -s, --water <str>   Water model to use i.e. tip3p, spc, etc. (ff-dependent)
 -f, --ff <str>      Force-field e.g. charmm27, amber94, etc.
-                    Enter "wd" if ff in working directory
+                    (Enter "wd" if ff in working directory)
 -R, --ntmpi <int>   Number of thread-MPI ranks (default is 0: gmx guesses)
 -m, --ntomp <int>   Number of OpenMP threads per MPI rank (default is 0: guess)
 -P, --pname <str>   Name of the positive ion (default is NA)
@@ -103,11 +103,13 @@ Optional (int=integer; str=string):
                     (Default is to use the gmx set in the environment)
 -v, --version       Print the installed version of CHAPERONg
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
+--movieFrame <int>  Number of frames to extract and use for movie
 --trFrac <int>      Fraction of trajectory to use for g_mmpbsa calculations
                     (e.g. enter 2 for 2nd half, 3 for last 3rd, etc.)
 --dist <float>      Solute-box distance i.e. distance to box edge (default is 1.0)
 --bg                Run production mdrun with nohup ("no hang up")
---inputtraj <str>   Corrected trajectory to use for analyses (noPBC, nojump, fit)
+--inputtraj <str>   Corrected trajectory to generate and use for analyses
+                    (options: noPBC, nojump, center, fit, combo)
 --ter <prompt>      Interactively choose the N- & C-termini protonation states
                     (default: ionized with NH3+ & COO-)
 guide_lg
@@ -125,10 +127,13 @@ read_parFile()
 	if [[ "$parfilename" != '' ]] ; then 
 		while IFS= read -r line; do
 			par=$(echo "$line" | awk '{print $1}')
-			if [[ "$par" == "mmgpath" ]] ; then
-				mmGMXpath=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "gmx_exe" ]] ; then
-				gmx_exe_path=$(echo "$line" | awk '{print $3}')
+			if [[ "$par" == "mmgpath" ]]; then	mmGMXpath=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "movieFrame" ]]; then customframeNo=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "conc" ]]; then ion_conc=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "maxwarn" ]]; then WarnMax=$(echo "$line" | awk '{print $3}')
+			elif [[ "$par" == "water" ]]; then wat=$(echo "$line" | awk '{print $3}')
 			fi
 		done < "$parfilename"
 	fi
@@ -155,6 +160,7 @@ while [ "$1" != "" ]; do
 	-i | --input) shift; coordinates_raw="$1";;
 	--inputtraj) shift; PBCcorrectType="$1";;
 	-m | --ntomp) shift; ntomp="$1" ;;
+	--movieFrame) shift; customframeNo="$1" ;;
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
 	-N | --nname) shift; nn="$1";;
 	-P | --pname) shift; pn="$1";;

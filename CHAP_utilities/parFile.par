@@ -25,7 +25,8 @@
 ; Water model i.e. tip3p, spc
 # water            =      x
 
-; Force-field (e.g. charmm27, amber94 etc.), "wd" if ff in working directory
+; Force-field (e.g. charmm27, amber94 etc.),
+; use "wd" if ff in working directory
 # ff               =      x
 
 ; Number of thread-MPI ranks      
@@ -36,6 +37,9 @@
 
 ; Absolute path to gmx binary to be used for mmpbsa
 # mmgpath          =      /home/abeeb/local/gromacs5.1/bin/gmx
+
+; Number of frames to extract and use for movie
+# movieFrame	   =      200
 
 ; Name of the positive ion
 # pname            =      x
@@ -52,13 +56,15 @@
 ; Solute-box distance i.e. distance to box edge 
 # dist             =      x
 
-; Corrected trajectory to use for analyses (options: noPBC, nojump, fit)
+; Corrected trajectory to use for analyses (options: 
+; noPBC, nojump, fit, combo)
 # inputtraj        =      x
 
 ; Parameter for umbrella sampling window spacing
 # smd_pull_spacing =      0.2
 
-; Absolute path to the gmx executable to use for all gmx runs except those involving mmpbsa
+; Absolute path to the gmx executable to use for 
+; all gmx runs except those involving mmpbsa
 # gmx_exe          =      x
 
 

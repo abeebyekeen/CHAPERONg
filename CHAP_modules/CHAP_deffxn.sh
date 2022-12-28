@@ -85,6 +85,13 @@ modTop2forAcpype()
 	mv topol.top topolPreResmod.top && mv topol.top.temp topol.top
 }
 
+notifyImgFail()
+{
+echo "$demA"$'CHAPERONg could not generate a finished image file from the .xvg output.'\
+$'\nConfirm that your xmgrace/gracebat is functional!'"$demB"
+sleep 2
+}
+
 #defining a function for make_ndx
 
 makeNDXGroup()
@@ -1469,6 +1476,36 @@ s6EnMin2()
 	echo "$demA"" Run energy minimization... DONE""$demB"
 	sleep 2
 
+	echo "$demA"$' Now calculating post-EM thermodynamic parameters...\n\n'
+	sleep 2
+
+	echo "Potential" | eval $gmx_exe_path energy -f em.edr -o postEM_Potential.xvg
+	gracebat postEM_Potential.xvg -hdevice PNG -autoscale xy -printfile postEM_Potential.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo "$demA"$' Calculate Potential energy...DONE\n\n' ; sleep 2
+
+	currentEMthermodyndir="$(pwd)""/postEM_thermodynamics"
+	nEMtherm=1
+	bkupEMtherm="$(pwd)""/#postEM_thermodynamics"".""backup.""$nEMtherm"
+	base_bkupEMtherm=$(basename "$bkupEMtherm")
+	if [[ -d "$currentEMthermodyndir" ]]; then
+		echo $'\n'"$currentEMthermodyndir"$' folder exists,\n'"backing it up as $base_bkupEMtherm"
+		sleep 1
+		while [[ -d "$bkupEMtherm" ]]; do
+			nEMtherm=$(( nEMtherm + 1 ))
+			bkupEMtherm="$(pwd)""/#postEM_thermodynamics"".""backup.""$nEMtherm"
+			base_bkupEMtherm=$(basename "$bkupEMtherm")
+		done
+		mv "$currentEMthermodyndir" "$bkupEMtherm" && mkdir ./postEM_thermodynamics || true
+		echo $'\n'"Backing up the last postEM_thermodynamics folder and its contents as $base_bkupEMtherm"
+		sleep 1
+	elif [[ ! -d "$currentEMthermodyndir" ]]; then mkdir postEM_thermodynamics
+	fi
+	mv postEM_Potential.xvg postEM_Potential.png ./postEM_thermodynamics || true
+
+	echo "$demA"$' Calculate post-EM thermodynamics parameters...DONE'"$demB"
+	sleep 2
+
 	if [[ "$sysType" == 3 ]] ; then
 		echo "$demA""CHAPERONg will run a check to detect the group numbers of protein and DNA...""$demB"
 		sleep 2
@@ -1934,7 +1971,19 @@ s8NVTeq2()
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm nvt
 		echo "$demA"" NVT Equilibration... DONE""$demB"
 		sleep 2
+		echo "$demA"$' Now calculating post-NVT thermodynamic parameters...\n\n'
+		sleep 2
+		echo "$demA"$' Analyzing the Temperature progression of the System...\n\n'
+		echo "Temperature" | eval $gmx_exe_path energy -f nvt.edr -o postNVT_Temperature.xvg
+		gracebat postNVT_Temperature.xvg -hdevice PNG -autoscale xy -printfile postNVT_Temperature.png \
+		-fixed 7500 4000 -legend load || notifyImgFail
+		echo "$demA"$' Calculate Temperature progression...DONE\n\n' ; sleep 2	
 	fi
+	currentEMthermodyndir="$(pwd)""/postEM_thermodynamics"
+	if [[ -d "$currentEMthermodyndir" ]]; then echo ''
+	elif [[ ! -d "$currentEMthermodyndir" ]]; then mkdir postEM_thermodynamics
+	fi
+	mv postNVT_Temperature.xvg postNVT_Temperature.png ./postEM_thermodynamics || true
 }
 
 s9NPTeq1()
@@ -1958,6 +2007,28 @@ s10NPTeq2()
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt
 	echo "$demA"" NPT Equilibration... DONE""$demB"
 	sleep 2
+	echo "$demA"$' Now calculating post-NPT thermodynamic parameters...\n\n'
+	sleep 2
+
+	echo "Pressure" | eval $gmx_exe_path energy -f "${filenm}".edr -o postNPT_Pressure.xvg
+	gracebat postNPT_Pressure.xvg -hdevice PNG -autoscale xy -printfile postNPT_Pressure.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo "$demA"$' Calculate Pressure progression...DONE\n\n' ; sleep 2
+
+	echo "Density" | eval $gmx_exe_path energy -f "${filenm}".edr -o postNPT_Density.xvg
+	gracebat postNPT_Density.xvg -hdevice PNG -autoscale xy -printfile postNPT_Density.png \
+	-fixed 7500 4000 -legend load || notifyImgFail
+	echo "$demA"$' Calculate Density progression...DONE\n\n' ; sleep 2
+	
+	currentEMthermodyndir="$(pwd)""/postEM_thermodynamics"
+	
+	if [[ ! -d "$currentEMthermodyndir" ]]; then mkdir postEM_thermodynamics
+	elif [[ -d "$currentEMthermodyndir" ]]; then echo
+	fi
+	mv postNPT_Density.xvg postNPT_Density.png ./postEM_thermodynamics || true
+	mv postNPT_Pressure.xvg postNPT_Pressure.png ./postEM_thermodynamics || true
+
+
 	if [[ $sysType == 1 && $mdType == 2 ]] ; then
 		read -p 'Do you need to make custom index for pulling groups? (yes/no): ' cstmndx
 		

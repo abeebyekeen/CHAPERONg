@@ -76,7 +76,7 @@ Option  Analysis
   9     Make a movie of the simulation
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
   11    Construct free energy landscape with gmx sham
-  12    Construct free energy surface using an external free energy function
+  12    Construct free energy surface using the CHAP free energy function
   13    Construct an interactive 3D free energy landscape using md-davis
   14    Plot an interactive hydrogen bond matrix with md-davis
   15    Extract frames from the trajectory
@@ -95,7 +95,8 @@ while [[ "$analysis" != *" 0 "* && "$analysis" != *" 1 "* && "$analysis" != *" 2
 	"$analysis" != *" 6 "* && "$analysis" != *" 7 "* && "$analysis" != *" 8 "* && \
 	"$analysis" != *" 9 "* && "$analysis" != *" 10 "* && "$analysis" != *" 11 "* && \
 	"$analysis" != *" 12 "* && "$analysis" != *" 13 "* && "$analysis" != *" 14 "* && \
-	"$analysis" != *" 15 "* && "$analysis" != *" 16 "* ]] ; do
+	"$analysis" != *" 15 "* && "$analysis" != *" 16 "* && "$analysis" != *" 17 "* && \
+	"$analysis" != *" 18 "* ]] ; do
 		echo $'\nYou entered: '"$analyse"$'\n'
 		echo $'Please enter a valid number!!\n'
 		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
@@ -192,7 +193,7 @@ if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
-		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump
+		echo 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump
 		echo 4 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -pbc mol -center
 		rm "${filenm}"_"nojump".xtc "${filenm}"_"nojump_fitTrans".xtc
@@ -309,38 +310,38 @@ if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
 analyser1()
 {
-	echo "$demA"$' Now calculating post-simulation thermodynamic parameters...\n'
+	echo "$demA"$' Now calculating post-MD thermodynamic parameters...\n\n'
 	sleep 2
 
-	echo "Temperature" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Temperature.xvg
+	echo "Temperature" | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_Temperature.xvg
 	gracebat postMD_Temperature.xvg -hdevice PNG -autoscale xy -printfile postMD_Temperature.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Temperature progression...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Temperature progression...DONE\n\n' ; sleep 2
 
-	echo "Pressure" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Pressure.xvg
+	echo "Pressure" | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_Pressure.xvg
 	gracebat postMD_Pressure.xvg -hdevice PNG -autoscale xy -printfile postMD_Pressure.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Pressure progression...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Pressure progression...DONE\n\n' ; sleep 2
 
-	echo "Density" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Density.xvg
+	echo "Density" | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_Density.xvg
 	gracebat postMD_Density.xvg -hdevice PNG -autoscale xy -printfile postMD_Density.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Density progression...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Density progression...DONE\n\n' ; sleep 2
 
-	echo "Total-Energy" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_TotalEnergy.xvg
+	echo "Total-Energy" | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_TotalEnergy.xvg
 	gracebat postMD_TotalEnergy.xvg -hdevice PNG -autoscale xy -printfile postMD_TotalEnergy.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Total energy...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Total energy...DONE\n\n' ; sleep 2
 
-	echo "Potential" | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_Potential.xvg
+	echo "Potential" | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_Potential.xvg
 	gracebat postMD_Potential.xvg -hdevice PNG -autoscale xy -printfile postMD_Potential.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Potential energy...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Potential energy...DONE\n\n' ; sleep 2
 
-	echo "Kinetic-En." | eval $gmx_exe_path trjconv -f "${filenm}".edr -o postMD_KineticEn.xvg
+	echo "Kinetic-En." | eval $gmx_exe_path energy -f "${filenm}".edr -o postMD_KineticEn.xvg
 	gracebat postMD_KineticEn.xvg -hdevice PNG -autoscale xy -printfile postMD_KineticEn.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo 'Calculate Kinetic energy...DONE\n' ; sleep 2
+	echo "$demA"$' Calculate Kinetic energy...DONE\n\n' ; sleep 2
 
 	currentMDthermodyndir="$(pwd)""/postMD_thermodynamics"
 	nMDtherm=1
@@ -359,10 +360,12 @@ analyser1()
 		sleep 1
 	elif [[ ! -d "$currentMDthermodyndir" ]]; then mkdir postMD_thermodynamics
 	fi
+	gracebat postMD_Potential.xvg postMD_KineticEn.xvg postMD_TotalEnergy.xvg -hdevice PNG \
+	-autoscale xy -printfile postMD_Energies.png -fixed 7500 4000 -legend load || notifyImgFail
 	mv postMD_Temperature.xvg postMD_KineticEn.xvg postMD_Potential.xvg ./postMD_thermodynamics || true
 	mv postMD_Density.xvg postMD_Pressure.xvg postMD_TotalEnergy.xvg ./postMD_thermodynamics || true
-	mv postMD_Temperature.png postMD_KineticEn.png postMD_Potential.png ./postMD_thermodynamics || true
-	mv postMD_Density.png postMD_Pressure.png postMD_TotalEnergy.png ./postMD_thermodynamics || true
+	mv postMD_Temperature.png postMD_KineticEn.png postMD_Potential.png postMD_Density.png ./postMD_thermodynamics || true
+	mv postMD_Pressure.png postMD_TotalEnergy.png postMD_Energies.png ./postMD_thermodynamics || true
 
 	echo "$demA"$' Calculate post-MD thermodynamics parameters...DONE'"$demB"
 	sleep 2
@@ -575,7 +578,7 @@ if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 	sleep 2
 	echo 1 "SOL" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_Pro-SOL_${filenm}.xvg \
 	-hbm hb_matrix_Pro-SOL_${filenm}.xpm -hbn hb_index_Pro-SOL_${filenm}.ndx -tu ns $hbthread || \
-	echo " There are multiple groups with the name SOL. Skipping..."
+	echo "$demA"$' There are multiple groups with the name SOL. Skipping...'
 	echo "$demA"$' Protein-SOL hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
 	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
@@ -888,26 +891,30 @@ if [[ "$analysis" == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
 
 makeMoviePy1()
 {
-echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
+$'\nquit' > make1_movie_Pyscript.pml
 pymol make1_movie_Pyscript.pml
 }
 	
 makeMoviePy2()
 {
-echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
+$'\nquit' > make2_movie_Pyscript.pml
 pymol make2_movie_Pyscript.pml
 }
 
 ##function specific for movie update
 makeMoviePyx()
 {
-echo $'cd ./MOVIE\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
+echo $'cd ./MOVIE\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
+$'\nquit' > make1_movie_Pyscript.pml
 pymol make1_movie_Pyscript.pml
 }
 ##function specific for movie update	
 makeMoviePyy()
 {
-echo $'cd ./MOVIE\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
+echo $'cd ./MOVIE\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
+$'\nquit' > make2_movie_Pyscript.pml
 pymol make2_movie_Pyscript.pml
 }
 
@@ -916,6 +923,7 @@ analyser9()
 {
 echo "$demA"$'Preparing to make a summary movie of the trajectory'
 
+if [[ $customframeNo == '' ]]; then
 cat << askMovielength
 
 Do you want to proceed to making a movie summarized into 200 frames?
@@ -925,36 +933,44 @@ Do you want to proceed to making a movie summarized into 200 frames?
 
 askMovielength
 
-read -p ' Enter 1 or 2 here: ' movieLeng
-	while [[ "$movieLeng" != 1 && "$movieLeng" != 2 ]]; do
-		echo $'\nYou entered: '"$movieLeng"
-		echo $'Please enter a valid number (1 or 2)!!\n'
-		read -p ' Enter 1 or 2 here: ' movieLeng
-	done
-	
-if [[ $movieLeng == 2 ]] ; then
-	cat trajectDetails.log | grep -v "GROMACS reminds"
-	echo "$demA"$'Above is a summary of your simulation trajectory.\nUse the info to provide a response below.\n'
-	read -p '*Please enter the number of frames to skip at intervals: ' skimov
+	read -p ' Enter 1 or 2 here: ' movieLeng
+		while [[ "$movieLeng" != 1 && "$movieLeng" != 2 ]]; do
+			echo $'\nYou entered: '"$movieLeng"
+			echo $'Please enter a valid number (1 or 2)!!\n'
+			read -p ' Enter 1 or 2 here: ' movieLeng
+		done
+	if [[ $movieLeng == 1 ]] ; then
+		customframeNo_int=200
+	elif [[ $movieLeng == 2 ]] ; then
+		cat trajectDetails.log | grep -v "GROMACS reminds"
+		sleep 2
 
-	echo "You entered: $skimov"$'\n'
-
-elif [[ $movieLeng == 1 ]] ; then
-	if (( $No_of_frames >= 200 )) ; then 
-		skimov_raw=$(awk "BEGIN {print $No_of_frames / 200}")
-		skimov=$(echo ${skimov_raw%\.*})
-		echo "$demA""Number of frames in the trajectory: ${No_of_frames}"$'\n'"${skimov} frames will be \
-		skipped at intervals to produce a total of ~200 frames for movie""$demB"
-		
-	elif (( $No_of_frames < 200 )) ; then
-		skimov=1
-		echo "$demA""Number of frames in the trajectory: ${No_of_frames}"$'\n'"Total number of frames \
-		in the trajectory is less than 200."$'\n'"No frames will be skipped.""$demB"
-	fi
+		echo "$demA"$'Above is a summary of your simulation trajectory.'
+		sleep 1
+		echo $'You may find the info useful to provide a response to the prompt below.'
+		sleep 2
+		echo "$demA"$'How many frames do you want the movie to be composed of?\n'
+		sleep 1
+		read -p '*Please enter a value here: ' customframeNo
+		echo "You entered: $customframeNo"$'\n'
+		customframeNo_int=$(echo ${customframeNo%\.*})
+	fi 
+elif [[ "$customframeNo" != '' ]]; then
+	customframeNo_int=$(echo ${customframeNo%\.*})
 fi
 
+if (( $No_of_frames >= "$customframeNo_int" )) ; then
+	skimov_raw=$(awk "BEGIN {print $No_of_frames / $customframeNo}")
+	skimov=$(echo ${skimov_raw%\.*})
+elif (( $No_of_frames < "$customframeNo_int" )) ; then 
+	skimov=1
+	echo "$demA""Number of frames in the trajectory: ${No_of_frames}"\
+	$'\n'"Total number of frames in the trajectory is less than $customframeNo!"\
+	$'\n'"Using ${No_of_frames} frames directly.""$demB"
+	$customframeNo=$(echo ${No_of_frames})
+fi
 
-echo "$demA"$' Will now extract frames to be used for the movie...'
+echo "$demA"$' Will now extract frames to be used for the movie...\n\n'
 sleep 2
 #if [[ $sysType == 1 ]] || [[ $sysType == 2 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
 echo 0 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -skip $skimov
@@ -962,7 +978,7 @@ echo 0 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${file
 #gmx trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -skip $skimov
 #fi
 sleep 2
-echo "$demA"$' Preparing to extract 200 snapshots...\n'
+echo "$demA Preparing to extract $customframeNo snapshots...$'\n'
 sleep 2
 if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -s "${filenm}".tpr -o summaryForMovie.pdb
@@ -1012,7 +1028,8 @@ convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || m
 
 if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
 	echo "$demA"$'The program "Convert/ImageMagick" could not be found.\nCHAPERONg detected'\
-	$'"PyMOL" and will use it to make a movie which may, however, be of lesser quality'"$demB"
+	$'"PyMOL" and will use it to make a movie which may,\n'\
+	$'however, be of lesser quality'"$demB"
 		
 	makeMoviePy1
 	makeMoviePy2
@@ -1022,8 +1039,8 @@ fi
 
 if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
 	echo "$demA"$'A mp4 movie could not be made. This may be due to the program'\
-	$'"Convert/ImageMagick" not being found, or some library is missing.'\
-	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+	$'\n"Convert/ImageMagick" not being found, or some library is missing.'\
+	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,\n'\
 	$'however, be of lesser quality'"$demB"
 		
 	makeMoviePy1
@@ -1036,7 +1053,8 @@ fi
 #mv frame_*.png ./frames || true ; mv ../summaryForMovie.pdb ./ || true; mv ../"${filenm}""_trjEvery""$skimov""skipForMovie.xtc" ./ || true ; mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
 rm frame_*.png || true ; rm ../summaryForMovie.pdb || true
 rm ../"${filenm}""_trjEvery""$skimov""skipForMovie.xtc" || true 
-mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
+mv ../*.pse ./ || true ; rm ../*_movie_Pyscript.pml || true
+rm ./*_movie_Pyscript.pml || true
 rm ./PyMOLsession.pse || true
 #rm prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml
 #rm ../prep_movie_Pyscript.pml || true; cd ..
@@ -1044,7 +1062,6 @@ rm ./PyMOLsession.pse || true
 echo "$demA"$' Convert images to movie...DONE'"$demB"
 cd ..
 }
-
 
 analyser9update()
 {
@@ -1124,12 +1141,13 @@ if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
 fi
 
 rm frame_*.png || true 
-rm ../*movie_Pyscript.pml || true
+# rm ../*movie_Pyscript.pml || true
+rm ./*movie_Pyscript.pml || true
 echo "$demA"$' Convert images to movie...DONE'"$demB"
 cd ..
 }
 
-if [[ "$analyse" == "9" ]]; then
+if [[ "$analyse" == "9" ]] && [[ -d MOVIE ]]; then
 cat << MovChoic
 $demA
 Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
@@ -1147,12 +1165,17 @@ while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
 	read -p '*Enter your choice here (a or b): ' moviechoic
 done
  
-if [[ "$moviechoic" == "a" ]]; then ScanTRAJ; analyser9
-elif [[ "$moviechoic" == "b" ]]; then analyser9update; fi
+	if [[ "$moviechoic" == "a" ]]; then ScanTRAJ; analyser9
+	elif [[ "$moviechoic" == "b" ]]; then analyser9update
+	fi
 
+elif [[ "$analyse" == "9" ]] && [[ ! -d MOVIE ]]; then
+	ScanTRAJ; analyser9
 fi
 
-if [[ "$analysis" == *" 9 "* ]]; then ScanTRAJ; analyser9 ; fi
+if [[ "$analysis" == *" 9 "* ]]; then
+	ScanTRAJ; analyser9
+fi
 	
 analyser10()
 {
@@ -1177,13 +1200,15 @@ if [[ $mmGMXpath != '' ]] ; then
 	if (( $No_of_last_third_framesINT >= $mmpbframesNo )) ; then
 		skipframegpsa=$(awk "BEGIN {print $No_of_last_third_frames / $mmpbframesNo }")
 		skipframegpsaINT=$(echo ${skipframegpsa%\.*})
-		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"$'\n'"${skipframegpsaINT} "\
-		"frames will be skipped at intervals to produce a total of ~100 frames for g_mmpbsa calculations.""$demB"
+		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'"${skipframegpsaINT} frames will be skipped at intervals "\
+		"to produce a total of ~100 frames for g_mmpbsa calculations.""$demB"
 		
 	elif (( $No_of_last_third_framesINT < $mmpbframesNo )) ; then
 		skipframegpsaINT=1
-		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"$'\n'"Total number of frames "\
-		"in the trajectory is less than 200."$'\n'"No frames will be skipped for g_mmpbsa calculations.""$demB"
+		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'"Total number of frames in the trajectory is less than 200."\
+		$'\n'"No frames will be skipped for g_mmpbsa calculations.""$demB"
 	fi
 
 	if [[ "$mmGMX" == "1" ]] ; then
@@ -1229,7 +1254,8 @@ if [[ $mmGMXpath != '' ]] ; then
 
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
-			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
+			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
+			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
 			-s "${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
 			${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
@@ -1260,7 +1286,8 @@ if [[ $mmGMXpath != '' ]] ; then
 
 	if [[ "$mmGMX" == "1" ]] ; then
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
-			echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+			echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
+			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
 			eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		fi
@@ -2169,8 +2196,8 @@ extractMoreStructs
 			echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"$demB"
 			sleep 2
 			echo "$demA"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
-			$'\n sorted by time and energy all containing the mapped simulation time, order'\
-			$'\n parameters and the corresponding free energy has been generated and saved'\
+			$'\n (sorted by time or energy) all containing the mapped simulation time, order'\
+			$'\n parameters and the corresponding free energy have been generated and saved'\
 			$'\n into the folder '"$results_folder""/collect_mappings."\
 			$'\n\n **You may use this file to identify the sumulation time(s) of the'\
 			$'\n structure(s) you may want to extract from the free energy landscape'"$demB"
