@@ -12,21 +12,6 @@ set -o pipefail
 #set version
 CHAPERONg_version="v0.1"
 
-#Initialize (default) parameters
-btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
-THREA="-nt ""${nt}"; hbthread="-nthreads ""0"
-wmodel=""; wat=""; nb='' ; indexer=''
-flw=0; ffUse=""; gpid=''; filenm=''
-ntmpi=0; ntomp=0; skp=''; nohp=''
-threader="-ntmpi ""${ntmpi}"" -ntomp ""${ntomp}"
-Enmdp=0; Minmdp=0; wraplabel=''
-pn=''; nn=''; ion_conc=''; pnam_nnam=''
-extr="-ignh" ; customNDXask=''
-PBCcorrectType='' ; trajFraction=''
-mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
-parfilename='' ; mmpbframesNo=''
-gmx_exe_path="gmx" ; customframeNo=''
-#gmxV=''
 
 #Defining primary functions
 Credit()
@@ -121,6 +106,17 @@ demB=$'\n'"#====================================================================
 #demB=$'\n'"#*****************************************************************************#"$'\n\n'
 
 
+# Initialize (default) parameters
+btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
+wat=""; nb='' ; termini=0 ; gmx_exe_path="gmx"
+flw=0; ffUse=""; gpid=''; filenm=''
+ntmpi=0; ntomp=0; skp=''; nohp=''
+pn=''; nn=''; ion_conc='' ; customframeNo=''
+PBCcorrectType='' ; trajFraction=''
+mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
+parfilename='' ; mmpbframesNo=''
+#gmxV=''
+
 # check if the parFile flag is used and then read the provided parameter file
 read_parFile()
 {
@@ -139,8 +135,8 @@ read_parFile()
 	fi
 }
 
-#then check other flags
-#flags provided on the terminal overwrite parameters in parFile in case of conflicts
+# then check other flags
+# flags provided on the terminal overwrite parameters in parFile in case of conflicts
 while [ "$1" != "" ]; do	
 	case "$1" in
 	--parFile) shift; parfilename="$1"; read_parFile;;	
@@ -186,7 +182,6 @@ if [[ "$edgeDist" != *"0."* && "$edgeDist" != *"1."* && "$edgeDist" != *"2."* &&
 	exit 1
 fi
 
-
 if [[ "$#" == 1 ]] || [[ "$#" == 2 ]] && [[ "$flag" != "h" ]] && [[ "$flag" != "H" ]]; then
 	echo "$demA"" No arguments are given. Default parameters will be used...""$demB"
 	sleep 1
@@ -204,11 +199,11 @@ else coordinates=$coordinates_raw
 fi
 
 if test "$wat" != ""; then wmodel="-water ""${wat}"
+elif test "$wat" == ""; then wmodel=""
 # elif test "$wat" == ""; then
 # 	echo "$demA"" No water model is provided. You maybe be prompted to choose later.$demB"
 # 	sleep 1
 fi
-
 
 if [[ "${filenm}" == '' ]]; then filenm="md_${coordinates}"; fi
 
@@ -218,7 +213,11 @@ elif [[ "$gpid" == '' ]] && [[ "$nb" == 1 ]] ; then gpidn="-nb gpu"
 elif [[ "$gpid" == '' ]] && [[ "$nb" == '' ]] ; then gpidn=''
 fi
 
-if [[ "$termini" == 1 ]]; then extr="-ignh -ter"; fi
+if [[ $termini == 1 ]]; then extr="-ignh -ter"
+elif [[ $termini == 0 ]]; then extr="-ignh"
+fi
+
+pnam_nnam=''
 
 if [[ "$pn" != '' ]] || [[ "$nn" != '' ]] && [[ "$ion_conc" == '' ]]; then
 	pnam_nnam="-pname $pn -nname $nn"
@@ -229,6 +228,10 @@ elif [[ "$pn" == '' ]] || [[ "$nn" == '' ]] && [[ "$ion_conc" == '' ]]; then
 elif [[ "$pn" == '' ]] || [[ "$nn" == '' ]] && [[ "$ion_conc" != '' ]]; then
 	pnam_nnam="-conc ${ion_conc}"
 fi
+
+
+THREA="-nt ""${nt}"; hbthread="-nthreads ""0"
+threader="-ntmpi ""${ntmpi}"" -ntomp ""${ntomp}"
 
 if [[ "$nt" == 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then threader='' && THREA=''
 elif [[ "$nt" != 0 ]] && [[ "$ntmpi" != 0 ]] && [[ "$ntomp" == 0 ]]; then

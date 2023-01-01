@@ -781,110 +781,192 @@ analyser7()
 if [[ "$analysis" == *" 7 "* ]]; then analyser7 ; fi
 	
 dsspCheck="Avail"
-checkDSSP()
+DSSPfail()
 {
-echo "$demA"$'DSSP not configured for gromacs!\nSkipping secondary structure analysis...\n'
-sleep 2
-dsspCheck="notAvail"
+	echo "$demA"$' DSSP could not be configured for gromacs!\n Skipping secondary structure analysis...\n'
+	sleep 2
+	dsspCheck="notAvail"
+}
+useCHAPdssp()
+{
+	echo "$demA"$' DSSP not detected on your machine.'\
+	$'\nDo you want use the DSSP executable packaged with CHAPERONg?\n'
+	read -p ' Enter a response here (yes or no): ' configDSSP
+		while [[ "$configDSSP" != "yes" && "$movieLeng" != "y" \
+		&& "$movieLeng" != "no" && "$movieLeng" != "n" ]]; do
+			echo $'\nYou entered: '"$configDSSP"
+			echo $'Please enter a valid response (yes/no or y/n)!!\n'
+			read -p ' Enter a response here (y/n): ' configDSSP
+		done
+	if [[ $configDSSP == "yes" || $configDSSP == "y" ]] ; then
+		export DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+		alias DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+	elif [[ $configDSSP == "no" || $configDSSP == "n" ]] ; then echo ""
+	fi
+}
+
+useCHAPdsspGMX()
+{
+	echo "$demA"$' DSSP not detected on your machine.'\
+	$'Either it is not installed or the\n environment has not been set (properly).'
+	sleep 2
+	echo $'\n Do you want configure the DSSP executable packaged with'\
+	$'CHAPERONg for use\n by GMX?\n'
+	sleep 2
+	read -p ' Enter a response here (yes or no): ' configDSSP
+		while [[ "$configDSSP" != "yes" && "$configDSSP" != "y" \
+		&& "$configDSSP" != "no" && "$configDSSP" != "n" ]]; do
+			echo $'\nYou entered: '"$configDSSP"
+			echo $'Please enter a valid response (yes/no or y/n)!!\n'
+			read -p ' Enter a response here (y/n): ' configDSSP
+		done
+	if [[ $configDSSP == "yes" || $configDSSP == "y" ]] ; then
+		export DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+		alias DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+
+		echo "$demA"$' DSSP configured...\n'
+		sleep 1
+		echo $' Now attempting to run secondary analysis again...\n\n'
+		sleep 2
+		echo "MainChain" | eval $gmx_exe_path do_dssp -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+		-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || DSSPfail
+
+	elif [[ $configDSSP == "no" || $configDSSP == "n" ]] ; then DSSPfail
+	fi
 }
 
 analyser8()
 {
+	# echo "$demA"$' Checking DSSP availability and configuration...\n'
+	# sleep 2
+	# catchDSSP1error=''
+	# DSSP -h &> tempdssp.temp1 || true
+	# catchDSSP1error=$(cat tempdssp.temp1 | grep "not found")
+	# cat tempdssp.temp1
+	# echo $catchDSSP1error
+	# sleep 3
+	# cat tempdssp.temp1 | grep "not found"
+	# sleep 3
+	# echo "Pass 1"
+	# #rm tempdssp.temp1
 
-echo "$demA"$' Now computing secondary structure with DSSP...\n'
+	# if [[ $catchDSSP1error == *"not found" ]]; then
+	# 	echo "Pass 2"
+	# 	catchdssp2error=''
+	# 	dssp -h &> tempdssp.temp2 || true
+	# 	catchdssp2error=$(cat tempdssp.temp2 | grep "not found")
+	# 	cat tempdssp.temp2
+	# 	echo $catchdssp2error
+	# 	sleep 3
+	# 	cat tempdssp.temp2 | grep "not found"
+	# 	sleep 3
+	# 	#rm tempdssp.temp2
+	# 	echo "Pass 3"
+	# 	if [[ $catchdssp2error == *"not found" ]]; then
+	# 		echo "Pass 4"
+	# 		useCHAPdssp
+	# 		echo "Pass 5"
+	# 	fi	
+	# fi
 
-#CollectDSSPdt()
-
-#echo $'Enter a number below to set the time interval for frames to be used (dt).'\
-#$'\nCHAPERONg recommends 0.1 for 100ns mds, 0.2 for 200ns etc.\nYou can also enter 0 instead, for gmx default estimation.\n'
-
-#read -p 'Value of dt: ' dt_dssp
-#echo $'\nYou entered: '"$dt_dssp"$'\n'
-
-#sleep 2
-
-#if [[ $simDuratnINTns == 1000 ]]; then dt_dssp=
-#elif [[ $simDuratnINTns == 500 ]]; then dt_dssp="0.5"
-#elif [[ $simDuratnINTns == 200 ]]; then dt_dssp="0.2"
-#fi
-
-#dt_dssp=$(echo "scale=3; ${simDuratnINTns} / 1000" | bc -l)
-
-dt_dssp_alt()
-{
-simDuratnINTns=$(cat simulation_duration)
-dt_dssp=$(awk "BEGIN {print $simDuratnINTns / 1000}")
-}
-
-dt_dssp=$(awk "BEGIN {print $simDuratnINTns / 1000}") || dt_dssp_alt
-
-echo "MainChain" | eval $gmx_exe_path do_dssp -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || checkDSSP
-if [[ "$dsspCheck" == "Avail" ]] ; then
-	echo "$demA"$' Compute secondary structure...DONE'"$demB"
-	sleep 1
-	
-	echo "$demA"$' Detecting colour codes assigned in the eps file...\n'
-	while IFS= read -r line; do
-		scanSSname=$(echo "$line" | awk '{print $6}')
-		if [[ "$scanSSname" == '"Coil"' ]] ; then coilCODEcoil=$(echo "$line" | awk '{print $3}')
-		elif [[ "$scanSSname" == '"B-Sheet"' ]] ; then coilCODEbeta=$(echo "$line" | awk '{print $3}')
-		elif [[ "$scanSSname" == '"A-Helix"' ]] ; then coilCODEhelix=$(echo "$line" | awk '{print $3}')
-		fi
-	done < ss_"${filenm}".xpm
-	
-	echo "$demA"$' Reducing colour coding to helix-sheet-turn-coil...\n'
-	
-	while IFS= read -r line; do
-		scanSSname=$(echo "$line" | awk '{print $6}')
-		if [[ "$scanSSname" == '"B-Bridge"' ]] ; then 
-			echo "$line" | awk '{print $1 $2 $coilCODEbeta $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
-		elif [[ "$scanSSname" == '"Bend"' ]] ; then
-			echo "$line" | awk '{print $1 $2 $coilCODEcoil $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
-		elif [[ "$scanSSname" == '"5-Helix"' ]] ; then
-			echo "$line" | awk '{print $1 $2 $coilCODEhelix $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
-		elif [[ "$scanSSname" == '"3-Helix"' ]] ; then
-			echo "$line" | awk '{print $1 $2 $coilCODEhelix $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
-		else echo "$line" >> ss_"${filenm}"_HETC.xpm
-		fi
-	done < ss_"${filenm}".xpm
-	
-	echo "$demA"$' Converting output ss_xpm to an eps file...\n'
-	#eval $gmx_exe_path xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype2.eps -rainbow blue || true
-	eval $gmx_exe_path xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype1.eps || true
-	echo "$demA"$' Converting eps to pdf...\n' || true
-	ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
-	#ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size2.pdf || true
-	ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size1.pdf || true
-	#ps2pdf ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size1.pdf || true
-
-	echo "$demA"$' Converting ss_eps to png...\n'
-	
-	convert ss_"${filenm}"_colortype1.eps -trim -bordercolor ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
-
-	convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
-	
-	currentSecStrdir="$(pwd)""/Secondary_structure"
-	nSecStr=1
-	bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
-	base_bkupSecStrdir=$(basename "$bkupSecStrdir")
-	if [[ -d "$currentSecStrdir" ]]; then
-		echo $'\n'"$currentSecStrdir"$' folder exists,\n'"backing it up as $base_bkupSecStrdir"
-		sleep 1
-		while [[ -d "$bkupSecStrdir" ]]; do
-			nSecStr=$(( nSecStr + 1 ))
-			bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
-			base_bkupSecStrdir=$(basename "$bkupSecStrdir")
-		done
-		mv "$currentSecStrdir" "$bkupSecStrdir" && mkdir ./Secondary_structure || true
-		echo $'\n'"Backing up the last Secondary_structure folder and its contents as $base_bkupSecStrdir"
-		sleep 1
-		mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
-	elif [[ ! -d "$currentSecStrdir" ]]; then
-		mkdir Secondary_structure; mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
-	fi
-	echo "$demA"$' Secondary structure analysis...DONE'"$demB"
+	echo "$demA"$' Now computing secondary structure with DSSP...\n'
 	sleep 2
-fi
+	#CollectDSSPdt()
+
+	#echo $'Enter a number below to set the time interval for frames to be used (dt).'\
+	#$'\nCHAPERONg recommends 0.1 for 100ns mds, 0.2 for 200ns etc.\nYou can also enter 0 instead, for gmx default estimation.\n'
+
+	#read -p 'Value of dt: ' dt_dssp
+	#echo $'\nYou entered: '"$dt_dssp"$'\n'
+
+	#sleep 2
+
+	#if [[ $simDuratnINTns == 1000 ]]; then dt_dssp=
+	#elif [[ $simDuratnINTns == 500 ]]; then dt_dssp="0.5"
+	#elif [[ $simDuratnINTns == 200 ]]; then dt_dssp="0.2"
+	#fi
+
+	#dt_dssp=$(echo "scale=3; ${simDuratnINTns} / 1000" | bc -l)
+
+	dt_dssp_alt()
+	{
+		simDuratnINTns=$(cat simulation_duration)
+		dt_dssp=$(awk "BEGIN {print $simDuratnINTns / 1000}")
+	}
+
+	dt_dssp=$(awk "BEGIN {print $simDuratnINTns / 1000}") || dt_dssp_alt
+
+	echo "MainChain" | eval $gmx_exe_path do_dssp -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+	-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || useCHAPdsspGMX
+	if [[ "$dsspCheck" == "Avail" ]] ; then
+		echo "$demA"$' Compute secondary structure...DONE'"$demB"
+		sleep 1
+		echo "$demA"$' Detecting colour codes assigned in the eps file...\n'
+		sleep 2
+		while IFS= read -r line; do
+			scanSSname=$(echo "$line" | awk '{print $6}')
+			if [[ "$scanSSname" == '"Coil"' ]] ; then coilCODEcoil=$(echo "$line" | awk '{print $3}')
+			elif [[ "$scanSSname" == '"B-Sheet"' ]] ; then coilCODEbeta=$(echo "$line" | awk '{print $3}')
+			elif [[ "$scanSSname" == '"A-Helix"' ]] ; then coilCODEhelix=$(echo "$line" | awk '{print $3}')
+			fi
+		done < ss_"${filenm}".xpm
+		
+		echo $' Reducing colour coding to helix-sheet-turn-coil...\n'
+		sleep 2
+		
+		while IFS= read -r line; do
+			scanSSname=$(echo "$line" | awk '{print $6}')
+			if [[ "$scanSSname" == '"B-Bridge"' ]] ; then 
+				echo "$line" | awk '{print $1 $2 $coilCODEbeta $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
+			elif [[ "$scanSSname" == '"Bend"' ]] ; then
+				echo "$line" | awk '{print $1 $2 $coilCODEcoil $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
+			elif [[ "$scanSSname" == '"5-Helix"' ]] ; then
+				echo "$line" | awk '{print $1 $2 $coilCODEhelix $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
+			elif [[ "$scanSSname" == '"3-Helix"' ]] ; then
+				echo "$line" | awk '{print $1 $2 $coilCODEhelix $4 $5 $7}' >> ss_"${filenm}"_HETC.xpm
+			else echo "$line" >> ss_"${filenm}"_HETC.xpm
+			fi
+		done < ss_"${filenm}".xpm
+		
+		echo $' Converting output ss_xpm to an eps file...\n\n'
+		sleep 2
+		#eval $gmx_exe_path xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype2.eps -rainbow blue || true
+		eval $gmx_exe_path xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype1.eps || true
+		echo "$demA"$' Converting eps to pdf...\n'
+		sleep 1
+		ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
+		#ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size2.pdf || true
+		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size1.pdf || true
+		#ps2pdf ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size1.pdf || true
+
+		echo $' Converting ss_eps to png...\n'
+		sleep 1
+		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
+
+		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
+		
+		currentSecStrdir="$(pwd)""/Secondary_structure"
+		nSecStr=1
+		bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
+		base_bkupSecStrdir=$(basename "$bkupSecStrdir")
+		if [[ -d "$currentSecStrdir" ]]; then
+			echo $'\n'"$currentSecStrdir"$' folder exists,\n'"backing it up as $base_bkupSecStrdir"
+			sleep 1
+			while [[ -d "$bkupSecStrdir" ]]; do
+				nSecStr=$(( nSecStr + 1 ))
+				bkupSecStrdir="$(pwd)""/#Secondary_structure"".""backup.""$nSecStr"
+				base_bkupSecStrdir=$(basename "$bkupSecStrdir")
+			done
+			mv "$currentSecStrdir" "$bkupSecStrdir" && mkdir ./Secondary_structure || true
+			echo $'\n'"Backing up the last Secondary_structure folder and its contents as $base_bkupSecStrdir"
+			sleep 1
+			mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
+		elif [[ ! -d "$currentSecStrdir" ]]; then
+			mkdir Secondary_structure; mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
+		fi
+		echo "$demA"$' Secondary structure analysis...DONE'"$demB"
+		sleep 2
+	fi
 }
 
 if [[ "$analysis" == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
@@ -978,7 +1060,7 @@ echo 0 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${file
 #gmx trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -skip $skimov
 #fi
 sleep 2
-echo "$demA Preparing to extract $customframeNo snapshots...$'\n'
+echo "$demA"$' Preparing to extract $customframeNo snapshots...\n'
 sleep 2
 if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -s "${filenm}".tpr -o summaryForMovie.pdb
@@ -1010,8 +1092,8 @@ elif [[ ! -d "$currentMOVIEdir" ]]; then mkdir MOVIE
 fi	
 	
 echo $'load summaryForMovie.pdb\nsave PyMOLsession.pse\nintra_fit name ca+c+n+o\n'\
-$'preset.pretty(selection='"'""all""')"\
-$'\nspectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
+$'preset.pretty(selection='"'all'"$')\n'\
+$'spectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
 $'set movie_loop, 0\nsmooth\norient\nviewport 760, 540\nzoom all, -10\n'\
 $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
 $'mclear\ncd ./MOVIE\nsave PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
@@ -1179,7 +1261,8 @@ fi
 	
 analyser10()
 {
-if [[ $mmGMXpath != '' ]] ; then	
+if [[ $mmGMXpath != '' ]] ; then
+	indexer=''
 	#if [[ $sysType == 1 ]]; then indexer=''
  	if [[ $sysType == 2 || $sysType == 3 ]] ; then indexer='-n index.ndx' ; fi
 	echo "$demA"$'Preparing to generate input files for g_MMPBSA free energy calculations...\n'
@@ -1541,8 +1624,8 @@ askFELuseexist
 	echo "# from the data generated by GROMACS..." >> RgVsRMSD.xvg
 	echo "#" >> RgVsRMSD.xvg
 	echo "@    title "$'"Plot of Rg against RMSD"' >> RgVsRMSD.xvg
-	echo "@    xaxis  label "$'"RMSD (nm)"' >> RgVsRMSD.xvg
-	echo "@    yaxis  label "$'"Rg (nm)"' >> RgVsRMSD.xvg
+	echo "@    xaxis  label "$'"'"RMSD (nm)"$'"' >> RgVsRMSD.xvg
+	echo "@    yaxis  label "$'"'"Rg (nm)"$'"' >> RgVsRMSD.xvg
 	echo "@TYPE xy" >> RgVsRMSD.xvg
 	paste -d "        " RMSData.dat RgData.dat >> RgVsRMSD.xvg
 
@@ -1638,8 +1721,8 @@ inputFormat
 				echo "# from the data generated by GROMACS..." >> RgVsRMSD.xvg
 				echo "#"  >> RgVsRMSD.xvg
 				echo "@    title "$'"Plot of Rg against RMSD"' >> RgVsRMSD.xvg
-				echo "@    xaxis  label "$'"RMSD (nm)"' >> RgVsRMSD.xvg
-				echo "@    yaxis  label "$'"Rg (nm)"' >> RgVsRMSD.xvg
+				echo "@    xaxis  label "$'"'"RMSD (nm)"$'"' >> RgVsRMSD.xvg
+				echo "@    yaxis  label "$'"'"Rg (nm)"$'"' >> RgVsRMSD.xvg
 				echo "@TYPE xy" >> RgVsRMSD.xvg
 				paste -d "        " RMSData.dat RgData.dat >> RgVsRMSD.xvg
 				
@@ -1950,8 +2033,8 @@ analyser12()
 			echo "# from the data generated by GROMACS..."
 			echo "#"
 			echo "@    title "$'"Plot of Rg against RMSD"' > RgVsRMSD.xvg
-			echo "@    xaxis  label "$'"RMSD (nm)"' >> RgVsRMSD.xvg
-			echo "@    yaxis  label "$'"Rg (nm)"' >> RgVsRMSD.xvg
+			echo "@    xaxis  label "$'"'"RMSD (nm)"$'"' >> RgVsRMSD.xvg
+			echo "@    yaxis  label "$'"'"Rg (nm)"$'"' >> RgVsRMSD.xvg
 			echo "@TYPE xy" >> RgVsRMSD.xvg
 			paste -d "        " RMSData.dat RgData.dat >> RgVsRMSD.xvg
 			

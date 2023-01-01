@@ -1443,6 +1443,7 @@ s5EnMin1()
 {
 	echo "$demA"" Now running energy minimization...""$demB"
 	sleep 2
+	Enmdp=0; Minmdp=0
 	#1. Assemble the binary input with grompp
 	for param in *m.mdp; do
 		if [[ "${param}" == "minim.mdp" ]] ; then Minmdp=1
@@ -1608,6 +1609,7 @@ ProvProDNAMakNdx
 		$'\n\n *If you are unsure, enter "no" and CHAPERONg will make appropriate index for'\
 		$'\n you while automatically updating topol.top accordingly.'"$demB"
 		sleep 3
+		customNDXask=''
 		read -p 'Do you need to make custom index group(s) before proceeding? (yes/no): ' customNDXask
 
 		while [[ "$customNDXask" != "yes" && "$customNDXask" != "no" && "$customNDXask" != '"yes"' && "$customNDXask" != '"no"' ]]
