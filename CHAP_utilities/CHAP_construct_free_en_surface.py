@@ -12,8 +12,8 @@
 
 from matplotlib import pyplot as plt
 import math
+import time
 import numpy as np
-from matplotlib import cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
@@ -35,16 +35,13 @@ with open("CHAP_fes_Par.in") as Inpar:
 			Para2max = float(paraData[1])
 		elif "XaxisL" in parameter:
 			paraData = parameter.rstrip('\n').split(",")
-			XaxisL = str(paraData[1])
+			XaxisLabel = str(paraData[1])
 		elif "YaxisL" in parameter:
 			paraData = parameter.rstrip('\n').split(",")
-			YaxisL = str(paraData[1])
-		elif "xbin" in parameter:
+			YaxisLabel = str(paraData[1])
+		elif "no_of_frames" in parameter:
 			paraData = str(parameter).split(",")
-			xbin = int(paraData[1])
-		elif "ybin" in parameter:
-			paraData = str(parameter).split(",")
-			ybin = int(paraData[1])
+			no_of_frames = int(paraData[1])
 		elif "Temp" in parameter:
 			paraData = str(parameter).split(",")
 			Temp = float(paraData[1])
@@ -55,75 +52,76 @@ with open("CHAP_fes_Par.in") as Inpar:
 			paraData = parameter.rstrip('\n').split(",")
 			plotTitle = str(paraData[1])+str(" Free Energy Surface")
 
-#range of data from order parameters
+# Range of data from order parameters
 dPara1 = Para1max - Para1min
 dPara2 = Para2max - Para2min
 
-#initiating the order parameter lists
+# Initialize the order parameter lists
 OrderP1 = []
 OrderP2 = []
 
 print (" Reading in data of order parameters"+"\n")
-#reading in data of order parameters
+# Read in data of order parameters
 with open("OrderParameterPair.dat") as alldata:
 	alldataLines = alldata.readlines()
-	for lineNo, line in enumerate(alldataLines):
-		##using enumerate to map each line of the file to
-		##it's line_number starting line number from zero
+	for line in alldataLines:
 		dataPoint = str(line).split(",")
 		OrderP1.append(float(dataPoint[0]))
 		OrderP2.append(float(dataPoint[1]))
-#initiating probability and dG arrays
-Probb = np.zeros((xbin,ybin))
+time.sleep(2)
+
+print (" Binning and generating a 2D histogram"+"\n")
+# Determine the number of bins to use
+num_of_bins = int(math.floor(math.sqrt(no_of_frames)))
+if num_of_bins%2 != 0:
+	num_of_bins += 1
+
+xbin = num_of_bins
+ybin = num_of_bins
+
+# Create a 2D histogram using the numpy histogram2d function
+hist, x_edges, y_edges = np.histogram2d(OrderP1, OrderP2, bins=(xbin, ybin), range=[[Para1min, Para1max], [Para2min, Para2max]])
+time.sleep(2)
+
+print (" Identifying the highest probability bin"+"\n")
+# Flatten the 2D histogram into a 1D array
+Prob = hist.flatten()
+
+# Identify the most populated bin
+max_bin = np.max(Prob)
+time.sleep(2)
+
+# constant -> product a kilocal conversion factor, Avogadro's number, Boltzmann constant & temperature
+RT = -0.001 * 6.02214E23 * 3.29763E-24 * Temp
+
+print (" Calculating delta_G values by Boltzmann inversion of the histogram"+"\n")
+
+# Initialize the dG array
 dG = np.zeros((xbin,ybin))
 
-print (" Calculating probability of given combination of data points"+"\n")
-#calculate probabilities
-for value in range(lineNo+1):
-	for x in range(xbin):
-		if OrderP1[value] > (Para1min+x*dPara1/xbin) and OrderP1[value] <= (Para1min+(x+1)*dPara1/xbin):
-			for y in range(ybin):
-				if  OrderP2[value] > (Para2min+y*dPara2/ybin) and OrderP2[value] <= (Para2min+(y+1)*dPara2/ybin):
-					Probb[x][y] = Probb[x][y] + 1
-					break
-			break
-
-#maximum probability
-#P_list = []
-P_list = list()
-for x in range(xbin):
-	for y in range(ybin):
-		P_list.append(Probb[x][y])
-ProbMax = max(P_list)
-
-#constant
-RT = Temp * -0.001 * 6.02214E23 * 3.29763E-24
-
-print (" Calculating delta_G values"+"\n")
-#estimating dG values
+# Estimate dG values using Boltzmann inversion
 with open("OrderParameters1_2_dG.dat", "w") as dGoutFile:
 	for x in range(xbin):
 		for y in range(ybin):
-			if Probb[x][y] == 0:
+			if hist[x][y] == 0:
 				dG[x][y] = 10
-				dGoutFile.write((str((2*Para1min+(2*x+1)*dPara1/xbin)/2) + "\t" + str((2*Para2min+(2*y+1)*dPara2/ybin)/2) + "\t" + str(dG[x][y])+"\n"))
+				dGoutFile.write((f"{(2*Para1min+(2*x+1)*dPara1/xbin)/2}\t{(2*Para2min+(2*y+1)*dPara2/ybin)/2}\t{dG[x][y]}\n"))
 				continue
 			else:
-				dG[x][y] = RT*(math.log(Probb[x][y]) - math.log(ProbMax))
-				dGoutFile.write((str((2*Para1min+(2*x+1)*dPara1/xbin)/2) + "\t" + str((2*Para2min+(2*y+1)*dPara2/ybin)/2) + "\t" + str(dG[x][y])+"\n"))
+				dG[x][y] = RT*(np.log(hist[x][y]) - np.log(max_bin))
+				dGoutFile.write((f"{(2*Para1min+(2*x+1)*dPara1/xbin)/2}\t{(2*Para2min+(2*y+1)*dPara2/ybin)/2}\t{dG[x][y]}\n"))
 				dGoutFile.write("\n")
+time.sleep(2)
 
 print (" Generating and saving FES plot")
-#generating figure
-ZaxisL = r'$\Delta G$'+' (kcal/mol)'
+# Plot figure
 plt.figure()
 ax = plt.gca()
-im = ax.imshow(dG.T, origin='lower', aspect='auto', cmap=cm.gnuplot, extent=[Para1min,Para1max,Para2min,Para2max])
+im = ax.imshow(dG.T, origin='lower', aspect='auto', cmap="gnuplot", extent=[Para1min,Para1max,Para2min,Para2max])
 plt.title(plotTitle)
-plt.xlabel(XaxisL)
-plt.ylabel(YaxisL)
-divider = make_axes_locatable(ax)
-cax = divider.append_axes("right", size="2%", pad=0.05)
-cbar = plt.colorbar(im, cax=cax)
-cbar.set_label(ZaxisL,size=12)
+ax.set_xlabel(XaxisLabel)
+ax.set_ylabel(YaxisLabel)
+cbar = plt.colorbar(im, cax=(make_axes_locatable(ax).append_axes("right", size="2.5%", pad=0.1)))
+cbar.set_label(r'$\Delta G$'+' (kcal/mol)', size=12)
 plt.savefig(outFilename,dpi=600)
+time.sleep(2)

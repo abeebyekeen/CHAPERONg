@@ -43,13 +43,18 @@ with open("OrderParameters1_2_dG_nogap-sorted.dat", "r") as paramets:
             milestone_count=milestone_factor*200
             print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
             milestone_factor=2
-        if filecount%500 == 0 and filecount > 1000:
+        if filecount%500 == 0 and filecount > 1000 and filecount <= 9500:
             milestone_factor+=1
             milestone_count=milestone_factor*500
             print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
-        if filecount%500 == 0 and filecount > 9500:
+        if filecount == 10000:
             milestone_factor+=1
             milestone_count=milestone_factor*500
+            print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
+            milestone_factor=10
+        if filecount%1000 == 0 and filecount > 10000:
+            milestone_factor+=1
+            milestone_count=milestone_factor*1000
             print(" Number of data points processed: "+str(milestone_count)+" of "+str(len(allDataPts)))
         spltcurrent_datapt = current_datapt.split("\t")
         Par1 = spltcurrent_datapt[0]

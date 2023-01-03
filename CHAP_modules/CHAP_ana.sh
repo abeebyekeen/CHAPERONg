@@ -75,9 +75,9 @@ Option  Analysis
   8     Secondary structure analysis
   9     Make a movie of the simulation
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
-  11    Construct free energy landscape with gmx sham
-  12    Construct free energy surface using the CHAP free energy function
-  13    Construct an interactive 3D free energy landscape using md-davis
+  11    Construct a free energy surface with gmx sham
+  12    Construct a free energy surface using the CHAPERONg FES script
+  13    Construct an interactive 3D plot of the FES using md-davis
   14    Plot an interactive hydrogen bond matrix with md-davis
   15    Extract frames from the trajectory
   16    Make index groups (make_ndx)
@@ -1420,7 +1420,7 @@ if [[ "$analysis" == *" 10 "* ]]; then ScanTRAJ; analyser10 ; fi
 
 useFoundPCA_sham()
 {
-	echo "$demA"$' Preparing PCA-derived FEL with gmx sham...\n'
+	echo "$demA"$' Preparing PCA-derived FES with gmx sham...\n'
 	sleep 1
 				
 	eval $gmx_exe_path sham -f ./PCA/PCA_2dproj_$filenm.xvg -ls ./PCA/FEL_PCA_sham_$filenm.xpm -notime || true
@@ -1456,13 +1456,13 @@ useFoundPCA_sham()
 	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
 	fi
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
-	echo "$demA"$' Prepare Gibbs FEL with gmx sham...DONE'"$demB"
+	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
 	sleep 2
 }
 
 useFoundRgRMSData_sham()
 {
-	echo "$demA"$' Preparing Rg Vs RMSD FEL using gmx sham...\n\n'
+	echo "$demA"$' Preparing Rg Vs RMSD FES using gmx sham...\n\n'
 	sleep 1
 				
 	eval $gmx_exe_path sham -f RgVsRMSD.xvg -ls FEL_sham_RgVsRMSD_$filenm.xpm -notime || true
@@ -1500,7 +1500,7 @@ useFoundRgRMSData_sham()
 	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm \
 	entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 
-	echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
+	echo "$demA"$' Prepare Rg Vs RMSD FES with gmx sham...DONE'"$demB"
 	sleep 2
 }
 
@@ -1508,7 +1508,7 @@ order_parameters()
 {
 cat << orderPair
 
-Which order parameter pair do you want to use for FEL calculations?
+Which order parameter pair do you want to use for the FES calculations?
 
   1) Principal components
   2) Rg versus RMSD
@@ -1534,10 +1534,10 @@ if [[ $orderPair_choice == 1 ]] ; then
 			sleep 2
 cat << askFELuseexist
 
-Do you want to use this file for free energy landscape calculations?
+Do you want to use this file for the 2D energetic landscape calculations?
 
   1) Yes, use the file above
-  2) No, repeat PCA calculations and use the new output for FEL plot
+  2) No, repeat PCA calculations and use the new output for FES plot
   3) No, I want to provide another file to be used
 
 askFELuseexist
@@ -1550,7 +1550,7 @@ askFELuseexist
 			done
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated PCA_2d projection data found!\n File found:'" $exist2dPCA"\
-			$'\n *CHAPERONg in auto mode\n'" $exist2dPCA will be used for FEL plotting"
+			$'\n *CHAPERONg in auto mode\n'" $exist2dPCA will be used for FES plotting"
 			sleep 2
 		fi
 	elif [[ ! -f "$exist2dPCA" ]] ; then analyser7		
@@ -1565,10 +1565,10 @@ elif [[ $orderPair_choice == 2 ]] ; then
 			sleep 2
 cat << askFELuseexist
 
-Do you want to use this file for free energy landscape calculations?
+Do you want to use this file for free energy surface calculations?
 
   1) Yes, use the file above
-  2) No, repeat Rg calculations and use the new output for FEL plot
+  2) No, repeat Rg calculations and use the new output for FES plot
   3) No, I want to provide another file to be used
 
 askFELuseexist
@@ -1581,7 +1581,7 @@ askFELuseexist
 			done
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated Rg data found!\nFile found:'" $existRg"\
-			$'\n *CHAPERONg in auto mode\n'" $existRg will be used for FEL plotting"
+			$'\n *CHAPERONg in auto mode\n'" $existRg will be used for FES plotting"
 			sleep 2
 		fi
 	elif [[ ! -f "$existRg" ]] ; then analyser4
@@ -1601,7 +1601,7 @@ cat << askFELuseexist
 Do you want to use this file for free energy landscape calculations?
 
   1) Yes, use the file above
-  2) No, repeat RMSD calculations and use the new output for FEL plot
+  2) No, repeat RMSD calculations and use the new output for FES plot
   3) No, I want to provide another file to be used
 
 askFELuseexist
@@ -1614,7 +1614,7 @@ askFELuseexist
 			done
 		elif [[ "$flw" == 1 ]] ; then
 			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"\
-			$'\n *CHAPERONg in auto mode\n'" $existRMSD will be used for FEL plotting"
+			$'\n *CHAPERONg in auto mode\n'" $existRMSD will be used for FES plotting"
 			sleep 2
 		fi
 	elif [[ ! -f "$existRMSD" ]] ; then analyser2		
@@ -1643,7 +1643,7 @@ analyser11()
 		elif [[ "$PCFile" == 3 ]]; then echo ""
 			read -p ' Provide the path to the pre-calculated 2d_PCA projection file: ' precalcPCfile
 	
-			echo "$demA"$'Preparing PCA-derived FEL with user-provided 2d_PCA file...\n\n'
+			echo "$demA"$'Preparing PCA-derived FES with user-provided 2d_PCA file...\n\n'
 			sleep 1
 
 			felcal=0			
@@ -1676,7 +1676,7 @@ analyser11()
 				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
 					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 				fi
-				echo "$demA"$' Prepare PCA-based FEL using gmx sham...DONE'"$demB"
+				echo "$demA"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"$demB"
 				sleep 2
 			
 			elif [[ "$felcal" == 1 ]] ; then
@@ -1766,7 +1766,7 @@ inputFormat
 				elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				fi
-				echo "$demA"$' Prepare Rg Vs RMSD FEL with gmx sham...DONE'"$demB"
+				echo "$demA"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"$demB"
 				sleep 2
 
 			elif [[ "$felcal" == 1 ]] ; then
@@ -1850,7 +1850,7 @@ inputFormat
 			elif [[ ! -d "$currentFELshamOrderParameterPairdir" ]]; then mkdir OrderParameterPair_FEL_sham
 				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			fi
-			echo "$demA"$' Prepare FEL with gmx sham...DONE'"$demB"
+			echo "$demA"$' Prepare 2D energetic landscape with gmx sham...DONE'"$demB"
 			sleep 2
 		elif [[ "$felcal" == 1 ]] ; then
 			echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
@@ -1889,8 +1889,10 @@ useFoundPCA_FESPy()
 
 	rm sorted_PC1.dat sorted_PC2.dat
 
-	echo "minPar1,$minPC1"$'\n'"maxPar1,$maxPC1"$'\n'"minPar2,$minPC2"$'\n'"maxPar2,$maxPC2" > CHAP_fes_Par.in
-	echo $'XaxisL,PC1\nYaxisL,PC2\nxbin,100\nybin,100\nTemp,300' >> CHAP_fes_Par.in
+	ScanTRAJ
+	echo "minPar1,$minPC1"$'\n'"maxPar1,$maxPC1"$'\n'"minPar2,$minPC2" > CHAP_fes_Par.in
+	echo "maxPar2,$maxPC2"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
+	echo $'XaxisL,PC1\nYaxisL,PC2\nTemp,300' >> CHAP_fes_Par.in
 	echo $'outFilename,PCA_FES\nplotTitle,PCA-derived' >> CHAP_fes_Par.in
 
 	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
@@ -1964,8 +1966,10 @@ useFoundRgRMSData_FESPy()
 
 	rm sorted_RMSData.dat sorted_RgData.dat
 
-	echo "minPar1,$minRMSD"$'\n'"maxPar1,$maxRMSD"$'\n'"minPar2,$minRg"$'\n'"maxPar2,$maxRg" > CHAP_fes_Par.in
-	echo $'XaxisL,RMSD (nm)\nYaxisL,Rg (nm)\nxbin,100\nybin,100\nTemp,300' >> CHAP_fes_Par.in
+	ScanTRAJ
+	echo "minPar1,$minRMSD"$'\n'"maxPar1,$maxRMSD"$'\n'"minPar2,$minRg" > CHAP_fes_Par.in
+	echo "maxPar2,$maxRg"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
+	echo $'XaxisL,RMSD (nm)\nYaxisL,Rg (nm)\nTemp,300' >> CHAP_fes_Par.in
 	echo $'outFilename,RgVsRMSD_FES\nplotTitle,Rg Vs RMSD' >> CHAP_fes_Par.in
 
 	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
@@ -2104,8 +2108,10 @@ inputFormat
 
 		rm sorted_precalcOrderPar1.dat sorted_precalcOrderPar2.dat
 
-		echo "minPar1,$minParam1"$'\n'"maxPar1,$maxParam1"$'\n'"minPar2,$minParam2"$'\n'"maxPar2,$maxParam2" > CHAP_fes_Par.in
-		echo $'XaxisL,PC1\nYaxisL,PC2\nxbin,100\nybin,100\nTemp,300' >> CHAP_fes_Par.in
+		ScanTRAJ
+		echo "minPar1,$minParam1"$'\n'"maxPar1,$maxParam1"$'\n'"minPar2,$minParam2" > CHAP_fes_Par.in
+		echo "maxPar2,$maxParam2"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
+		echo $'XaxisL,PC1\nYaxisL,PC2\nTemp,300' >> CHAP_fes_Par.in
 		echo $'outFilename,FES\nplotTitle,' >> CHAP_fes_Par.in
 
 		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
@@ -2159,14 +2165,21 @@ inputFormat
 	read -p ' Enter a response here (yes or no): ' getEnergyMin
 	
 	while [[ "$getEnergyMin" != "yes" && "$getEnergyMin" != "no" && \
-		"$getEnergyMin" != '"yes"' && "$getEnergyMin" != '"no"' ]]
+		"$getEnergyMin" != '"yes"' && "$getEnergyMin" != '"no"' && \
+		"$getEnergyMin" != "y" && "$getEnergyMin" != "n" && \
+		"$getEnergyMin" != '"y"' && "$getEnergyMin" != '"n"' ]]
 	do
 		echo $' \nPlease enter the appropriate response (a "yes" or a "no")!!\n'
 		echo $' Identify and extract the lowest energy structure from the landscape??\n'
 		read -p ' Enter yes or no here: ' getEnergyMin
 	done
-	if [[ "$getEnergyMin" == "yes" || "$getEnergyMin" == '"yes"' ]] ; then
-		mkdir collect_mappings
+	if [[ "$getEnergyMin" == "yes" || "$getEnergyMin" == '"yes"' || \
+		"$getEnergyMin" == '"y"' || "$getEnergyMin" == "y" ]] ; then
+		if [[ ! -d "collect_mappings" ]] ; then mkdir collect_mappings
+		elif [[ -d "collect_mappings" ]] ; then
+			rm -r collect_mappings
+			mkdir collect_mappings
+		fi
 		paste SimTime.dat $OrderParameter1 $OrderParameter2 > SimTime_OrderParameters1_2.dat
 		echo "$demA"$' Mapping landscape data point to simulation time...\n'
 		sleep 2
@@ -2237,7 +2250,11 @@ extractMoreStructs
 		if [[ "$getMoreStructs" == 1 ]] ; then
 			cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
 			cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
-			mkdir collect_mappings_extra
+			if [[ ! -d "collect_mappings_extra" ]] ; then mkdir collect_mappings_extra
+			elif [[ -d "collect_mappings_extra" ]] ; then
+				rm -r collect_mappings_extra
+				mkdir collect_mappings_extra
+			fi
 			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py || \
 			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py
 
@@ -2283,7 +2300,8 @@ extractMoreStructs
 			$'\n parameters and the corresponding free energy have been generated and saved'\
 			$'\n into the folder '"$results_folder""/collect_mappings."\
 			$'\n\n **You may use this file to identify the sumulation time(s) of the'\
-			$'\n structure(s) you may want to extract from the free energy landscape'"$demB"
+			$'\n structure(s) you may want to extract from the 2D representation of the free'\
+			$'\n energy landscape'"$demB"
 			sleep 2
 
 cat << extractMoreStructs
@@ -2306,7 +2324,7 @@ extractMoreStructs
 		
 			while [[ "$getMoreStructure" == 1 ]]
 			do
-
+				echo ""
 				read -p ' Specify the time (in ns) at which to extract a structure: ' frameTime
 
 				frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
@@ -2353,7 +2371,9 @@ extractMoreStructs
 			done
 		elif [[ "$getMoreStructs" != 1 ]] ; then echo ""
 		fi
-	elif [[ "$getEnergyMin" == "no" || "$getEnergyMin" == '"no"' ]] ; then echo ""
+	elif [[ "$getEnergyMin" == "no" || "$getEnergyMin" == '"no"' ]] ; then
+		mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat ./"$results_folder" || true
+		
 	fi
 }
 
@@ -2710,7 +2730,7 @@ sleep 2
 }
 
 
-if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
+# if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
 
 if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
 
