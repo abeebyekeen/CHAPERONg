@@ -91,7 +91,7 @@ Prob = hist.flatten()
 max_bin = np.max(Prob)
 time.sleep(2)
 
-# constant -> product a kilocal conversion factor, Avogadro's number, Boltzmann constant & temperature
+# Constant -> product of kilocal conversion factor, Avogadro's number, Boltzmann constant & temperature
 RT = -0.001 * 6.02214E23 * 3.29763E-24 * Temp
 
 print (" Calculating delta_G values by Boltzmann inversion of the histogram"+"\n")
@@ -116,12 +116,9 @@ time.sleep(2)
 print (" Generating and saving FES plot")
 # Plot figure
 plt.figure()
-ax = plt.gca()
-im = ax.imshow(dG.T, origin='lower', aspect='auto', cmap="gnuplot", extent=[Para1min,Para1max,Para2min,Para2max])
+plt.xlabel(XaxisLabel)
+plt.ylabel(YaxisLabel)
 plt.title(plotTitle)
-ax.set_xlabel(XaxisLabel)
-ax.set_ylabel(YaxisLabel)
-cbar = plt.colorbar(im, cax=(make_axes_locatable(ax).append_axes("right", size="2.5%", pad=0.1)))
-cbar.set_label(r'$\Delta G$'+' (kcal/mol)', size=12)
+im = plt.gca().imshow(dG.T, origin='lower', aspect='auto', cmap="gnuplot", extent=[Para1min,Para1max,Para2min,Para2max])
+plt.colorbar(im, cax=(make_axes_locatable(plt.gca()).append_axes("right", size="2.5%", pad=0.1))).set_label(r'$\Delta G$'+' (kcal/mol)', size=12)
 plt.savefig(outFilename,dpi=600)
-time.sleep(2)

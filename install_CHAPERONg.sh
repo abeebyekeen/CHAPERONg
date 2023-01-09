@@ -43,15 +43,16 @@ echo "$demA"$' Installation completed'"$demB"
 sleep 2
 
 # set version
-CHAPERONg_version="beta3"
+# CHAPERONg_version="beta3"
+
+cp "$CHAPERONg_PATH/CHAP_modules/run_CHAPERONg.sh" "$CHAPERONg_PATH"
 
 chmod a+x "$CHAPERONg_PATH/CHAP_modules/CHAP_colPar.sh" "$CHAPERONg_PATH/CHAP_modules/CHAP_deffxn.sh" \
 "$CHAPERONg_PATH/CHAP_modules/CHAP_ana.sh" "$CHAPERONg_PATH/CHAP_modules/CHAP_sim.sh" \
 "$CHAPERONg_PATH/conda_env_setup.sh" "$CHAPERONg_PATH/conda_dependencies.yml" \
 "$CHAPERONg_PATH/CHAP_modules/run_CHAPERONg.sh" "$CHAPERONg_PATH/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa" \
-"$CHAPERONg_PATH/CHAP_utilities/g_mmpbsa_pkg/energy2bfac" "$CHAPERONg_PATH/CHAP_utilities/dssp-x64"
-
-cp "$CHAPERONg_PATH/CHAP_modules/run_CHAPERONg.sh" "$CHAPERONg_PATH"
+"$CHAPERONg_PATH/CHAP_utilities/g_mmpbsa_pkg/energy2bfac" "$CHAPERONg_PATH/CHAP_utilities/dssp-x64" \
+"$CHAPERONg_PATH/run_CHAPERONg.sh"
 
 echo \
   $'\n###############################################################################'\

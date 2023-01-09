@@ -75,8 +75,8 @@ Option  Analysis
   8     Secondary structure analysis
   9     Make a movie of the simulation
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
-  11    Construct a free energy surface with gmx sham
-  12    Construct a free energy surface using the CHAPERONg FES script
+  11    Construct a free energy surface (FES) with gmx sham
+  12    Construct a FES using the CHAPERONg energetic landscape script
   13    Construct an interactive 3D plot of the FES using md-davis
   14    Plot an interactive hydrogen bond matrix with md-davis
   15    Extract frames from the trajectory
@@ -1265,7 +1265,7 @@ if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
 	#if [[ $sysType == 1 ]]; then indexer=''
  	if [[ $sysType == 2 || $sysType == 3 ]] ; then indexer='-n index.ndx' ; fi
-	echo "$demA"$'Preparing to generate input files for g_MMPBSA free energy calculations...\n'
+	echo "$demA"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
 
 	if [[ $trajFraction == '' ]]; then trajFraction=3 ; fi
 
@@ -1283,59 +1283,58 @@ if [[ $mmGMXpath != '' ]] ; then
 	if (( $No_of_last_third_framesINT >= $mmpbframesNo )) ; then
 		skipframegpsa=$(awk "BEGIN {print $No_of_last_third_frames / $mmpbframesNo }")
 		skipframegpsaINT=$(echo ${skipframegpsa%\.*})
-		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'"${skipframegpsaINT} frames will be skipped at intervals "\
-		"to produce a total of ~100 frames for g_mmpbsa calculations.""$demB"
+		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'" ${skipframegpsaINT} frames will be skipped at intervals to produce a total of ~100 frames for"\
+		$'\n'" g_mmpbsa calculations.""$demB"
 		
 	elif (( $No_of_last_third_framesINT < $mmpbframesNo )) ; then
 		skipframegpsaINT=1
-		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'"Total number of frames in the trajectory is less than 200."\
-		$'\n'"No frames will be skipped for g_mmpbsa calculations.""$demB"
+		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'" Total number of frames in the trajectory is less than 200."\
+		$'\n'" No frames will be skipped for g_mmpbsa calculations.""$demB"
 	fi
 
 	if [[ "$mmGMX" == "1" ]] ; then
-		echo "$demA"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n'
-		eval $mmGMXpath grompp -f md.mdp -c $coordinates_raw -p topol.top -o \
+		echo "$demA"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n\n\n'
+		eval $mmGMXpath grompp -f md.mdp -c "${filenm}".gro -p topol.top -o \
 		"${filenm}"_TPR_for_g_mmpbsa.tpr $indexer
-		echo "$demA"$'Generate a compatible .tpr for g_MMPBSA...DONE'"$demB"
+		echo "$demA"$' Generate a compatible .tpr for g_MMPBSA...DONE'"$demB"
 		#fi
-		echo "$demA"$'Generating a compatible fraction of the trajectory for g_MMPBSA...\n'
+		echo "$demA"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
 		if [[ $flw == 1 ]]; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$'Generate a compatible last 3rd trajectory file for g_MMPBSA...DONE'"$demB"
+			echo "$demA"$' Generate a compatible last 3rd trajectory file for g_MMPBSA...DONE'"$demB"
 			sleep 2
 		
-			echo "$demA"$'Extracting 100 frames from the last 3rd of the trajectory...\n'
+			echo "$demA"$' Extracting 100 frames from the last 3rd of the trajectory...\n\n\n'
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA"$'Extract 100 frames from the last 3rd of the trajectory...DONE'"$demB"
+			echo "$demA"$' Extract 100 frames from the last 3rd of the trajectory...DONE'"$demB"
 			sleep 2
 		
 		elif [[ $flw != 1 ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$'Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"$demB"
+			echo "$demA"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"$demB"
 			sleep 2
 		
-			echo "$demA"$'Extracting 100 frames from the last 3rd of the trajectory...\n'
+			echo "$demA"$' Extracting 100 frames from the last 3rd of the trajectory...\n\n\n'
 		
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA"$'Extract 100 frames from the last 3rd of the trajectory...DONE'"$demB"
+			echo "$demA"$' Extract 100 frames from the last 3rd of the trajectory...DONE'
 			sleep 2
-		
 		fi	
 	
-		echo "$demA"$'Generate input files for g_MMPBSA free energy calculations...DONE'"$demB"
+		echo $' Generate input files for g_MMPBSA free energy calculations...DONE'"$demB"
 		sleep 2
 
-		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
+		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
 			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
@@ -1344,19 +1343,19 @@ if [[ $mmGMXpath != '' ]] ; then
 			${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
 			-s "${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		fi
-		echo "$demA"$'Run g_MMPBSA calculations...DONE'"$demB"
+		echo "$demA"$' Run g_MMPBSA calculations...DONE'"$demB"
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
 			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp \
-			-pdie 2 -pbsa -decomp || echo "$demA"$'g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			-pdie 2 -pbsa -decomp || echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
 			g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
-			-pbsa -decomp || echo "$demA"$'g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			-pbsa -decomp || echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		fi
 	fi
-	echo "$demA"$'Now calculating average binding energy & contribution of residues...\n'
+	echo "$demA"$' Calculating average binding energy & contribution of residues...\n'
 	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
 	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
@@ -1384,7 +1383,7 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 	fi
 
-	echo "$demA"$'Calculate average binding energy & contribution of residues...DONE'"$demB"
+	echo "$demA"$' Calculate average binding energy & contribution of residues...DONE'"$demB"
 	sleep 2
 
 	AnaName="MMPBSA"
@@ -1458,6 +1457,9 @@ useFoundPCA_sham()
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
 	sleep 2
+
+	# extract lowest free energy structures
+	
 }
 
 useFoundRgRMSData_sham()

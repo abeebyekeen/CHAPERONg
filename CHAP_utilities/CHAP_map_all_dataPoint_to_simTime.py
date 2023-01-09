@@ -33,20 +33,20 @@ with open("OrderParameters1_2_dG_nogap-sorted.dat", "r") as paramets:
         current_datapt = datapt.strip("\n")
         filecount+=1
         if filecount == 2:
-            print("\n Number of data point processed:      1 "+"of "+str(len(allDataPts)))
+            print("\n Number of data point processed:       1 "+"of "+str(len(allDataPts)))
         if filecount%200 == 0 and filecount > 0 and filecount < 1000:
             milestone_factor+=1
             milestone_count=milestone_factor*200
-            print(" Number of data points processed:   "+str(milestone_count)+" of "+str(len(allDataPts)))
+            print(" Number of data points processed:    "+str(milestone_count)+" of "+str(len(allDataPts)))
         if filecount == 1000:
             milestone_factor+=1
             milestone_count=milestone_factor*200
-            print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
+            print(" Number of data points processed:   "+str(milestone_count)+" of "+str(len(allDataPts)))
             milestone_factor=2
         if filecount%500 == 0 and filecount > 1000 and filecount <= 9500:
             milestone_factor+=1
             milestone_count=milestone_factor*500
-            print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
+            print(" Number of data points processed:   "+str(milestone_count)+" of "+str(len(allDataPts)))
         if filecount == 10000:
             milestone_factor+=1
             milestone_count=milestone_factor*500
@@ -55,7 +55,7 @@ with open("OrderParameters1_2_dG_nogap-sorted.dat", "r") as paramets:
         if filecount%1000 == 0 and filecount > 10000:
             milestone_factor+=1
             milestone_count=milestone_factor*1000
-            print(" Number of data points processed: "+str(milestone_count)+" of "+str(len(allDataPts)))
+            print(" Number of data points processed:  "+str(milestone_count)+" of "+str(len(allDataPts)))
         spltcurrent_datapt = current_datapt.split("\t")
         Par1 = spltcurrent_datapt[0]
         Par1float = float(Par1)
@@ -173,3 +173,4 @@ with open("OrderParameters1_2_dG_nogap-sorted.dat", "r") as paramets:
             if linecount > 0:
                 readinFile = "DataPt_"+str(filecount)+".txt"
                 recordHits()
+    print(" Number of data points processed:  "+str(filecount)+" of "+str(len(allDataPts)))

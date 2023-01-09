@@ -123,7 +123,7 @@ read_parFile()
 	if [[ "$parfilename" != '' ]] ; then 
 		while IFS= read -r line; do
 			par=$(echo "$line" | awk '{print $1}')
-			if [[ "$par" == "mmgpath" ]]; then	mmGMXpath=$(echo "$line" | awk '{print $3}')
+			if [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath=$(echo "$line" | awk '{print $3}')
 			elif [[ "$par" == "movieFrame" ]]; then customframeNo=$(echo "$line" | awk '{print $3}')
 			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path=$(echo "$line" | awk '{print $3}')
 			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType=$(echo "$line" | awk '{print $3}')
