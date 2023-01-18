@@ -105,5 +105,5 @@ with open("mapped_dataPt.txt") as paramet:
                 mappedfestimed.write(FESdata+"\n")
             WriteCycle+=1
     HitList = []
-    print(" Number of data points processed: "+str(filecount)+" of "+str(len(allmappedData))+"\n")
+    print(" Number of data points processed: "+str(len(allmappedData))+" of "+str(len(allmappedData))+"\n")
 os.chdir('../')
