@@ -14,7 +14,7 @@
 # nt               =      x
 
 ; Use system GPU for non-bonded interactions
-# nb gpu           =      x
+# nb               =      gpu
 
 ; List ID(s) of unique GPU device(s) available for use
 # gpu_id           =      x
@@ -23,11 +23,11 @@
 # deffnm           =      x
    
 ; Water model i.e. tip3p, spc
-# water            =      x
+# water            =      tip3p
 
 ; Force-field (e.g. charmm27, amber94 etc.),
 ; use "wd" if ff in working directory
-# ff               =      x
+# ff               =      wd
 
 ; Number of thread-MPI ranks      
 # ntmpi            =      x
@@ -42,23 +42,26 @@
 # movieFrame	   =      200
 
 ; Name of the positive ion
-# pname            =      x
+# pname            =      NA
 
 ; Name of the negative ion
-# nname            =      x
+# nname            =      CL
 
 ; Salt concentration (mol/L)
-# conc             =      x
+# conc             =      0.1
+
+; Simulation temperature (in degree Celcius)
+# temp             =      300 
 
 ; Number of allowed warnings 
 # maxwarn          =      x
 
 ; Solute-box distance i.e. distance to box edge 
-# dist             =      x
+# dist             =      1.0
 
 ; Corrected trajectory to use for analyses (options: 
 ; noPBC, nojump, fit, combo)
-# inputtraj        =      x
+# inputtraj        =      combo
 
 ; Parameter for umbrella sampling window spacing
 # smd_pull_spacing =      0.2

@@ -87,6 +87,7 @@ Optional (int=integer; str=string):
 -E, --gmx_exe <str> Path to gmx to use for all gmx runs except g_mmpbsa
                     (Default is to use the gmx set in the environment)
 -v, --version       Print the installed version of CHAPERONg
+--temp              Simulation temperature in degree Celcius
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
 --movieFrame <int>  Number of frames to extract and use for movie
 --trFrac <int>      Fraction of trajectory to use for g_mmpbsa calculations
@@ -109,12 +110,12 @@ demB=$'\n'"#====================================================================
 # Initialize (default) parameters
 btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
 wat=""; nb='' ; termini=0 ; gmx_exe_path="gmx"
-flw=0; ffUse=""; gpid=''; filenm=''
+flw=0; ffUse=""; gpid=''; filenm=''; Temp=300
 ntmpi=0; ntomp=0; skp=''; nohp=''
 pn=''; nn=''; ion_conc='' ; customframeNo=''
 PBCcorrectType='' ; trajFraction=''
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
-parfilename='' ; mmpbframesNo=''
+parfilename='' ; mmpbframesNo='' ; 
 #gmxV=''
 
 # check if the parFile flag is used and then read the provided parameter file
@@ -123,13 +124,16 @@ read_parFile()
 	if [[ "$parfilename" != '' ]] ; then 
 		while IFS= read -r line; do
 			par=$(echo "$line" | awk '{print $1}')
-			if [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "movieFrame" ]]; then customframeNo=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "conc" ]]; then ion_conc=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "maxwarn" ]]; then WarnMax=$(echo "$line" | awk '{print $3}')
-			elif [[ "$par" == "water" ]]; then wat=$(echo "$line" | awk '{print $3}')
+			par_input=$(echo "$line" | awk '{print $3}')
+			if [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath="$par_input"
+			elif [[ "$par" == "movieFrame" ]]; then customframeNo="$par_input"
+			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path="$par_input"
+			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType="$par_input"
+			elif [[ "$par" == "conc" ]]; then ion_conc="$par_input"
+			elif [[ "$par" == "maxwarn" ]]; then WarnMax="$par_input"
+			elif [[ "$par" == "water" ]]; then wat="$par_input"
+			elif [[ "$par" == "temp" ]]; then Temp="$par_input"
+			elif [[ "$par" == "nb" && "$par_input" == "gpu" ]]; then nb=1
 			fi
 		done < "$parfilename"
 	fi
@@ -163,9 +167,10 @@ while [ "$1" != "" ]; do
 	--parFile) shift; parfilename="$1";;	
 	-R | --ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
-	--trFrac) shift; trajFraction="$1";;	
 	-T | --nt) shift; nt="$1";;
+	--temp) Temp="$1";;
 	--ter) termini=1;;
+	--trFrac) shift; trajFraction="$1";;	
 	-v | --version) echo "$demA"$' CHAPERON version: '"$CHAPERONg_version"; Credit; echo $''; exit 0 ;;
 	-W | --maxwarn) shift; WarnMax="$1";;
 	*) echo "Invalid option: $1"; Help; echo $''; exit 1;;

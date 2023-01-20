@@ -2487,5 +2487,4 @@ umbre_s18_MoreWin()
 		if [[ "$procd2pmf" == "yes" || "$procd2pmf" == '"yes"' ]] ; then echo ""
 		elif [[ "$procd2pmf" == "no" || "$procd2pmf" == '"no"' ]] ; then exit 0
 		fi
-
 }

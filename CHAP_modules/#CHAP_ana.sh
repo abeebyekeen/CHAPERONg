@@ -76,7 +76,7 @@ Option  Analysis
   9     Make a movie of the simulation
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
   11    Construct a free energy surface (FES) with gmx sham
-  12    Construct a FES using the CHAPERONg energetic landscape scripts
+  12    Construct a FES using the CHAPERONg energetic landscape script
   13    Construct an interactive 3D plot of the FES using md-davis
   14    Plot an interactive hydrogen bond matrix with md-davis
   15    Extract frames from the trajectory
@@ -114,13 +114,13 @@ fi
 ScanTRAJ()
 {
 if [[ ! -f "trajectDetails.log" ]]; then
-	echo "$demA"$' Checking the trajectory to extract info about the number of\n frames and simulation time'"$demB"
+	echo "$demA"$' Checking the trajectory to extract info about\n number of frames and simulation time'"$demB"
 	sleep 2
 	eval $gmx_exe_path check -f "${filenm}"_"${wraplabel}".xtc |& tee trajectDetails.log
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
-	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
 	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+
 	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
 	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
 	echo $simDuratnINTns > simulation_duration
@@ -130,8 +130,8 @@ if [[ ! -f "trajectDetails.log" ]]; then
 else
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
-	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
 	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+
 	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
 	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
 	echo $simDuratnINTns > simulation_duration
@@ -1263,7 +1263,20 @@ analyser10()
 {
 if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
-	#if [[ $sysType == 1 ]]; then indexer=''
+	# #if [[ $sysType == 1 ]]; then indexer=''
+ 	# if [[ $sysType == 2 || $sysType == 3 ]] ; then indexer='-n index.ndx' ; fi
+	# echo "$demA"$'Preparing to generate input files for g_MMPBSA free energy calculations...\n'
+
+	# if [[ $trajFraction == '' ]]; then trajFraction=3 ; fi
+
+	# No_of_last_third_frames=$(awk "BEGIN {print $No_of_frames / $trajFraction}")
+	# No_of_last_third_framesINT=$(echo ${No_of_last_third_frames%\.*})
+
+	# trajFractionFactor=$(( trajFraction - 1 ))
+
+	# simDuratnps_lastFractn_begin=$(awk "BEGIN {print $simDuratnps * $trajFractionFactor / $trajFraction}")
+	# simDuratnps_lastFractn_beginINT=$(echo ${simDuratnps_lastFractn_begin%\.*})
+
  	if [[ $sysType == 2 || $sysType == 3 ]] ; then indexer='-n index.ndx' ; fi
 	echo "$demA"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
 
@@ -1285,83 +1298,80 @@ if [[ $mmGMXpath != '' ]] ; then
 	if (( $No_of_last_third_framesINT >= $mmpbframesNo )) ; then
 		skipframegpsa=$(awk "BEGIN {print $No_of_last_third_frames / $mmpbframesNo }")
 		skipframegpsaINT=$(echo ${skipframegpsa%\.*})
-		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'" ${skipframegpsaINT} frames will be skipped at intervals to produce a total of ~100 frames for"\
-		$'\n'" g_mmpbsa calculations.""$demB"
+		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'"${skipframegpsaINT} frames will be skipped at intervals "\
+		"to produce a total of ~100 frames for g_mmpbsa calculations.""$demB"
 		
 	elif (( $No_of_last_third_framesINT < $mmpbframesNo )) ; then
 		skipframegpsaINT=1
-		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'" Total number of frames in the trajectory is less than 200."\
-		$'\n'" No frames will be skipped for g_mmpbsa calculations.""$demB"
+		echo "$demA""Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		$'\n'"Total number of frames in the trajectory is less than 200."\
+		$'\n'"No frames will be skipped for g_mmpbsa calculations.""$demB"
 	fi
 
 	if [[ "$mmGMX" == "1" ]] ; then
-		echo "$demA"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n\n\n'
-		sleep 2
+		echo "$demA"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n'
 		eval $mmGMXpath grompp -f md.mdp -c "${filenm}".gro -p topol.top -o \
 		"${filenm}"_TPR_for_g_mmpbsa.tpr $indexer
-		echo "$demA"$' Generate a compatible .tpr for g_MMPBSA...DONE'"$demB"
-		sleep 2
-		echo "$demA"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
-		sleep 2
+		echo "$demA"$'Generate a compatible .tpr for g_MMPBSA...DONE'"$demB"
+		#fi
+		echo "$demA"$'Generating a compatible fraction of the trajectory for g_MMPBSA...\n'
 		if [[ $flw == 1 ]]; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$' Generate a compatible trajectory file for g_MMPBSA...DONE'"$demB"
+			echo "$demA"$'Generate a compatible last 3rd trajectory file for g_MMPBSA...DONE'"$demB"
 			sleep 2
 		
-			echo "$demA Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
+			echo "$demA"$'Extracting 100 frames from the last 3rd of the trajectory...\n'
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA Extract $mmpbframesNo frames from the trajectory...DONE""$demB"
+			echo "$demA"$'Extract 100 frames from the last 3rd of the trajectory...DONE'"$demB"
 			sleep 2
 		
 		elif [[ $flw != 1 ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"$demB"
+			echo "$demA"$'Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"$demB"
 			sleep 2
 		
-			echo "$demA Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
+			echo "$demA"$'Extracting 100 frames from the last 3rd of the trajectory...\n'
 		
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA Extract $mmpbframesNo frames from the trajectory...DONE""$demB"
+			echo "$demA"$'Extract 100 frames from the last 3rd of the trajectory...DONE'"$demB"
 			sleep 2
+		
 		fi	
 	
-		echo $' Generate input files for g_MMPBSA free energy calculations...DONE'"$demB"
+		echo "$demA"$'Generate input files for g_MMPBSA free energy calculations...DONE'"$demB"
 		sleep 2
 
-		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
+		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
 			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
-			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
-			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
+			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
+			-s "${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
-			${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
-			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
-			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
+			${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc \
+			-s "${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		fi
-		echo "$demA"$' Run g_MMPBSA calculations...DONE'"$demB"
+		echo "$demA"$'Run g_MMPBSA calculations...DONE'"$demB"
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
-			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s \
-			"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \
-			echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp \
+			-pdie 2 -pbsa -decomp || echo "$demA"$'g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
 			g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
-			-pbsa -decomp || echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			-pbsa -decomp || echo "$demA"$'g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		fi
 	fi
-	echo "$demA"$' Calculating average binding energy & contribution of residues...\n'
+	echo "$demA"$'Now calculating average binding energy & contribution of residues...\n'
 	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
 	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
@@ -1377,8 +1387,7 @@ if [[ $mmGMXpath != '' ]] ; then
 			echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
-			eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
-			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+			eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		fi
 	elif [[ "$mmGMX" == '' ]] ; then
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
@@ -1390,7 +1399,7 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 	fi
 
-	echo "$demA"$' Calculate average binding energy & contribution of residues...DONE'"$demB"
+	echo "$demA"$'Calculate average binding energy & contribution of residues...DONE'"$demB"
 	sleep 2
 
 	AnaName="MMPBSA"
@@ -1444,161 +1453,26 @@ useFoundPCA_sham()
 	convert ./PCA/FEL_PCA_sham_$filenm.eps -trim -bordercolor white -units pixelsperinch \
 	-density 600 -resize 3000x5000 ./PCA/FEL_PCA_sham_${filenm}_convertps2pngfull.png || true
 				
-	currentFELPCAdir="$(pwd)""/PCA_FES_sham"
+	currentFELPCAdir="$(pwd)""/PCA_FEL_sham"
 	nFELpca=1
-	bkupFELpcadir="$(pwd)""/#PCA_FES_sham"".""backup.""$nFELpca"
+	bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 	base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 	if [[ -d "$currentFELPCAdir" ]]; then
 		echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $base_bkupFELpcadir"
 		sleep 1
 		while [[ -d "$bkupFELpcadir" ]]; do
 			nFELpca=$(( nFELpca + 1 ))
-			bkupFELpcadir="$(pwd)""/#PCA_FES_sham"".""backup.""$nFELpca"
+			bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 			base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 		done
-		mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FES_sham || true
-		echo $'\n'"Backing up the last PCA_FES_sham folder and its contents as $base_bkupFELpcadir"
+		mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
+		echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $base_bkupFELpcadir"
 		sleep 1
-	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
+	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
 	fi
-	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
+	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
 	sleep 2
-
-	# extract lowest free energy structures
-	echo "$demA Identifying the lowest energy bins and frames"$'\n'
-	sleep 2
-	min0_bin_index=$(grep -F '0.000' ./PCA_FES_sham/shamlog.log | tail -n 1 | awk '{print $5}')
-	echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
-	sleep 2
-	echo $'\n Three representative structures will be extracted from this bin\n'
-	sleep 1
-	# min0_index_spaced=" $min0_index "
-	min0_struct1_frame=$(grep -A1 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	min0_struct2_frame=$(grep -A2 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	min0_struct3_frame=$(grep -A3 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# min0_struct1=(grep -FA1 \["$min0_index_spaced"\] ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	ScanTRAJ
-	# sim_timestep
-	echo $' Identifying the corresponding times for the lowest energy structures...'
-	sleep 2
-	min0_struct1_time=$(awk "BEGIN {print $sim_timestep * $min0_struct1_frame}")
-	min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
-	min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
-
-	echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
-	sleep 2
-	structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
-	structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
-	structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
-
-	if [[ $flw == 1 && $sysType == 1 ]]; then
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 2 ]]; then
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 1 && $sysType == 2 ]]; then
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	fi
-	echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
-	sleep 2
-	mv "$structure1" "$structure2" "$structure3" ./PCA_FES_sham/ || true
-
-cat << inform
- All outputs from of the PCA-derived free energy surface have been saved to
- the folder PCA_FES_sham.
-
- In the prompt below, you may check the shamlog.log file to find the index\
- of the bin of interest you may wish to extract from, and the bindex.ndx file\
- to identify the frames in the bin.
-
-inform
-
-	get_more_structs=1
-	while [[ "$get_more_structs" == 1 ]]
-	do
-		
-cat << extractMoreStructs
- Do you want extract additional structures from the trajectory?
-
-  1) Yes
-  2) No
-
-extractMoreStructs
-
-		read -p ' Enter a response here (1 or 2): ' get_more_structs
-		
-		while [[ "$get_more_structs" != 1 && "$get_more_structs" != 2 ]]
-		do
-			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
-			echo $' Extract additional structures from the trajectory??\n  1) Yes\n  2) No\n'
-			read -p ' Enter 1 or 2 here: ' get_more_structs
-		done
-		
-		if [[ "$get_more_structs" == 2 ]] ; then
-			echo ""
-		elif [[ "$get_more_structs" == 1 ]] ; then
-			echo ""
-			read -p ' Specify the frame number of the structure to extract: ' frame_no
-
-			echo $'\n Identifying the corresponding time for the specified frame...'
-			sleep 2
-			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
-			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
-
-			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
-			sleep 2
-
-			if [[ $flw == 1 && $sysType == 1 ]]; then
-				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 1 ]]; then
-				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 2 ]]; then
-				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 1 && $sysType == 2 ]]; then
-				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			fi
-			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
-			sleep 2
-			mv "$spec_struct" ./PCA_FES_sham/ || true
-		fi
-	done
-
 }
 
 useFoundRgRMSData_sham()
@@ -1798,24 +1672,24 @@ analyser11()
 
 				ps2pdf FEL_PCA_sham_$filenm.eps FEL_PCA_sham_${filenm}_portrait.pdf || true
 			
-				currentFELPCAdir="$(pwd)""/PCA_FES_sham"
+				currentFELPCAdir="$(pwd)""/PCA_FEL_sham"
 				nFELpca=1
-				bkupFELpcadir="$(pwd)""/#PCA_FES_sham"".""backup.""$nFELpca"
+				bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 				base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 				if [[ -d "$currentFELPCAdir" ]]; then
 					echo $'\n'"$currentFELPCAdir"$' folder exists,\n'"backing it up as $base_bkupFELpcadir"
 					sleep 1
 					while [[ -d "$bkupFELpcadir" ]]; do
 						nFELpca=$(( nFELpca + 1 ))
-						bkupFELpcadir="$(pwd)""/#PCA_FES_sham"".""backup.""$nFELpca"
+						bkupFELpcadir="$(pwd)""/#PCA_FEL_sham"".""backup.""$nFELpca"
 						base_bkupFELpcadir=$(basename "$bkupFELpcadir")
 					done
-					mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FES_sham || true
-					echo $'\n'"Backing up the last PCA_FES_sham folder and its contents as $base_bkupFELpcadir"
+					mv "$currentFELPCAdir" "$bkupFELpcadir" && mkdir ./PCA_FEL_sham || true
+					echo $'\n'"Backing up the last PCA_FEL_sham folder and its contents as $base_bkupFELpcadir"
 					sleep 1
-					mv FEL_PCA_sham_*.xpm enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg FEL_PCA_sham_*.eps FEL_PCA_sham_*.pdf ./PCA_FES_sham || true
-				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
-					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
+					mv FEL_PCA_sham_*.xpm enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg FEL_PCA_sham_*.eps FEL_PCA_sham_*.pdf ./PCA_FEL_sham || true
+				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FEL_sham
+					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FEL_sham || true
 				fi
 				echo "$demA"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"$demB"
 				sleep 2
@@ -1886,8 +1760,7 @@ inputFormat
 
 				convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white FEL_sham_RgVsRMSD_${filenm}_convertps2png.png || true
 
-				convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white -units pixelsperinch \
-				-density 600 -resize 3000x5000 FEL_sham_RgVsRMSD_${filenm}_convertps2pngfull.png || true
+				convert FEL_sham_RgVsRMSD_$filenm.eps -trim -bordercolor white -units pixelsperinch -density 600 -resize 3000x5000 FEL_sham_RgVsRMSD_${filenm}_convertps2pngfull.png || true
 			
 				currentFELshamRgVsRMSDdir="$(pwd)""/RgVsRMSD_FEL_sham"
 				nFELRgVsRMSD=1
@@ -1901,15 +1774,12 @@ inputFormat
 						bkupFELshamRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FEL_sham"".""backup.""$nFELRgVsRMSD"
 						base_bkupFELshamRgVsRMSDdir=$(basename "$bkupFELshamRgVsRMSDdir")
 					done
-					mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && \
-					mkdir ./RgVsRMSD_FEL_sham || true
+					mv "$currentFELshamRgVsRMSDdir" "$bkupFELshamRgVsRMSDdir" && mkdir ./RgVsRMSD_FEL_sham || true
 					echo $'\n'"Backing up the last RgVsRMSD_FEL_sham folder and its contents as $base_bkupFELshamRgVsRMSDdir"
 					sleep 1
-					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm \
-					entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
+					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				elif [[ ! -d "$currentFELshamRgVsRMSDdir" ]]; then mkdir RgVsRMSD_FEL_sham
-					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm \
-					entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
+					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				fi
 				echo "$demA"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"$demB"
 				sleep 2
@@ -1964,23 +1834,17 @@ inputFormat
 		eval $gmx_exe_path sham -f $precalcOrderParPair -ls FEL_sham_OrderParameterPair_${filenm}.xpm -notime || felcal=1
 		
 		if [[ "$felcal" == 0 ]] ; then
-			eval $gmx_exe_path xpm2ps -f FEL_sham_OrderParameterPair_$filenm.xpm -o \
-			FEL_sham_OrderParameterPair_${filenm}.eps -rainbow red || true
+			eval $gmx_exe_path xpm2ps -f FEL_sham_OrderParameterPair_$filenm.xpm -o FEL_sham_OrderParameterPair_${filenm}.eps -rainbow red || true
 
-			ps2pdf -sPAPERSIZE=ledger FEL_sham_OrderParameterPair_$filenm.eps \
-			FEL_sham_OrderParameterPair_${filenm}_landscape.pdf || true
+			ps2pdf -sPAPERSIZE=ledger FEL_sham_OrderParameterPair_$filenm.eps FEL_sham_OrderParameterPair_${filenm}_landscape.pdf || true
 	
-			ps2pdf FEL_sham_OrderParameterPair_$filenm.eps \
-			FEL_sham_OrderParameterPair_${filenm}_portrait.pdf || true
+			ps2pdf FEL_sham_OrderParameterPair_$filenm.eps FEL_sham_OrderParameterPair_${filenm}_portrait.pdf || true
 
-			pdf2ppm -png -r 600 FEL_sham_OrderParameterPair_${filenm}_portrait.pdf \
-			FEL_sham_OrderParameterPair_${filenm}_portrait.png || true
+			pdf2ppm -png -r 600 FEL_sham_OrderParameterPair_${filenm}_portrait.pdf FEL_sham_OrderParameterPair_${filenm}_portrait.png || true
 
-			convert FEL_sham_OrderParameterPair_$filenm.eps -trim -bordercolor white \
-			FEL_sham_OrderParameterPair_${filenm}_convertps2png.png || true
+			convert FEL_sham_OrderParameterPair_$filenm.eps -trim -bordercolor white FEL_sham_OrderParameterPair_${filenm}_convertps2png.png || true
 
-			convert FEL_sham_OrderParameterPair_$filenm.eps -trim -bordercolor white -units pixelsperinch \
-			-density 600 -resize 3000x5000 FEL_sham_OrderParameterPair_${filenm}_convertps2pngfull.png || true
+			convert FEL_sham_OrderParameterPair_$filenm.eps -trim -bordercolor white -units pixelsperinch -density 600 -resize 3000x5000 FEL_sham_OrderParameterPair_${filenm}_convertps2pngfull.png || true
 			
 			currentFELshamOrderParameterPairdir="$(pwd)""/OrderParameterPair_FEL_sham"
 			nFELOrderParameterPair=1
@@ -1997,11 +1861,9 @@ inputFormat
 				mv "$currentFELshamOrderParameterPairdir" "$bkupFELshamOrderParameterPairdir" && mkdir ./OrderParameterPair_FEL_sham || true
 				echo $'\n'"Backing up the last OrderParameterPair_FEL_sham folder and its contents as $base_bkupFELshamOrderParameterPairdir"
 				sleep 1
-				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg \
-				enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
+				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			elif [[ ! -d "$currentFELshamOrderParameterPairdir" ]]; then mkdir OrderParameterPair_FEL_sham
-				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg \
-				enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
+				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			fi
 			echo "$demA"$' Prepare 2D energetic landscape with gmx sham...DONE'"$demB"
 			sleep 2
@@ -2012,6 +1874,7 @@ inputFormat
 	fi
 	echo "$demA"$' Construct free energy landscape with gmx sham...DONE'"$demB"
 	sleep 2
+
 }
 
 if [[ "$analysis" == *" 11 "* ]]; then analyser11 ; fi
@@ -2032,7 +1895,7 @@ useFoundPCA_FESPy()
 	echo "$demA"$' Preparing parameters for FES calculations...\n'
 	sleep 2
 
-	echo $' Determining minimal and maximal data points...\n'
+	echo $' Determining minimal and maximal data points...'
 	sleep 1
 	minPC1=$(head -1 sorted_PC1.dat)
 	maxPC1=$(tail -1 sorted_PC1.dat)
@@ -2044,75 +1907,58 @@ useFoundPCA_FESPy()
 	ScanTRAJ
 	echo "minPar1,$minPC1"$'\n'"maxPar1,$maxPC1"$'\n'"minPar2,$minPC2" > CHAP_fes_Par.in
 	echo "maxPar2,$maxPC2"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
-	echo $'XaxisL,PC1\nYaxisL,PC2\n'"Temp,$Temp" >> CHAP_fes_Par.in
+	echo $'XaxisL,PC1\nYaxisL,PC2\nTemp,300' >> CHAP_fes_Par.in
 	echo $'outFilename,PCA_FES\nplotTitle,PCA-derived' >> CHAP_fes_Par.in
-	echo $'x_bin_count,100\ny_bin_count,100' >> CHAP_fes_Par.in
 
-	echo $' The input parameters for FES calculations have been prepared\n'\
-	$' These parameters have been written to file (CHAP_fes_Par.in).\n'
-	echo $' Do you want to proceed?\n\n  (1) Yes\n  (2) No\n'
-	read -p ' Enter a response here (1 or 2): ' para_set
+	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
+	sleep 2
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py || \
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py
 
-	while [[ "$para_set" != 1 && "$para_set" != 2 ]]; do
-			echo $'\n You entered: '"$para_set"
-			echo $' Please enter a valid number (1 or 2)!!\n'
-			read -p ' Enter 1 or 2 here: ' para_set
-		done
+	echo $'\n Run construct_free_en_surface.py...DONE'
+	sleep 2
+	echo "$demA"$' Cleaning up...\n'
+	sleep 1
 
-	if [[ "$para_set" == 2 ]]; then
-		echo ' Skipping FES calculation'
-		sleep 2
-	elif [[ "$para_set" == 1 ]]; then
-		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
-		sleep 2
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py || \
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py
-
-		echo $'\n Run construct_free_en_surface.py...DONE'
-		sleep 2
-		echo "$demA"$' Cleaning up...\n'
+	currentFESchapPCAdir="$(pwd)""/PCA_FES_chap"
+	nFESPCA=1
+	bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
+	base_bkupFELmdDavisPCAdir=$(basename "$bkupFESchapPCAdir")
+	if [[ -d "$currentFESchapPCAdir" ]]; then
+		echo $'\n'"$currentFESchapPCAdir"$' folder exists,\n'"backing it up as $base_bkupFELmdDavisPCAdir"
 		sleep 1
+		while [[ -d "$bkupFESchapPCAdir" ]]; do
+			nFESPCA=$(( nFESPCA + 1 )); bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
+			base_bkupFELmdDavisPCAdir=$(basename "$bkupFESchapPCAdir")
+		done
+		echo $'\n'"Backing up the last PCA_FES_chap folder and its contents as $base_bkupFELmdDavisPCAdir"
+		sleep 1
+		mv "$currentFESchapPCAdir" "$bkupFESchapPCAdir" && mkdir ./PCA_FES_chap || true
+	elif [[ ! -d "$currentFESchapPCAdir" ]]; then mkdir PCA_FES_chap
+	fi
 
-		currentFESchapPCAdir="$(pwd)""/PCA_FES_chap"
-		nFESPCA=1
-		bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
-		base_bkupFESchapPCAdir=$(basename "$bkupFESchapPCAdir")
-		if [[ -d "$currentFESchapPCAdir" ]]; then
-			echo $'\n'"$currentFESchapPCAdir"$' folder exists,\n'"backing it up as $base_bkupFESchapPCAdir"
-			sleep 1
-			while [[ -d "$bkupFESchapPCAdir" ]]; do
-				nFESPCA=$(( nFESPCA + 1 )); bkupFESchapPCAdir="$(pwd)""/#PCA_FES_chap"".""backup.""$nFESPCA"
-				base_bkupFESchapPCAdir=$(basename "$bkupFESchapPCAdir")
-			done
-			echo $'\n'"Backing up the last PCA_FES_chap folder and its contents as $base_bkupFESchapPCAdir"
-			sleep 1
-			mv "$currentFESchapPCAdir" "$bkupFESchapPCAdir" && mkdir ./PCA_FES_chap || true
-		elif [[ ! -d "$currentFESchapPCAdir" ]]; then mkdir PCA_FES_chap
-		fi
-
-		OrderParameter1="PC1.dat"
-		OrderParameter2="PC2.dat"
-		fesFigure="PCA_FES.png"
-		results_folder="PCA_FES_chap"
-		# cat "$exist2dPCA" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
-		# fetch simulation time from the trajectory using the ScanTRAJ fxn
-		checksimtime="SimTime.dat"
-		if [[ ! -f "$checksimtime" ]] ; then
-			echo "$demA"$' Extracting the simulation time-points from the trajectory...\n'
-			ScanTRAJ
-			increment_factor=$(awk "BEGIN {print $simDuratnINTns / $No_of_frames}")
-			simtimeRecorded=0
-			echo "$simtimeRecorded" > SimTime.dat
-			while [[ "$simtimeRecorded" != "$simDuratnINTns" ]]; do
-				simtimeRecorded=$(awk "BEGIN {print $simtimeRecorded + $increment_factor}")
-				echo "$simtimeRecorded" >> SimTime.dat
-				if [[ "$simtimeRecorded" == "$simDuratnINTns" ]]; then
-					break
-				fi
-			done
-			echo $' Extract simulation time-points from the trajectory...DONE'"$demB"
-			sleep 2
-		fi
+	OrderParameter1="PC1.dat"
+	OrderParameter2="PC2.dat"
+	fesFigure="PCA_FES.png"
+	results_folder="PCA_FES_chap"
+	# cat "$exist2dPCA" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
+	# fetch simulation time from the trajectory using the ScanTRAJ fxn
+	checksimtime="SimTime.dat"
+	if [[ ! -f "$checksimtime" ]] ; then
+		echo "$demA"$' Extracting the simulation time-points from the trajectory...\n'
+		ScanTRAJ
+		increment_factor=$(awk "BEGIN {print $simDuratnINTns / $No_of_frames}")
+		simtimeRecorded=0
+		echo "$simtimeRecorded" > SimTime.dat
+		while [[ "$simtimeRecorded" != "$simDuratnINTns" ]]; do
+			simtimeRecorded=$(awk "BEGIN {print $simtimeRecorded + $increment_factor}")
+			echo "$simtimeRecorded" >> SimTime.dat
+			if [[ "$simtimeRecorded" == "$simDuratnINTns" ]]; then
+				break
+			fi
+		done
+		echo $' Extract simulation time-points from the trajectory...DONE'"$demB"
+		sleep 2
 	fi
 }
 
@@ -2121,23 +1967,24 @@ useFoundRgRMSData_FESPy()
 	echo "$demA"$' Preparing parameters for FES calculations...\n'
 	sleep 2
 	
-	# cat RMSData.dat | sort -n > sorted_RMSData.dat
-	# cat RgData.dat | sort -n > sorted_RgData.dat
+	cat RMSData.dat | sort -n > sorted_RMSData.dat
+	cat RgData.dat | sort -n > sorted_RgData.dat
 
 	paste -d "," RMSData.dat RgData.dat > OrderParameterPair.dat
 
 	echo $' Determining minimal and maximal data points...'
 	sleep 1
-	# minRMSD=$(head -1 sorted_RMSData.dat)
-	# maxRMSD=$(tail -1 sorted_RMSData.dat)
-	# minRg=$(head -1 sorted_RgData.dat)
-	# maxRg=$(tail -1 sorted_RgData.dat)
+	minRMSD=$(head -1 sorted_RMSData.dat)
+	maxRMSD=$(tail -1 sorted_RMSData.dat)
+	minRg=$(head -1 sorted_RgData.dat)
+	maxRg=$(tail -1 sorted_RgData.dat)
 
-	# rm sorted_RMSData.dat sorted_RgData.dat
+	rm sorted_RMSData.dat sorted_RgData.dat
 
 	ScanTRAJ
-	echo "no_of_frames,$No_of_frames" > CHAP_fes_Par.in
-	echo $'XaxisL,RMSD (nm)\nYaxisL,Rg (nm)\n'"Temp,$Temp" >> CHAP_fes_Par.in
+	echo "minPar1,$minRMSD"$'\n'"maxPar1,$maxRMSD"$'\n'"minPar2,$minRg" > CHAP_fes_Par.in
+	echo "maxPar2,$maxRg"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
+	echo $'XaxisL,RMSD (nm)\nYaxisL,Rg (nm)\nTemp,300' >> CHAP_fes_Par.in
 	echo $'outFilename,RgVsRMSD_FES\nplotTitle,Rg Vs RMSD' >> CHAP_fes_Par.in
 
 	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
@@ -2158,8 +2005,7 @@ useFoundRgRMSData_FESPy()
 		echo $'\n'"$currentFESchapRgVsRMSDdir"$' folder exists,\n'"backing it up as $base_bkupFESchapRgVsRMSDdir"
 		sleep 1
 		while [[ -d "$bkupFESchapRgVsRMSDdir" ]]; do
-			nFESRgVsRMSD=$(( nFESRgVsRMSD + 1 ))
-			bkupFESchapRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FES_chap"".""backup.""$nFESRgVsRMSD"
+			nFESRgVsRMSD=$(( nFESRgVsRMSD + 1 )); bkupFESchapRgVsRMSDdir="$(pwd)""/#RgVsRMSD_FES_chap"".""backup.""$nFESRgVsRMSD"
 			base_bkupFESchapRgVsRMSDdir=$(basename "$bkupFESchapRgVsRMSDdir")
 		done
 		echo $'\n'"Backing up the last RgVsRMSD_FES_chap folder and its contents as $base_bkupFESchapRgVsRMSDdir"
@@ -2279,8 +2125,9 @@ inputFormat
 
 		ScanTRAJ
 		echo "minPar1,$minParam1"$'\n'"maxPar1,$maxParam1"$'\n'"minPar2,$minParam2" > CHAP_fes_Par.in
-		echo "maxPar2,$maxParam2"$'\n'"no_of_frames,$No_of_frames"$'\n'"Temp,$Temp" >> CHAP_fes_Par.in
-		echo $'XaxisL,PC1\nYaxisL,PC2\noutFilename,FES\nplotTitle,' >> CHAP_fes_Par.in
+		echo "maxPar2,$maxParam2"$'\n'"no_of_frames,$No_of_frames" >> CHAP_fes_Par.in
+		echo $'XaxisL,PC1\nYaxisL,PC2\nTemp,300' >> CHAP_fes_Par.in
+		echo $'outFilename,FES\nplotTitle,' >> CHAP_fes_Par.in
 
 		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
 		sleep 2
@@ -2315,6 +2162,7 @@ inputFormat
 		#fetch simulation time from one of the .xvg files
 		cat "$inputprecalcOrderPar1" | grep -v "^[@#]" | awk '{print $1}' > SimTime.dat
 		mv OrderParameterPair.xvg ./"$results_folder" || true
+
 	fi
 
 	cat OrderParameters1_2_dG.dat | grep --color=none "\S" > OrderParameters1_2_dG_nogap.dat
@@ -2322,8 +2170,8 @@ inputFormat
 	#sort based on dG values
 	# cat SimTime_OrderParameters1_2_dG.dat | sort -k 4,4 -n > SimTime_OrderParameters1_2_dG-sorted.dat
 	cat OrderParameters1_2_dG_nogap.dat | sort -k 3,3 -n > OrderParameters1_2_dG_nogap-sorted.dat
-	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in binning_summary.dat ./"$results_folder" || true
-	mv OrderParameters1_2_dG.dat OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
+	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in OrderParameters1_2_dG.dat ./"$results_folder" || true
+	mv OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
 
 	echo "$demA"$' Construct free energy surface...DONE'"$demB"
 	sleep 2
@@ -2371,24 +2219,19 @@ inputFormat
 		echo $' Identify the corresponding time for the lowest energy structure...DONE'
 		sleep 1
 		
-		echo "$demA"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
+		echo "$demA"$' Extracting lowest energy structure from the trajectory...\n\n'
 		sleep 2
 
 		if [[ $flw == 1 && $sysType == 1 ]]; then
-			echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 		elif [[ $flw == 0 && $sysType == 1 ]]; then
-			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 		elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-			echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 		elif [[ $flw == 0 && $sysType == 2 ]]; then
-			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
-			index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 		elif [[ $flw == 1 && $sysType == 2 ]]; then
-			echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-			"${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 		fi
 		echo "$demA"$' Extract lowest energy structure from the trajectory...DONE'"$demB"
 		sleep 2
@@ -2416,9 +2259,10 @@ extractMoreStructs
 			read -p ' Enter 1 or 2 here: ' getMoreStructs
 		done
 		
+		echo "$demA"$' Mapping all data points from the Free Enery Surface to simulation time...\n'
+		sleep 2
+
 		if [[ "$getMoreStructs" == 1 ]] ; then
-			echo "$demA"$' Mapping all data points from the Free Energy Surface to simulation time...\n'
-			sleep 2
 			cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
 			cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
 			if [[ ! -d "collect_mappings_extra" ]] ; then mkdir collect_mappings_extra
@@ -2431,7 +2275,7 @@ extractMoreStructs
 
 			echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
 			sleep 2
-			echo $' Sorting and pre-processing FES data points...\n'
+			echo $' Sorting and pre-processing FES data points...'
 			cd ./collect_mappings_extra
 			dataRec_counter=0
 			for dataRec in DataPt_*.txt
@@ -2454,13 +2298,10 @@ extractMoreStructs
 			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
 			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
 
-			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
-			./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k1,1n -k4,4n) > \
-			./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
-			
-			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
-			./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k4,4n -k2,2n) > \
-			./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
+			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 ./collect_mappings_extra/mappedFESdataPoints_timed.dat  \
+			| sort -k1,1n -k4,4n) > ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
+			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 ./collect_mappings_extra/mappedFESdataPoints_timed.dat  \
+			| sort -k4,4n -k2,2n) > ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
 			
 			mv ./collect_mappings_extra/mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
 			mv ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
@@ -2503,24 +2344,19 @@ extractMoreStructs
 
 				frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
 
-				echo "$demA"$' Extracting structure at the specified time from the trajectory...\n\n'
+				echo "$demA"$' Extracting structure at the specified from the trajectory...\n\n'
 				sleep 2
 
 				if [[ $flw == 1 && $sysType == 1 ]]; then
-					echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 				elif [[ $flw == 0 && $sysType == 1 ]]; then
-					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 				elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-					echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 				elif [[ $flw == 0 && $sysType == 2 ]]; then
-					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
-					index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 				elif [[ $flw == 1 && $sysType == 2 ]]; then
-					echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-					"${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 				fi
 				echo "$demA"$' Extract structure at the specified from the trajectory...DONE'"$demB"
 				sleep 2
@@ -2706,16 +2542,17 @@ analyser13()
 		fi
 	fi
 
-	echo "$demA"$' Constructing 3D plot of the md-davis free energy surface...\n'
+	Temp=300
+
+	echo "$demA"$' Constructing 3D free energy landscape...\n'
 	sleep 2
 
-	md-davis landscape_xvg -T $Temp -x ${OrderParameter1} -y ${OrderParameter2} -n \
-	"3D_FEL_for_${filenm}" -l "3D_FEL_for_${filenm}" -o ${results_folder}/${filenm}_3D_${outName}FEL.html
+	md-davis landscape_xvg -T $Temp -x ${OrderParameter1} -y ${OrderParameter2} -n "3D_FEL_for_${filenm}" -l "3D_FEL_for_${filenm}" -o ${results_folder}/${filenm}_3D_${outName}FEL.html
 
 	if [[ $orderPair_choice == 2 ]] ; then
 		rm RgVsRMSD.xvg RgData.dat RMSData.dat
 	fi
-	echo $'\n Construct 3D plot of the md-davis free energy surface...DONE'"$demB"
+	echo $'\n Construct 3D free energy landscape...DONE'"$demB"
 	sleep 2
 }
 
@@ -2758,8 +2595,8 @@ hbondMatrix_useFoundData()
 	elif [[ ! -d "$currentHBmatrixdir" ]]; then mkdir hbond_matrix
 	fi
 
-	echo "$demA"$' Extracting a reference structure from the trajectory...\n\n\n'
-	sleep 2
+	echo "$demA"$' Extracting a reference structure from the trajectory...\n\n'
+		sleep 2
 	if [[ $flw == 1 && $sysType == 1 ]]; then
 		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
 	elif [[ $flw == 0 && $sysType == 1 ]]; then
@@ -2771,10 +2608,10 @@ hbondMatrix_useFoundData()
 	elif [[ $flw == 1 && $sysType == 2 ]]; then
 		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
 	fi
-	echo "$demA"$' Extract a reference structure from the trajectory...DONE\n'
-	echo $' Preparing the H-bond matrix...\n'
+	echo ' Extract a reference structure from the trajectory...DONE'"$demA"
+	echo "$demA"$' Preparing the H-bond matrix...\n'
 	sleep 2
-	echo $' Detecting the list of H-bonds from the gmx index file...\n'
+	echo " Detecting the list of H-bonds from the gmx index file..."
 	sleep 2
 	hbondList=$(grep "hbond" ${existINDEXin} | awk '{print $2}')
 	echo " Calculating and saving the H-bond data..."
@@ -2784,18 +2621,18 @@ hbondMatrix_useFoundData()
 	if [[ $flw == 0 ]]; then
 cat << hbcutAsk
 
-  Proceed to plotting the H-bond matrix with a 33 % occurrence cut-off?
+Do you want to proceed to plotting the H-bond matrix with a 33 % occurrence cut-off?
 
-    1) Yes, set 33 % as the cut-off for the H-bonds to be included in the plot
-    2) No, I want to set a different percentage cut-off
+  1) Yes, set 33 % as the cut-off for the H-bonds to be included in the plot
+  2) No, I want to set a different percentage cut-off
 
 hbcutAsk
 	
-	read -p '  Enter 1 or 2 here: ' HBcutOff_ask
+	read -p ' Enter 1 or 2 here: ' HBcutOff_ask
 		while [[ "$HBcutOff_ask" != 1 && "$HBcutOff_ask" != 2 ]]; do
 			echo $'\nYou entered: '"$HBcutOff_ask"
 			echo $'Please enter a valid number (1 or 2)!!\n'
-			read -p '  Enter 1 or 2 here: ' HBcutOff_ask
+			read -p ' Enter 1 or 2 here: ' HBcutOff_ask
 		done
 	elif [[ $flw == 1 ]]; then HBcutOff_ask=1
 	fi	
@@ -2813,8 +2650,8 @@ hbcutAsk
 		md-davis plot_hbond --percent --total_frames 101 --cutoff ${HBcutOff} \
 		-o hbond_matrix/hbond_matrix_${filenm}.html hbond_matrix/hb_data.p
 	fi
-	echo $' Preparing the H-bond matrix...DONE'"$demB"
 }
+
 
 analyser14()
 {
@@ -2822,7 +2659,7 @@ analyser14()
 	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
 		then
 		if [[ "$flw" == 0 ]] ; then
-			echo "$demA"$' Pre-calculated H-bond data found!\n\nFiles found:'\
+			echo $'CHAPERONg: Pre-calculated H-bond data found!\n\nFiles found:'\
 			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"
 			sleep 2
 cat << askFELuseexist

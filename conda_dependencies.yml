@@ -5,9 +5,23 @@ dependencies:
 # - anaconda::networkx=2.3
   - conda-forge::pymol-open-source=2.5.0
   - conda-forge::imagemagick
+  - conda-forge::wxpython
   - pip
   - pip:
     - scipy
+    - pandas
     - numpy
     - matplotlib
     - networkx==2.3
+    - biopandas
+    - biopython
+    - click
+    - h5py>=3.0
+    - mdtraj
+    - plotly>=4.0
+    - scikit-learn
+    - toml
+    - pmw
+    - psutil                # required by plotly for png
+    - openpyxl              # Required by pandas
+    - md-davis
