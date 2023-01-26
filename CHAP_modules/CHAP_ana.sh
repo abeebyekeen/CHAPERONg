@@ -1351,7 +1351,7 @@ if [[ $mmGMXpath != '' ]] ; then
 		echo "$demA"$' Run g_MMPBSA calculations...DONE'"$demB"
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
-		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n'
+		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
 		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
 			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s \
 			"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \

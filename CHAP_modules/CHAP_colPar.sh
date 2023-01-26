@@ -72,7 +72,6 @@ Optional (int=integer; str=string):
 -p, --deffnm <str>  Define filename prefix (default is "md_filename" for outputs)
 -a, --auto          Automatic mode (less prompts): Use default parameters &
                     do common analyses
---parFile <str>     Name of the CHAPERONg input parameter file
 -H, --Help          Print more, advanced options
 -s, --water <str>   Water model to use i.e. tip3p, spc, etc. (ff-dependent)
 -f, --ff <str>      Force-field e.g. charmm27, amber94, etc.
@@ -87,6 +86,7 @@ Optional (int=integer; str=string):
 -E, --gmx_exe <str> Path to gmx to use for all gmx runs except g_mmpbsa
                     (Default is to use the gmx set in the environment)
 -v, --version       Print the installed version of CHAPERONg
+--parFile <str>     Name of the CHAPERONg input parameter file
 --temp              Simulation temperature in degree Celcius
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
 --movieFrame <int>  Number of frames to extract and use for movie
