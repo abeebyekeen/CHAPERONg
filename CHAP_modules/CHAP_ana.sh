@@ -1464,141 +1464,140 @@ useFoundPCA_sham()
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
 	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
 	sleep 2
+	ana_folder="PCA_FES_sham"
+	# # extract lowest free energy structures
+	# echo "$demA Identifying the lowest energy bins and frames"$'\n'
+	# sleep 2
+	# min0_bin_index=$(grep -F '0.000' ./PCA_FES_sham/shamlog.log | tail -n 1 | awk '{print $5}')
+	# echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
+	# sleep 2
+	# echo $'\n Three representative structures will be extracted from this bin\n'
+	# sleep 1
+	# # min0_index_spaced=" $min0_index "
+	# min0_struct1_frame=$(grep -A1 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
+	# min0_struct2_frame=$(grep -A2 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
+	# min0_struct3_frame=$(grep -A3 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
+	# # min0_struct1=(grep -FA1 \["$min0_index_spaced"\] ./PCA_FES_sham/bindex.ndx | tail -n 1)
+	# ScanTRAJ
+	# # sim_timestep
+	# echo $' Identifying the corresponding times for the lowest energy structures...'
+	# sleep 2
+	# min0_struct1_time=$(awk "BEGIN {print $sim_timestep * $min0_struct1_frame}")
+	# min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
+	# min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
 
-	# extract lowest free energy structures
-	echo "$demA Identifying the lowest energy bins and frames"$'\n'
-	sleep 2
-	min0_bin_index=$(grep -F '0.000' ./PCA_FES_sham/shamlog.log | tail -n 1 | awk '{print $5}')
-	echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
-	sleep 2
-	echo $'\n Three representative structures will be extracted from this bin\n'
-	sleep 1
-	# min0_index_spaced=" $min0_index "
-	min0_struct1_frame=$(grep -A1 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	min0_struct2_frame=$(grep -A2 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	min0_struct3_frame=$(grep -A3 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# min0_struct1=(grep -FA1 \["$min0_index_spaced"\] ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	ScanTRAJ
-	# sim_timestep
-	echo $' Identifying the corresponding times for the lowest energy structures...'
-	sleep 2
-	min0_struct1_time=$(awk "BEGIN {print $sim_timestep * $min0_struct1_frame}")
-	min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
-	min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
+	# echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
+	# sleep 2
+	# structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
+	# structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
+	# structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
 
-	echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
-	sleep 2
-	structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
-	structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
-	structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
+	# if [[ $flw == 1 && $sysType == 1 ]]; then
+	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
+	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
+	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
+	# elif [[ $flw == 0 && $sysType == 1 ]]; then
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
+	# elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	# elif [[ $flw == 0 && $sysType == 2 ]]; then
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+	# 	"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+	# 	"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+	# 	"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	# elif [[ $flw == 1 && $sysType == 2 ]]; then
+	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+	# 	-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	# fi
+	# echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
+	# sleep 2
+	# mv "$structure1" "$structure2" "$structure3" ./PCA_FES_sham/ || true
 
-	if [[ $flw == 1 && $sysType == 1 ]]; then
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 2 ]]; then
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-		"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 1 && $sysType == 2 ]]; then
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	fi
-	echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
-	sleep 2
-	mv "$structure1" "$structure2" "$structure3" ./PCA_FES_sham/ || true
+# cat << inform
+#  All outputs from of the PCA-derived free energy surface have been saved to
+#  the folder PCA_FES_sham.
 
-cat << inform
- All outputs from of the PCA-derived free energy surface have been saved to
- the folder PCA_FES_sham.
+#  In the prompt below, you may check the shamlog.log file to find the index of
+#  the bin of interest you may wish to extract from, and the bindex.ndx file to
+#  identify the frames in the bin.
 
- In the prompt below, you may check the shamlog.log file to find the index of
- the bin of interest you may wish to extract from, and the bindex.ndx file to
- identify the frames in the bin.
+# inform
 
-inform
-
-	get_more_structs=1
-	while [[ "$get_more_structs" == 1 ]]
-	do
+# 	get_more_structs=1
+# 	while [[ "$get_more_structs" == 1 ]]
+# 	do
 		
-cat << extractMoreStructs
- Do you want extract additional structures from the trajectory?
+# cat << extractMoreStructs
+#  Do you want extract additional structures from the trajectory?
 
-  1) Yes
-  2) No
+#   1) Yes
+#   2) No
 
-extractMoreStructs
+# extractMoreStructs
 
-		read -p ' Enter a response here (1 or 2): ' get_more_structs
+# 		read -p ' Enter a response here (1 or 2): ' get_more_structs
 		
-		while [[ "$get_more_structs" != 1 && "$get_more_structs" != 2 ]]
-		do
-			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
-			echo $' Extract additional structures from the trajectory??\n  1) Yes\n  2) No\n'
-			read -p ' Enter 1 or 2 here: ' get_more_structs
-		done
+# 		while [[ "$get_more_structs" != 1 && "$get_more_structs" != 2 ]]
+# 		do
+# 			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+# 			echo $' Extract additional structures from the trajectory??\n  1) Yes\n  2) No\n'
+# 			read -p ' Enter 1 or 2 here: ' get_more_structs
+# 		done
 		
-		if [[ "$get_more_structs" == 2 ]] ; then
-			echo ""
-		elif [[ "$get_more_structs" == 1 ]] ; then
-			echo ""
-			read -p ' Specify the frame number of the structure to extract: ' frame_no
+# 		if [[ "$get_more_structs" == 2 ]] ; then
+# 			echo ""
+# 		elif [[ "$get_more_structs" == 1 ]] ; then
+# 			echo ""
+# 			read -p ' Specify the frame number of the structure to extract: ' frame_no
 
-			echo $'\n Identifying the corresponding time for the specified frame...'
-			sleep 2
-			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
-			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
+# 			echo $'\n Identifying the corresponding time for the specified frame...'
+# 			sleep 2
+# 			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
+# 			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
 
-			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
-			sleep 2
+# 			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
+# 			sleep 2
 
-			if [[ $flw == 1 && $sysType == 1 ]]; then
-				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 1 ]]; then
-				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 2 ]]; then
-				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 1 && $sysType == 2 ]]; then
-				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			fi
-			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
-			sleep 2
-			mv "$spec_struct" ./PCA_FES_sham/ || true
-		fi
-	done
-
+# 			if [[ $flw == 1 && $sysType == 1 ]]; then
+# 				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+# 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
+# 			elif [[ $flw == 0 && $sysType == 1 ]]; then
+# 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+# 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
+# 			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+# 				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+# 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+# 			elif [[ $flw == 0 && $sysType == 2 ]]; then
+# 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+# 				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+# 			elif [[ $flw == 1 && $sysType == 2 ]]; then
+# 				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+# 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+# 			fi
+# 			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
+# 			sleep 2
+# 			mv "$spec_struct" ./PCA_FES_sham/ || true
+# 		fi
+# 	done
 }
 
 useFoundRgRMSData_sham()
@@ -1643,6 +1642,7 @@ useFoundRgRMSData_sham()
 
 	echo "$demA"$' Prepare Rg Vs RMSD FES with gmx sham...DONE'"$demB"
 	sleep 2
+	ana_folder="RgVsRMSD_FEL_sham"
 }
 
 order_parameters()
@@ -1820,6 +1820,7 @@ analyser11()
 				fi
 				echo "$demA"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"$demB"
 				sleep 2
+				ana_folder="PCA_FES_sham"
 			
 			elif [[ "$felcal" == 1 ]] ; then
 				echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
@@ -1914,6 +1915,7 @@ inputFormat
 				fi
 				echo "$demA"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"$demB"
 				sleep 2
+				ana_folder="RgVsRMSD_FEL_sham"
 
 			elif [[ "$felcal" == 1 ]] ; then
 				echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
@@ -2006,11 +2008,147 @@ inputFormat
 			fi
 			echo "$demA"$' Prepare 2D energetic landscape with gmx sham...DONE'"$demB"
 			sleep 2
+			ana_folder="OrderParameterPair_FEL_sham"
 		elif [[ "$felcal" == 1 ]] ; then
 			echo $'Calculation failed.\n'" Please confirm that you have entered the right path/file as input!"
 			sleep 1
 		fi
 	fi
+
+	# extract lowest free energy structures
+	echo "$demA Identifying the lowest energy bins and frames"$'\n'
+	sleep 2
+	min0_bin_index=$(grep -F '0.000' ./${ana_folder}/shamlog.log | tail -n 1 | awk '{print $5}')
+	echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
+	sleep 2
+	echo $'\n Three representative structures will be extracted from this bin\n'
+	sleep 1
+	# min0_index_spaced=" $min0_index "
+	min0_struct1_frame=$(grep -A1 "\[ $min0_bin_index \]" ./${ana_folder}/bindex.ndx | tail -n 1)
+	min0_struct2_frame=$(grep -A2 "\[ $min0_bin_index \]" ./${ana_folder}/bindex.ndx | tail -n 1)
+	min0_struct3_frame=$(grep -A3 "\[ $min0_bin_index \]" ./${ana_folder}/bindex.ndx | tail -n 1)
+	# min0_struct1=(grep -FA1 \["$min0_index_spaced"\] ./${ana_folder}/bindex.ndx | tail -n 1)
+	ScanTRAJ
+	# sim_timestep
+	echo $' Identifying the corresponding times for the lowest energy structures...'
+	sleep 2
+	min0_struct1_time=$(awk "BEGIN {print $sim_timestep * $min0_struct1_frame}")
+	min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
+	min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
+
+	echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
+	sleep 2
+	structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
+	structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
+	structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
+
+	if [[ $flw == 1 && $sysType == 1 ]]; then
+		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
+		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
+		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
+	elif [[ $flw == 0 && $sysType == 1 ]]; then
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
+	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	elif [[ $flw == 0 && $sysType == 2 ]]; then
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+		"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+		"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+		"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	elif [[ $flw == 1 && $sysType == 2 ]]; then
+		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
+		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
+		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
+	fi
+	echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
+	sleep 2
+	mv "$structure1" "$structure2" "$structure3" ./${ana_folder}/ || true
+
+cat << inform
+ All outputs from the free energy surface calculations have been saved to
+ the folder ${ana_folder}.
+
+ In the prompt below, you may check the shamlog.log file to find the index of
+ the bin of interest you may wish to extract from, and the bindex.ndx file to
+ identify the frames in the bin.
+
+inform
+
+	get_more_structs=1
+	while [[ "$get_more_structs" == 1 ]]
+	do
+		
+cat << extractMoreStructs
+ Do you want extract additional structures from the trajectory?
+
+  1) Yes
+  2) No
+
+extractMoreStructs
+
+		read -p ' Enter a response here (1 or 2): ' get_more_structs
+		
+		while [[ "$get_more_structs" != 1 && "$get_more_structs" != 2 ]]
+		do
+			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+			echo $' Extract additional structures from the trajectory??\n  1) Yes\n  2) No\n'
+			read -p ' Enter 1 or 2 here: ' get_more_structs
+		done
+		
+		if [[ "$get_more_structs" == 2 ]] ; then
+			echo ""
+		elif [[ "$get_more_structs" == 1 ]] ; then
+			echo ""
+			read -p ' Specify the frame number of the structure to extract: ' frame_no
+
+			echo $'\n Identifying the corresponding time for the specified frame...'
+			sleep 2
+			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
+			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
+
+			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
+			sleep 2
+
+			if [[ $flw == 1 && $sysType == 1 ]]; then
+				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
+			elif [[ $flw == 0 && $sysType == 1 ]]; then
+				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
+			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+			elif [[ $flw == 0 && $sysType == 2 ]]; then
+				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+			elif [[ $flw == 1 && $sysType == 2 ]]; then
+				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
+				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
+			fi
+			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
+			sleep 2
+			mv "$spec_struct" ./${ana_folder}/ || true
+		fi
+	done
+
 	echo "$demA"$' Construct free energy landscape with gmx sham...DONE'"$demB"
 	sleep 2
 }
