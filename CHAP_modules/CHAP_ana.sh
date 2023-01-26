@@ -76,7 +76,7 @@ Option  Analysis
   9     Make a movie of the simulation
   10    Free energy calculations using the MMPBSA method (g_mmpbsa)
   11    Construct a free energy surface (FES) with gmx sham
-  12    Construct a FES using the CHAPERONg energetic landscape scripts
+  12    Construct FES using the CHAPERONg energetic landscape scripts
   13    Construct an interactive 3D plot of the FES using md-davis
   14    Plot an interactive hydrogen bond matrix with md-davis
   15    Extract frames from the trajectory
@@ -454,7 +454,7 @@ AnaName="RMSF"
 filesuffx="rmsf"
 createDIR
 	
-echo "$demA"$'Generate finished figure(s) of the RMSF plot(s)... DONE'"$demB"
+echo "$demA"$' Generate finished figure(s) of the RMSF plot(s)... DONE'"$demB"
 sleep 2
 }
 if [[ "$analysis" == *" 3 "* ]]; then analyser3 ; fi
@@ -643,7 +643,7 @@ if [[ -d "$currenthbonddir" ]]; then
 elif [[ ! -d "$currenthbonddir" ]]; then
 	mkdir ./hbond; mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 fi
-echo "$demA"$'Generate finished figure(s) of the hbond plot(s)... DONE'"$demB"
+echo "$demA"$' Generate finished figure(s) of the hbond plot(s)... DONE'"$demB"
 }
 
 if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
@@ -774,7 +774,7 @@ analyser7()
 	elif [[ ! -d "$currentPCAdir" ]]; then mkdir ./PCA
 	fi
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb dd?????? ./PCA || true
-	echo "$demA"$'Generate finished figures of the PCA plots... DONE'"$demB"
+	echo "$demA"$' Generate finished figures of the PCA plots... DONE'"$demB"
 	sleep 2
 }
 
@@ -1536,9 +1536,9 @@ cat << inform
  All outputs from of the PCA-derived free energy surface have been saved to
  the folder PCA_FES_sham.
 
- In the prompt below, you may check the shamlog.log file to find the index\
- of the bin of interest you may wish to extract from, and the bindex.ndx file\
- to identify the frames in the bin.
+ In the prompt below, you may check the shamlog.log file to find the index of
+ the bin of interest you may wish to extract from, and the bindex.ndx file to
+ identify the frames in the bin.
 
 inform
 
@@ -1649,20 +1649,20 @@ order_parameters()
 {
 cat << orderPair
 
-Which order parameter pair do you want to use for the FES calculations?
+  Which order parameter pair do you want to use for the FES calculations?
 
-  1) Principal components
-  2) Rg versus RMSD
-  3) Other user-provided pair of order parameters
+    1) Principal components
+    2) Rg versus RMSD
+    3) Other user-provided pair of order parameters
 
 orderPair
 
-read -p ' Enter 1, 2 or 3 here: ' orderPair_choice
+read -p '  Enter 1, 2 or 3 here: ' orderPair_choice
 	while [[ $orderPair_choice != 1 && $orderPair_choice != 2 && $orderPair_choice != 3 ]]
 	do
 		echo $'\nYou entered: '"$orderPair_choice"
 		echo $'Please enter a valid number (1, 2 or 3)!!\n'
-		read -p ' Enter 1, 2 or 3 here: ' orderPair_choice
+		read -p '  Enter 1, 2 or 3 here: ' orderPair_choice
 	done
 
 if [[ $orderPair_choice == 1 ]] ; then
@@ -1777,6 +1777,7 @@ fi
 
 analyser11()
 {
+	echo "$demA"$' Constructing free energy surface with gmx sham...\n'
 	order_parameters
 	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_sham
@@ -2049,14 +2050,14 @@ useFoundPCA_FESPy()
 	echo $'x_bin_count,100\ny_bin_count,100' >> CHAP_fes_Par.in
 
 	echo $' The input parameters for FES calculations have been prepared\n'\
-	$' These parameters have been written to file (CHAP_fes_Par.in).\n'
-	echo $' Do you want to proceed?\n\n  (1) Yes\n  (2) No\n'
-	read -p ' Enter a response here (1 or 2): ' para_set
+	$'These parameters have been written to file (CHAP_fes_Par.in).\n'
+	echo $'  Do you want to proceed?\n\n   (1) Yes\n   (2) No\n'
+	read -p '  Enter a response here (1 or 2): ' para_set
 
 	while [[ "$para_set" != 1 && "$para_set" != 2 ]]; do
 			echo $'\n You entered: '"$para_set"
 			echo $' Please enter a valid number (1 or 2)!!\n'
-			read -p ' Enter 1 or 2 here: ' para_set
+			read -p '  Enter 1 or 2 here: ' para_set
 		done
 
 	if [[ "$para_set" == 2 ]]; then
@@ -2070,7 +2071,8 @@ useFoundPCA_FESPy()
 
 		echo $'\n Run construct_free_en_surface.py...DONE'
 		sleep 2
-		echo "$demA"$' Cleaning up...\n'
+		echo $'\n Cleaning up...'"$demB"
+		#echo "$demA"$' Cleaning up...\n'
 		sleep 1
 
 		currentFESchapPCAdir="$(pwd)""/PCA_FES_chap"
@@ -2147,8 +2149,9 @@ useFoundRgRMSData_FESPy()
 
 	echo $'\n Run construct_free_en_surface.py...DONE'"$demB"
 	sleep 2
-	
-	echo "$demA"$' Cleaning up...\n'
+	echo $'\n Cleaning up...'"$demB"
+	#echo "$demA"$' Cleaning up...\n'
+	sleep 1
 	
 	currentFESchapRgVsRMSDdir="$(pwd)""/RgVsRMSD_FES_chap"
 	nFESRgVsRMSD=1
@@ -2180,6 +2183,7 @@ useFoundRgRMSData_FESPy()
 
 analyser12()
 {	
+	echo "$demA"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
 	order_parameters
  	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_FESPy
@@ -2289,7 +2293,9 @@ inputFormat
 
 		echo $'\n Run construct_free_en_surface.py...DONE'
 		sleep 2
-		echo "$demA"$' Cleaning up...\n'
+		echo $'\n Cleaning up...'"$demB"
+		#echo "$demA"$' Cleaning up...\n'
+		sleep 1
 
 		currentFESchapdir="$(pwd)""/FES_chap"
 		nFES=1
@@ -2322,80 +2328,83 @@ inputFormat
 	#sort based on dG values
 	# cat SimTime_OrderParameters1_2_dG.dat | sort -k 4,4 -n > SimTime_OrderParameters1_2_dG-sorted.dat
 	cat OrderParameters1_2_dG_nogap.dat | sort -k 3,3 -n > OrderParameters1_2_dG_nogap-sorted.dat
-	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in binning_summary.dat ./"$results_folder" || true
+	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in ./"$results_folder" || true
 	mv OrderParameters1_2_dG.dat OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
+	bin_prob=0
+	mv binning_summary.dat ./"$results_folder" || bin_prob=1
 
 	echo "$demA"$' Construct free energy surface...DONE'"$demB"
 	sleep 2
 	
-	echo "$demA"$'\n Proceed to identify, extract the lowest energy structure from the landscape?\n'
-	read -p ' Enter a response here (yes or no): ' getEnergyMin
-	
-	while [[ "$getEnergyMin" != "yes" && "$getEnergyMin" != "no" && \
-		"$getEnergyMin" != '"yes"' && "$getEnergyMin" != '"no"' && \
-		"$getEnergyMin" != "y" && "$getEnergyMin" != "n" && \
-		"$getEnergyMin" != '"y"' && "$getEnergyMin" != '"n"' ]]
-	do
-		echo $' \nPlease enter the appropriate response (a "yes" or a "no")!!\n'
-		echo $' Identify and extract the lowest energy structure from the landscape??\n'
-		read -p ' Enter yes or no here: ' getEnergyMin
-	done
-	if [[ "$getEnergyMin" == "yes" || "$getEnergyMin" == '"yes"' || \
-		"$getEnergyMin" == '"y"' || "$getEnergyMin" == "y" ]] ; then
-		if [[ ! -d "collect_mappings" ]] ; then mkdir collect_mappings
-		elif [[ -d "collect_mappings" ]] ; then
-			rm -r collect_mappings
-			mkdir collect_mappings
-		fi
-		paste SimTime.dat $OrderParameter1 $OrderParameter2 > SimTime_OrderParameters1_2.dat
-		echo "$demA"$' Mapping landscape data point to simulation time...\n'
-		sleep 2
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py
-
-		echo $' Map landscape data point to simulation time...DONE\n'
-		sleep 2
-
-		tail -n +2 ./collect_mappings/1.txt | sort -k2,2n -k3,3n > ./collect_mappings/sorted_1.txt
-
-		head -n 2 ./collect_mappings/1.txt | tail -n 1 > ./collect_mappings/EnergyMinim.txt
-
-		echo $' Identifying the corresponding time for the lowest energy structure...\n'
-		sleep 2
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_get_lowest_en_datapoint.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_get_lowest_en_datapoint.py
-		lowEn_time=$(tail -n 1 ./collect_mappings/lowest_energy_datapoints_timed.dat | awk '{print $1}')
-		lowEn_time_ps=$(awk "BEGIN {print $lowEn_time * 1000}")
-		rm ./collect_mappings/1.txt ./collect_mappings/sorted_1.txt
-
-		echo $' Identify the corresponding time for the lowest energy structure...DONE'
-		sleep 1
+	if (( "$bin_prob" == 0 )) ; then
+		echo "$demA"$'\n Proceed to identify, extract the lowest energy structure from the landscape?\n'
+		read -p ' Enter a response here (yes or no): ' getEnergyMin
 		
-		echo "$demA"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
-		sleep 2
+		while [[ "$getEnergyMin" != "yes" && "$getEnergyMin" != "no" && \
+			"$getEnergyMin" != '"yes"' && "$getEnergyMin" != '"no"' && \
+			"$getEnergyMin" != "y" && "$getEnergyMin" != "n" && \
+			"$getEnergyMin" != '"y"' && "$getEnergyMin" != '"n"' ]]
+		do
+			echo $' \nPlease enter the appropriate response (a "yes" or a "no")!!\n'
+			echo $' Identify and extract the lowest energy structure from the landscape??\n'
+			read -p ' Enter yes or no here: ' getEnergyMin
+		done
+		if [[ "$getEnergyMin" == "yes" || "$getEnergyMin" == '"yes"' || \
+			"$getEnergyMin" == '"y"' || "$getEnergyMin" == "y" ]] ; then
+			if [[ ! -d "collect_mappings" ]] ; then mkdir collect_mappings
+			elif [[ -d "collect_mappings" ]] ; then
+				rm -r collect_mappings
+				mkdir collect_mappings
+			fi
+			paste SimTime.dat $OrderParameter1 $OrderParameter2 > SimTime_OrderParameters1_2.dat
+			echo "$demA"$' Mapping landscape data point to simulation time...\n'
+			sleep 2
+			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py || \
+			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py
 
-		if [[ $flw == 1 && $sysType == 1 ]]; then
-			echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-		elif [[ $flw == 0 && $sysType == 1 ]]; then
-			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-		elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-			echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-			-n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-		elif [[ $flw == 0 && $sysType == 2 ]]; then
-			eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
-			index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-		elif [[ $flw == 1 && $sysType == 2 ]]; then
-			echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-			"${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-		fi
-		echo "$demA"$' Extract lowest energy structure from the trajectory...DONE'"$demB"
-		sleep 2
+			echo $' Map landscape data point to simulation time...DONE\n'
+			sleep 2
 
-		mv "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb ./collect_mappings/ || true
-		mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat collect_mappings SimTime_OrderParameters1_2.dat ./"$results_folder" || true
-		rm $OrderParameter1 $OrderParameter2
+			tail -n +2 ./collect_mappings/1.txt | sort -k2,2n -k3,3n > ./collect_mappings/sorted_1.txt
+
+			head -n 2 ./collect_mappings/1.txt | tail -n 1 > ./collect_mappings/EnergyMinim.txt
+
+			echo $' Identifying the corresponding time for the lowest energy structure...\n'
+			sleep 2
+			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_get_lowest_en_datapoint.py || \
+			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_get_lowest_en_datapoint.py
+			lowEn_time=$(tail -n 1 ./collect_mappings/lowest_energy_datapoints_timed.dat | awk '{print $1}')
+			lowEn_time_ps=$(awk "BEGIN {print $lowEn_time * 1000}")
+			rm ./collect_mappings/1.txt ./collect_mappings/sorted_1.txt
+
+			echo $' Identify the corresponding time for the lowest energy structure...DONE'
+			sleep 1
+			
+			echo "$demA"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
+			sleep 2
+
+			if [[ $flw == 1 && $sysType == 1 ]]; then
+				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+				-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			elif [[ $flw == 0 && $sysType == 1 ]]; then
+				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+				-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+				-n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			elif [[ $flw == 0 && $sysType == 2 ]]; then
+				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
+				index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			elif [[ $flw == 1 && $sysType == 2 ]]; then
+				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+				"${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
+			fi
+			echo "$demA"$' Extract lowest energy structure from the trajectory...DONE'"$demB"
+			sleep 2
+
+			mv "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb ./collect_mappings/ || true
+			mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat collect_mappings SimTime_OrderParameters1_2.dat ./"$results_folder" || true
+			rm $OrderParameter1 $OrderParameter2
 		
 cat << extractMoreStructs
  Do you want to map all data points from the FES to simulation time and,
@@ -2407,132 +2416,79 @@ cat << extractMoreStructs
 
 extractMoreStructs
 
-		read -p ' Enter a response here (1 or 2): ' getMoreStructs
-		
-		while [[ "$getMoreStructs" != 1 && "$getMoreStructs" != 2 ]]
-		do
-			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
-			echo $' Proceed to mapping the FES data points to simulation time??\n  1) Yes\n  2) No\n'
-			read -p ' Enter 1 or 2 here: ' getMoreStructs
-		done
-		
-		if [[ "$getMoreStructs" == 1 ]] ; then
-			echo "$demA"$' Mapping all data points from the Free Energy Surface to simulation time...\n'
-			sleep 2
-			cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
-			cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
-			if [[ ! -d "collect_mappings_extra" ]] ; then mkdir collect_mappings_extra
-			elif [[ -d "collect_mappings_extra" ]] ; then
-				rm -r collect_mappings_extra
-				mkdir collect_mappings_extra
-			fi
-			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py || \
-			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py
-
-			echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
-			sleep 2
-			echo $' Sorting and pre-processing FES data points...\n'
-			cd ./collect_mappings_extra
-			dataRec_counter=0
-			for dataRec in DataPt_*.txt
-			do
-				dataRec_counter=$(( dataRec_counter + 1 ))
-				if (( "$dataRec_counter" == 1 )) ; then
-					tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n > sorted_"${dataRec}"
-					mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
-					echo "$dataRec"$'\t'"$mapped_fes_Data" > mapped_dataPt.txt
-					rm "${dataRec}"
-				elif (( "$dataRec_counter" > 1 )) ; then
-					tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n >> sorted_"${dataRec}"
-					mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
-					echo "$dataRec"$'\t'"$mapped_fes_Data" >> mapped_dataPt.txt
-					rm "${dataRec}"
-				fi
-			done
-			cd ../
-			echo $' Generating approximated simulation times mapped with free energy...\n'
-			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
-			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
-
-			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
-			./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k1,1n -k4,4n) > \
-			./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
+			read -p ' Enter a response here (1 or 2): ' getMoreStructs
 			
-			(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
-			./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k4,4n -k2,2n) > \
-			./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
-			
-			mv ./collect_mappings_extra/mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
-			mv ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
-			mv ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
-			rm -r ./collect_mappings_extra SimTime_OrderParameters1_2.dat OrderParameters1_2_dG_nogap-sorted.dat
-
-			echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"$demB"
-			sleep 2
-			echo "$demA"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
-			$'\n (sorted by time or energy) all containing the mapped simulation time, order'\
-			$'\n parameters and the corresponding free energy have been generated and saved'\
-			$'\n into the folder '"$results_folder""/collect_mappings."\
-			$'\n\n **You may use this file to identify the sumulation time(s) of the'\
-			$'\n structure(s) you may want to extract from the 2D representation of the free'\
-			$'\n energy landscape'"$demB"
-			sleep 2
-
-cat << extractMoreStructs
-
- Do you want to extract a structure from the trajectory based on free energy?
-
- 1) Yes
- 2) No
-
-extractMoreStructs
-
-			read -p ' Enter a response here (1 or 2): ' getMoreStructure
-			
-			while [[ "$getMoreStructure" != 1 && "$getMoreStructure" != 2 ]]
+			while [[ "$getMoreStructs" != 1 && "$getMoreStructs" != 2 ]]
 			do
 				echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
-				echo $' Extract a structure from the trajectory based on free energy??\n  1) Yes\n  2) No\n'
-				read -p ' Enter 1 or 2 here: ' getMoreStructure
+				echo $' Proceed to mapping the FES data points to simulation time??\n  1) Yes\n  2) No\n'
+				read -p ' Enter 1 or 2 here: ' getMoreStructs
 			done
-		
-			while [[ "$getMoreStructure" == 1 ]]
-			do
-				echo ""
-				read -p ' Specify the time (in ns) at which to extract a structure: ' frameTime
-
-				frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
-
-				echo "$demA"$' Extracting structure at the specified time from the trajectory...\n\n'
+			
+			if [[ "$getMoreStructs" == 1 ]] ; then
+				echo "$demA"$' Mapping all data points from the Free Energy Surface to simulation time...\n'
 				sleep 2
-
-				if [[ $flw == 1 && $sysType == 1 ]]; then
-					echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-				elif [[ $flw == 0 && $sysType == 1 ]]; then
-					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-				elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-					echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
-					-n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-				elif [[ $flw == 0 && $sysType == 2 ]]; then
-					eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
-					index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-				elif [[ $flw == 1 && $sysType == 2 ]]; then
-					echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-					"${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+				cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
+				cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
+				if [[ ! -d "collect_mappings_extra" ]] ; then mkdir collect_mappings_extra
+				elif [[ -d "collect_mappings_extra" ]] ; then
+					rm -r collect_mappings_extra
+					mkdir collect_mappings_extra
 				fi
-				echo "$demA"$' Extract structure at the specified from the trajectory...DONE'"$demB"
+				python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py || \
+				python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py
+
+				echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
 				sleep 2
+				echo $' Sorting and pre-processing FES data points...\n'
+				cd ./collect_mappings_extra
+				dataRec_counter=0
+				for dataRec in DataPt_*.txt
+				do
+					dataRec_counter=$(( dataRec_counter + 1 ))
+					if (( "$dataRec_counter" == 1 )) ; then
+						tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n > sorted_"${dataRec}"
+						mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
+						echo "$dataRec"$'\t'"$mapped_fes_Data" > mapped_dataPt.txt
+						rm "${dataRec}"
+					elif (( "$dataRec_counter" > 1 )) ; then
+						tail -n +2 "${dataRec}" | sort -k2,2n -k3,3n >> sorted_"${dataRec}"
+						mapped_fes_Data=$(head -n 2 "${dataRec}" | tail -n 1)
+						echo "$dataRec"$'\t'"$mapped_fes_Data" >> mapped_dataPt.txt
+						rm "${dataRec}"
+					fi
+				done
+				cd ../
+				echo $' Generating approximated simulation times mapped with free energy...\n'
+				python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py || \
+				python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_approx_dataPoint_simTime_for_freeEn.py
 
-				mv "${filenm}"_Structure_at_Time"$frameTime_ps".pdb ./"$results_folder"/collect_mappings/ || true
+				(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
+				./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k1,1n -k4,4n) > \
+				./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat
+				
+				(head -n 1 ./collect_mappings_extra/mappedFESdataPoints_timed.dat && tail -n +2 \
+				./collect_mappings_extra/mappedFESdataPoints_timed.dat | sort -k4,4n -k2,2n) > \
+				./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat
+				
+				mv ./collect_mappings_extra/mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+				mv ./collect_mappings_extra/time-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+				mv ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
+				rm -r ./collect_mappings_extra SimTime_OrderParameters1_2.dat OrderParameters1_2_dG_nogap-sorted.dat
 
-				echo "$demA"$'\n The structure has been saved to the folder '"./$results_folder""/collect_mappings"
+				echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"$demB"
+				sleep 2
+				echo "$demA"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
+				$'\n (sorted by time or energy) all containing the mapped simulation time, order'\
+				$'\n parameters and the corresponding free energy have been generated and saved'\
+				$'\n into the folder '"$results_folder""/collect_mappings."\
+				$'\n\n **You may use this file to identify the sumulation time(s) of the'\
+				$'\n structure(s) you may want to extract from the 2D representation of the free'\
+				$'\n energy landscape.'"$demB"
+				sleep 2
 
 cat << extractMoreStructs
-
- Do you want to extract an additional structure from the trajectory based
- on free energy?
+ Do you want to extract a structure from the trajectory based on free energy?
 
  1) Yes
  2) No
@@ -2547,12 +2503,64 @@ extractMoreStructs
 					echo $' Extract a structure from the trajectory based on free energy??\n  1) Yes\n  2) No\n'
 					read -p ' Enter 1 or 2 here: ' getMoreStructure
 				done
-			done
-		elif [[ "$getMoreStructs" != 1 ]] ; then echo ""
+			
+				while [[ "$getMoreStructure" == 1 ]]
+				do
+					echo ""
+					read -p ' Specify the time (in ns) at which to extract a structure: ' frameTime
+
+					frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
+
+					echo "$demA"$' Extracting structure from the trajectory at the specified time...\n\n'
+					sleep 2
+
+					if [[ $flw == 1 && $sysType == 1 ]]; then
+						echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+						-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					elif [[ $flw == 0 && $sysType == 1 ]]; then
+						eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+						-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+						echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
+						-n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					elif [[ $flw == 0 && $sysType == 2 ]]; then
+						eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
+						index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					elif [[ $flw == 1 && $sysType == 2 ]]; then
+						echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
+						"${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
+					fi
+					echo "$demA"$' Extract structure from the trajectory at the specified time...DONE'"$demB"
+					sleep 2
+
+					mv "${filenm}"_Structure_at_Time"$frameTime_ps".pdb ./"$results_folder"/collect_mappings/ || true
+
+					echo "$demA"$'\n The structure has been saved to the folder '"./$results_folder""/collect_mappings"
+
+cat << extractMoreStructs
+
+ Do you want to extract an additional structure from the trajectory based
+ on free energy?
+
+ 1) Yes
+ 2) No
+
+extractMoreStructs
+
+					read -p ' Enter a response here (1 or 2): ' getMoreStructure
+					
+					while [[ "$getMoreStructure" != 1 && "$getMoreStructure" != 2 ]]
+					do
+						echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
+						echo $' Extract a structure from the trajectory based on free energy??\n  1) Yes\n  2) No\n'
+						read -p ' Enter 1 or 2 here: ' getMoreStructure
+					done
+				done
+			elif [[ "$getMoreStructs" != 1 ]] ; then echo ""
+			fi
+		elif [[ "$getEnergyMin" == "no" || "$getEnergyMin" == '"no"' ]] ; then
+			mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat ./"$results_folder" || true
 		fi
-	elif [[ "$getEnergyMin" == "no" || "$getEnergyMin" == '"no"' ]] ; then
-		mv SimTime.dat OrderParameters1_2_dG_nogap-sorted.dat ./"$results_folder" || true
-		
 	fi
 }
 
@@ -2652,6 +2660,7 @@ useFoundRgRMSData_mdDavis()
 
 analyser13()
 {	
+	echo "$demA"$' Constructing a 3D plot of the FES using md-davis...\n'
 	order_parameters
  	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_mdDavis

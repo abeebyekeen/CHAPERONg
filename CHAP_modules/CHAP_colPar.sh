@@ -168,7 +168,7 @@ while [ "$1" != "" ]; do
 	-R | --ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
 	-T | --nt) shift; nt="$1";;
-	--temp) Temp="$1";;
+	--temp) shift; Temp="$1";;
 	--ter) termini=1;;
 	--trFrac) shift; trajFraction="$1";;	
 	-v | --version) echo "$demA"$' CHAPERON version: '"$CHAPERONg_version"; Credit; echo $''; exit 0 ;;
