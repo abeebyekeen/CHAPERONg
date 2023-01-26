@@ -2330,8 +2330,22 @@ inputFormat
 	cat OrderParameters1_2_dG_nogap.dat | sort -k 3,3 -n > OrderParameters1_2_dG_nogap-sorted.dat
 	mv "$fesFigure" OrderParameterPair.dat CHAP_fes_Par.in ./"$results_folder" || true
 	mv OrderParameters1_2_dG.dat OrderParameters1_2_dG_nogap.dat ./"$results_folder" || true
+	
 	bin_prob=0
-	mv binning_summary.dat ./"$results_folder" || bin_prob=1
+	raise_bin_problem()
+	{
+		bin_prob=1
+		echo "$demA"$' **NOTE:\n  The choice of the bin size for the 2D histogram is not suitable.'\
+		$'\n  Lowest energy structures will not be extracted.'\
+		$'\n  Landscape data points will not be mapped to simulation time.'\
+		$'\n  Try experimenting with different bin counts. To do this,'\
+		$'\n  you can alter the FES input parameter file "CHAP_fes_Par.in".'\
+		$'\n  Please know that the problem could also be that'\
+		$'\n  the number of frames in the trajectory is small.'
+	}
+	
+	
+	mv binning_summary.dat ./"$results_folder" || raise_bin_problem
 
 	echo "$demA"$' Construct free energy surface...DONE'"$demB"
 	sleep 2
