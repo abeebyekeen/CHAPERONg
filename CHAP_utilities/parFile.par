@@ -7,7 +7,7 @@
 ; Input coordinate file (.pdb or .gro)
 # input            =      x
 
-; Simulation box type i.e. cubic, dodecahedron
+; Simulation box type: cubic, dodecahedron, triclinic, octahedron
 # bt               =      x
 
 ; Number of threads to use
@@ -62,6 +62,9 @@
 ; Corrected trajectory to use for analyses (options: 
 ; noPBC, nojump, fit, combo)
 # inputtraj        =      combo
+
+; Fraction of trajectory to use for g_mmpbsa calculations
+# trFrac 	       =      x
 
 ; Parameter for umbrella sampling window spacing
 # smd_pull_spacing =      0.2

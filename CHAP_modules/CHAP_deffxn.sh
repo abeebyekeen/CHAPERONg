@@ -119,7 +119,8 @@ s0GenTop()
 	sleep 2
 	if [[ $coordinates_raw == '' ]]; then
 		echo "$demA"" ERROR! No coordinates filename is given! Use the --input flag!!""$demB"
-		Help; Credit; exit 1
+		sleep 3
+		Help; sleep 3; Credit; exit 1
 	fi
 	if [[ "$ffUse" == "wd" || "$ffUse" == '"wd"' ]] && [[ "$wat" != "" ]]; then
 		echo "$demA"" GROMACS will use the force-field present in the working directory!""$demB"
@@ -1979,13 +1980,14 @@ s8NVTeq2()
 		echo "Temperature" | eval $gmx_exe_path energy -f nvt.edr -o postNVT_Temperature.xvg
 		gracebat postNVT_Temperature.xvg -hdevice PNG -autoscale xy -printfile postNVT_Temperature.png \
 		-fixed 7500 4000 -legend load || notifyImgFail
+		
+		currentEMthermodyndir="$(pwd)""/postEM_thermodynamics"
+		if [[ -d "$currentEMthermodyndir" ]]; then echo ''
+		elif [[ ! -d "$currentEMthermodyndir" ]]; then mkdir postEM_thermodynamics
+		fi
+		mv postNVT_Temperature.xvg postNVT_Temperature.png ./postEM_thermodynamics || true
 		echo "$demA"$' Calculate Temperature progression...DONE\n\n' ; sleep 2	
 	fi
-	currentEMthermodyndir="$(pwd)""/postEM_thermodynamics"
-	if [[ -d "$currentEMthermodyndir" ]]; then echo ''
-	elif [[ ! -d "$currentEMthermodyndir" ]]; then mkdir postEM_thermodynamics
-	fi
-	mv postNVT_Temperature.xvg postNVT_Temperature.png ./postEM_thermodynamics || true
 }
 
 s9NPTeq1()
@@ -2012,12 +2014,12 @@ s10NPTeq2()
 	echo "$demA"$' Now calculating post-NPT thermodynamic parameters...\n\n'
 	sleep 2
 
-	echo "Pressure" | eval $gmx_exe_path energy -f "${filenm}".edr -o postNPT_Pressure.xvg
+	echo "Pressure" | eval $gmx_exe_path energy -f npt.edr -o postNPT_Pressure.xvg
 	gracebat postNPT_Pressure.xvg -hdevice PNG -autoscale xy -printfile postNPT_Pressure.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
 	echo "$demA"$' Calculate Pressure progression...DONE\n\n' ; sleep 2
 
-	echo "Density" | eval $gmx_exe_path energy -f "${filenm}".edr -o postNPT_Density.xvg
+	echo "Density" | eval $gmx_exe_path energy -f npt.edr -o postNPT_Density.xvg
 	gracebat postNPT_Density.xvg -hdevice PNG -autoscale xy -printfile postNPT_Density.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
 	echo "$demA"$' Calculate Density progression...DONE\n\n' ; sleep 2

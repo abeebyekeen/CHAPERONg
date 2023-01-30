@@ -91,7 +91,7 @@ Optional (int=integer; str=string):
 --mmFrame <int>     Number of frames to be extracted for g_mmpbsa calculations
 --movieFrame <int>  Number of frames to extract and use for movie
 --trFrac <int>      Fraction of trajectory to use for g_mmpbsa calculations
-                    (e.g. enter 2 for 2nd half, 3 for last 3rd, etc.)
+                    (e.g. enter 1 for all, 2 for 2nd half, 3 for last 3rd, etc.)
 --dist <float>      Solute-box distance i.e. distance to box edge (default is 1.0)
 --bg                Run production mdrun with nohup ("no hang up")
 --inputtraj <str>   Corrected trajectory to generate and use for analyses
@@ -125,15 +125,27 @@ read_parFile()
 		while IFS= read -r line; do
 			par=$(echo "$line" | awk '{print $1}')
 			par_input=$(echo "$line" | awk '{print $3}')
-			if [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath="$par_input"
-			elif [[ "$par" == "movieFrame" ]]; then customframeNo="$par_input"
-			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path="$par_input"
-			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType="$par_input"
-			elif [[ "$par" == "conc" ]]; then ion_conc="$par_input"
-			elif [[ "$par" == "maxwarn" ]]; then WarnMax="$par_input"
-			elif [[ "$par" == "water" ]]; then wat="$par_input"
-			elif [[ "$par" == "temp" ]]; then Temp="$par_input"
+			if [[ "$par" == "input" ]]; then coordinates_raw="$par_input"
+			elif [[ "$par" == "bt" ]]; then btype="$par_input"
+			elif [[ "$par" == "nt" ]]; then nt="$par_input"
 			elif [[ "$par" == "nb" && "$par_input" == "gpu" ]]; then nb=1
+			elif [[ "$par" == "gpu_id" ]]; then gpid="$par_input"
+			elif [[ "$par" == "deffnm" ]]; then filenm="$par_input"
+			elif [[ "$par" == "water" ]]; then wat="$par_input"
+			elif [[ "$par" == "ff" ]]; then ffUse="$par_input"
+			elif [[ "$par" == "ntmpi" ]]; then ntmpi="$par_input"
+			elif [[ "$par" == "ntomp" ]]; then ntomp="$par_input"
+			elif [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath="$par_input"
+			elif [[ "$par" == "movieFrame" ]]; then customframeNo="$par_input"
+			elif [[ "$par" == "pname" ]]; then pn="$par_input"
+			elif [[ "$par" == "nname" ]]; then nn="$par_input"
+			elif [[ "$par" == "conc" ]]; then ion_conc="$par_input"
+			elif [[ "$par" == "temp" ]]; then Temp="$par_input"
+			elif [[ "$par" == "maxwarn" ]]; then WarnMax="$par_input"
+			elif [[ "$par" == "dist" ]]; then edgeDist="$par_input"
+			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType="$par_input"
+			elif [[ "$par" == "trFrac" ]]; then trajFraction="$par_input"
+			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path="$par_input"
 			fi
 		done < "$parfilename"
 	fi
