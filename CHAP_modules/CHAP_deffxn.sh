@@ -107,7 +107,7 @@ makeNDXGroup()
 
 	eval $gmx_exe_path make_ndx -f em.gro -o $ndxNAME
 
-	echo "$demA"" Make index group ${nameForIndex}... DONE""$demB"
+	echo "$demA Make index group ${nameForIndex}... DONE""$demB"
 }
 
 
@@ -118,26 +118,26 @@ s0GenTop()
 	echo "$demA"$' Generating protein topology...'"$demB"
 	sleep 2
 	if [[ $coordinates_raw == '' ]]; then
-		echo "$demA"" ERROR! No coordinates filename is given! Use the --input flag!!""$demB"
+		echo "$demA ERROR! No coordinates filename is given! Use the --input flag!!""$demB"
 		sleep 3
 		Help; sleep 3; Credit; exit 1
 	fi
 	if [[ "$ffUse" == "wd" || "$ffUse" == '"wd"' ]] && [[ "$wat" != "" ]]; then
-		echo "$demA"" GROMACS will use the force-field present in the working directory!""$demB"
+		echo "$demA GROMACS will use the force-field present in the working directory!""$demB"
 		sleep 2
 		echo 1 | eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	elif [[ "$ffUse" != "" && "$ffUse" != "wd" && "$ffUse" != '"wd"' ]]; then
-		echo "$demA"" gmx will use the specified $ffUse force-field""$demB"
+		echo "$demA gmx will use the specified $ffUse force-field""$demB"
 		sleep 2
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr -ff $ffUse ${wmodel}
 	elif [[ "$ffUse" != "" ]] && [[ "$ffUse" == "wd" || "$ffUse" != '"wd"' ]] && [[ "$wat" == "" ]]; then
-		echo "$demA"" gmx will use the specified $ffUse force-field""$demB"
+		echo "$demA gmx will use the specified $ffUse force-field""$demB"
 		sleep 2
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr
 	elif [[ "$ffUse" == "" ]]; then
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	fi
-	echo "$demA"" Generate protein topology...DONE""$demB"
+	echo "$demA Generate protein topology...DONE""$demB"
 	sleep 2
 
 	if [[ "$mdType" == 2 ]] ; then
@@ -164,12 +164,12 @@ s0CharmmSta()
 	ffcount=0
 	for ffd in charmm*.ff; do
 		if [[ "$ffd" == '' ]]; then
-			echo "$demA"" Provide below the path/name of the charmm forcefield to be used"$'\n'
+			echo "$demA Provide below the path/name of the charmm forcefield to be used"$'\n'
 			read -p " Path (or name if in current directory) of forcefield: " forceffd
 		else
 			ffcount=$(( ffcount + 1))
 			if [[ $ffcount == 2 ]] ; then 
-				echo "$demA""Multiple forcefield folders found in the working directory! \
+				echo "$demAMultiple forcefield folders found in the working directory! \
 				Please keep only the one to be used and try again!!"
 				exit 1
 			fi
@@ -183,7 +183,7 @@ s0CharmmSta()
 	charm2gmxCount=0
 	for cgenffscr in cgenff_charmm2gmx*.py; do
 		if [[ "$cgenffscr" == '' ]]; then
-			echo "$demA"" Please copy a suitable cgenff_charmm2gmx*.py script in the current \
+			echo "$demA Please copy a suitable cgenff_charmm2gmx*.py script in the current \
 			directory and repeat this step."$'\n'
 			exit 1
 		else
@@ -204,7 +204,7 @@ s0CharmmSta()
 	ligcount=0
 	for ligmol2 in *.mol2; do
 		if [[ "$ligmol2" == '' ]]; then
-			echo "$demA"" No mol2 ligand found in the current directory."
+			echo "$demA No mol2 ligand found in the current directory."
 			exit 1
 		else
 			ligcount=$(( ligcount + 1))
@@ -222,7 +222,7 @@ s0CharmmSta()
 	strcount=0
 	for strLig in *.str; do
 		if [[ "$strLig" == '' ]]; then
-			echo "$demA"" No CHARMM stream file (.str) found in the current directory."
+			echo "$demA No CHARMM stream file (.str) found in the current directory."
 			exit 1
 		else
 		strcount=$(( strcount + 1))
@@ -260,12 +260,12 @@ s0CharmmSta()
 		python2 $cgenffscript $ligname $ligandmol2 $strLigand $forceffd
 	}
 
-	echo "$demA"" Will now convert CHARMM topology to GROMACS format...""$demB"
+	echo "$demA Will now convert CHARMM topology to GROMACS format...""$demB"
 	sleep 2
 
 	cgenff_charmm2gmxTry1 || cgenff_charmm2gmxTry2 || cgenff_charmm2gmxTry3
 
-	echo "$demA"" Convert CHARMM topology to GROMACS format... DONE""$demB"
+	echo "$demA Convert CHARMM topology to GROMACS format... DONE""$demB"
 	sleep 2
 
 }
@@ -286,19 +286,19 @@ s0CharmmStb()
 				exit 1
 			fi
 		LigINIpdb="$LigINI"
-		echo "$demA"" Ligand_ini.pdb file found in the current directory: $LigINIpdb""$demB"
+		echo "$demA Ligand_ini.pdb file found in the current directory: $LigINIpdb""$demB"
 		sleep 3
 		fi	
 	done
 
 	ligPDB=$(basename "$LigINIpdb" _ini.pdb)
 
-	echo "$demA"" Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
+	echo "$demA Now converting ligand_ini.pdb file to ligand.gro format...""$demB"
 	sleep 2
 
 	eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
 
-	echo "$demA"" Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
+	echo "$demA Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
 }
 
 s0CharmmStc()
@@ -314,7 +314,7 @@ s0CharmmStc()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA"" Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -335,7 +335,7 @@ s0CharmmStc()
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
-	echo "$demA"" Now preparing protein-ligand complex..."$'\n'
+	echo "$demA Now preparing protein-ligand complex..."$'\n'
 
 	LineCounterRecept2=0
 	while IFS= read -r coordlineRec2; do
@@ -360,7 +360,7 @@ s0CharmmStc()
 	done < "$coordinates"_processed.gro
 
 	rm tempLigGro
-	echo "$demA"" Prepare protein-ligand complex...DONE""$demB"
+	echo "$demA Prepare protein-ligand complex...DONE""$demB"
 	sleep 2
 
 	coordinates="$coordinates""-$ligname"
@@ -368,7 +368,7 @@ s0CharmmStc()
 
 s0CharmmStd()
 {
-	echo "$demA"" Preparing the topology for the complex..."
+	echo "$demA Preparing the topology for the complex..."
 
 	Ligprmcount=0
 	for ligprm in *.prm; do
@@ -407,7 +407,7 @@ s0CharmmStd()
 		fi	
 	done
 
-	echo "$demA"" Now modifying topol.top file to include the ligand parameters..."$'\n\n'
+	echo "$demA Now modifying topol.top file to include the ligand parameters..."$'\n\n'
 
 	catchffpar="; Include forcefield parameters"
 	catchPosRes="; Include Position restraint file"
@@ -539,7 +539,7 @@ s0PrdrgSta()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA"" Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -561,7 +561,7 @@ s0PrdrgSta()
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
-	echo "$demA"" Now preparing protein-ligand complex..."$'\n'
+	echo "$demA Now preparing protein-ligand complex..."$'\n'
 
 	LineCounterRecept2=0
 	while IFS= read -r coordlineRec2; do
@@ -611,7 +611,7 @@ s0PrdrgStb()
 	sed -i "s|$ligID|$ligname|g" ./DRGGMX.ITP
 	mv ./DRGGMX.ITP ./"$ligname"".itp"
 	
-	echo "$demA"" Preparing the topology for the complex..."$'\n'
+	echo "$demA Preparing the topology for the complex..."$'\n'
 
 	Ligtopcount=0
 	for ligtop in *.itp; do
@@ -636,7 +636,7 @@ s0PrdrgStb()
 		fi	
 	done
 
-	echo "$demA"" Now modifying topol.top file to include the ligand parameters and topology..."$'\n\n'
+	echo "$demA Now modifying topol.top file to include the ligand parameters and topology..."$'\n\n'
 
 	#catchffpar="; Include forcefield parameters"
 	catchPosRes="; Include Position restraint file"
@@ -746,7 +746,7 @@ s0AcpypeSta()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA"" Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -2342,24 +2342,24 @@ umbre_s16_USampling()
 		if [[ $line == *"#"* ]] ; then continue
 		elif [[ $line != *"#"* ]] ; then
 			us_frame=$(echo "$line" | awk '{print $1}')
-			echo "$demA""Now running NPT equilibration for configuration $us_frame"
+			echo "$demA"" Now running NPT equilibration for configuration $us_frame"
 			sleep 1
 			eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
 			./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
 
 			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
-			echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
+			echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
 			sleep 1
 		
-			echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
+			echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
 			sleep 1
 			eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 			topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
 			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
-			echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
+			echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
 			sleep 1
 		fi
 		if [[ $window == 0 ]] ; then
@@ -2389,14 +2389,19 @@ umbre_s16_USampling()
 
 umbre_s17_WHAM()
 {
-	echo "$demA"" Now extracting the PMF and plotting the umbrella histograms...""$demB"
+	echo "$demA Extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o -hist -unit kCal
 	sleep 2
 
-	minPMFdG=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | head -1 | awk '{print $2}')
-	maxPMFdG=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | tail -1 | awk '{print $2}')
-	displacentATdGmin=$(grep -v "^[@#]" profile.xvg | sort -k 2,2 -n | head -1 | awk '{print $1}')
+	minPMFdG=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
+	maxPMFdG=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | tail -1 | awk '{print $2}')
+	displacentATdGmin=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | head -1 | awk '{print $1}')
+
+	# gromacs .xvg outputs often contain decimals in scientific notations and 
+	# sort command with the -g flag handles that.
+	# LC_ALL=C is necessary for users whose locales use a comma instead of a period to indicate
+	# decimals, in which case the sort -g command would fail to sort dot decimals properly
 
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o profile_YminAdjusted.xvg \
 	-hist -unit kCal -zprof0 $displacentATdGmin || true
@@ -2433,14 +2438,14 @@ umbre_s17_WHAM()
 
 	echo "$demA"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
-	echo "$demA"" Extract the PMF and plot the umbrella histograms...DONE""$demB"
+	echo "$demA Extract the PMF and plot the umbrella histograms...DONE""$demB"
 	sleep 2
 	
 }
 
 umbre_s18_MoreWin()
 {
-	echo "$demA"" Running umbrella sampling for an additional window...""$demB"
+	echo "$demA Running umbrella sampling for an additional window...""$demB"
 	sleep 2
 	read -p ' Enter the frame number of the SMD configuration to use: ' us_frame
 	echo $'\n You entered: '"$us_frame"
@@ -2451,24 +2456,24 @@ umbre_s18_MoreWin()
 		window=$(( window + 1 ))
 	done
 		
-	echo "$demA""Now running NPT equilibration for configuration $us_frame"
+	echo "$demA Now running NPT equilibration for configuration $us_frame"
 	sleep 1
 	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
 	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
-	echo "$demA""Run NPT equilibration for configuration $us_frame...DONE""$demB"
+	echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
 	sleep 1
 
-	echo "$demA""Now running umbrella sampling for configuration $us_frame"$'\n\n'
+	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
 	sleep 1
 	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
-	echo "$demA""Run umbrella sampling for configuration $us_frame...DONE""$demB"
+	echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
 	sleep 1
 	echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
 	echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
