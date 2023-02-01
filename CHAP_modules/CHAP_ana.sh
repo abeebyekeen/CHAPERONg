@@ -86,22 +86,37 @@ Option  Analysis
   
 AnalysisList
 
+# read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+
+# analysis=" $analyse "
+
+# while [[ "$analysis" != *" 0 "* && "$analysis" != *" 1 "* && "$analysis" != *" 2 "* && \
+# 	"$analysis" != *" 3 "* && "$analysis" != *" 4 "* && "$analysis" != *" 5 "* && \
+# 	"$analysis" != *" 6 "* && "$analysis" != *" 7 "* && "$analysis" != *" 8 "* && \
+# 	"$analysis" != *" 9 "* && "$analysis" != *" 10 "* && "$analysis" != *" 11 "* && \
+# 	"$analysis" != *" 12 "* && "$analysis" != *" 13 "* && "$analysis" != *" 14 "* && \
+# 	"$analysis" != *" 15 "* && "$analysis" != *" 16 "* && "$analysis" != *" 17 "* && \
+# 	"$analysis" != *" 18 "* ]] ; do
+# 		echo $'\nYou entered: '"$analyse"$'\n'
+# 		echo $'Please enter a valid number!!\n'
+# 		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+# 		analysis=" $analyse "
+# done
+
 read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 
-analysis=" $analyse "
+# create a bash array values listing valid numbers
+valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
 
-while [[ "$analysis" != *" 0 "* && "$analysis" != *" 1 "* && "$analysis" != *" 2 "* && \
-	"$analysis" != *" 3 "* && "$analysis" != *" 4 "* && "$analysis" != *" 5 "* && \
-	"$analysis" != *" 6 "* && "$analysis" != *" 7 "* && "$analysis" != *" 8 "* && \
-	"$analysis" != *" 9 "* && "$analysis" != *" 10 "* && "$analysis" != *" 11 "* && \
-	"$analysis" != *" 12 "* && "$analysis" != *" 13 "* && "$analysis" != *" 14 "* && \
-	"$analysis" != *" 15 "* && "$analysis" != *" 16 "* && "$analysis" != *" 17 "* && \
-	"$analysis" != *" 18 "* ]] ; do
-		echo $'\nYou entered: '"$analyse"$'\n'
-		echo $'Please enter a valid number!!\n'
-		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
-		analysis=" $analyse "
+while ! [[ $analyse =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] || \
+! [[ $analyse =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+do
+	echo $'\nYou entered: '"$analyse"$'\n'
+	echo $'Please enter a valid number!!\n'
+	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 done
+
+analysis=" $analyse "
 
 if [[ "$analyse" == "9" ]]; then
 	analysis="$analyse"

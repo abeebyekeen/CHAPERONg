@@ -190,14 +190,21 @@ while [ "$1" != "" ]; do
 	shift
 done
 
+pattern="^[0-9]+(\.[0-9]+)?$"
 
-if [[ "$edgeDist" != *"0."* && "$edgeDist" != *"1."* && "$edgeDist" != *"2."* && "$edgeDist" != *"3."* && \
-		"$edgeDist" != *"4."* && "$edgeDist" != *"5."* && "$edgeDist" != *"6."* && "$edgeDist" != *"7."* && \
-		"$edgeDist" != *"8."* && "$edgeDist" != *"9."* && "$edgeDist" != *"."*"0"* && "$edgeDist" != *".0"* ]];then
-	echo $'\n'"$demA"$'\nThe solute-box distance i.e. minimum distance to the edge of the box you entered: '"$edgeDist"
-	echo $'Please enter a valid number !!\n'
-	exit 1
+if ! [[ "$edgeDist" =~ $pattern ]]; then
+  echo -e "\n$demA\nThe solute-box distance i.e. minimum distance to the edge of the box you entered: $edgeDist"
+  echo "Please enter a valid number !!\n"
+  exit 1
 fi
+
+# if [[ "$edgeDist" != *"0."* && "$edgeDist" != *"1."* && "$edgeDist" != *"2."* && "$edgeDist" != *"3."* && \
+# 		"$edgeDist" != *"4."* && "$edgeDist" != *"5."* && "$edgeDist" != *"6."* && "$edgeDist" != *"7."* && \
+# 		"$edgeDist" != *"8."* && "$edgeDist" != *"9."* && "$edgeDist" != *"."*"0"* && "$edgeDist" != *".0"* ]];then
+# 	echo $'\n'"$demA"$'\nThe solute-box distance i.e. minimum distance to the edge of the box you entered: '"$edgeDist"
+# 	echo $'Please enter a valid number !!\n'
+# 	exit 1
+# fi
 
 if [[ "$#" == 1 ]] || [[ "$#" == 2 ]] && [[ "$flag" != "h" ]] && [[ "$flag" != "H" ]]; then
 	echo "$demA"" No arguments are given. Default parameters will be used...""$demB"

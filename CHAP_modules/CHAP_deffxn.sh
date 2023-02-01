@@ -161,6 +161,35 @@ s0GenTop()
 
 s0CharmmSta()
 {
+	ligcount=0
+	for ligmol2 in *.mol2; do
+		if [[ "$ligmol2" == '' ]]; then
+			echo "$demA No mol2 ligand found in the current directory."
+			exit 1
+		else
+			ligcount=$(( ligcount + 1))
+			if [[ $ligcount == 2 ]] ; then 
+				echo "$demA"$'Multiple mol2 ligands found in the working directory!'\
+				$'Please keep only the required ligand and try again!!'
+				exit 1
+			fi
+			ligandmol2="$ligmol2"
+			echo "Ligand (mol2) found in the current directory: $ligandmol2"$'\n'
+			sleep 3
+		fi	
+	done
+
+	# Run sort_mol2_bonds.pl on ligand if found in the working directory
+	if [[ -d "sort_mol2_bonds.pl" ]]; then
+		echo $' sort_mol2_bonds.pl script found in the working directory.\n'\
+		$' CHAPERONg will attempt to use it on '"$ligandmol2"$'\n'
+		cp $ligandmol2 ${ligandmol2}.bak
+		ligandmol2_basename=$(basename "$ligandmol2")
+		perl sort_mol2_bonds.pl $ligandmol2 ${ligandmol2_basename}_fix.mol2
+		rm $ligandmol2
+		ligandmol2="${ligandmol2_basename}_fix.mol2"
+	fi
+	
 	ffcount=0
 	for ffd in charmm*.ff; do
 		if [[ "$ffd" == '' ]]; then
@@ -201,23 +230,23 @@ s0CharmmSta()
 		break	
 	done
 
-	ligcount=0
-	for ligmol2 in *.mol2; do
-		if [[ "$ligmol2" == '' ]]; then
-			echo "$demA No mol2 ligand found in the current directory."
-			exit 1
-		else
-			ligcount=$(( ligcount + 1))
-			if [[ $ligcount == 2 ]] ; then 
-				echo "$demA"$'Multiple mol2 ligands found in the working directory!'\
-				$'Please keep only the required ligand and try again!!'
-				exit 1
-			fi
-			ligandmol2="$ligmol2"
-			echo "Ligand (mol2) found in the current directory: $ligandmol2"$'\n'
-			sleep 3
-		fi	
-	done
+	# ligcount=0
+	# for ligmol2 in *.mol2; do
+	# 	if [[ "$ligmol2" == '' ]]; then
+	# 		echo "$demA No mol2 ligand found in the current directory."
+	# 		exit 1
+	# 	else
+	# 		ligcount=$(( ligcount + 1))
+	# 		if [[ $ligcount == 2 ]] ; then 
+	# 			echo "$demA"$'Multiple mol2 ligands found in the working directory!'\
+	# 			$'Please keep only the required ligand and try again!!'
+	# 			exit 1
+	# 		fi
+	# 		ligandmol2="$ligmol2"
+	# 		echo "Ligand (mol2) found in the current directory: $ligandmol2"$'\n'
+	# 		sleep 3
+	# 	fi	
+	# done
 
 	strcount=0
 	for strLig in *.str; do
