@@ -2123,6 +2123,8 @@ umbre_s12_SMD2()
 
 	gracebat pullf.xvg -hdevice PNG -autoscale xy -printfile pullf.png -fixed 7500 4000 -legend load || true
 
+	gracebat pullx.xvg -hdevice PNG -autoscale xy -printfile pullx.png -fixed 7500 4000 -legend load || true
+
 	gracebat displacement_pullForce.xvg -hdevice PNG -autoscale xy -printfile displacement_pullForce.png -fixed 7500 4000 -legend load || true
 	
 	AnaName="steered_MD"
@@ -2139,10 +2141,10 @@ umbre_s12_SMD2()
 		done
 		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
 		echo "Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
-		mv pullf.png pullf.xvg pullx.xvg ./$AnaName || true
+		mv pullf.png pullx.png pullf.xvg pullx.xvg ./$AnaName || true
 		mv displacement_pullForce.xvg displacement_pullForce.png ./$AnaName || true	
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
-		mv pullf.png pullf.xvg pullx.xvg ./$AnaName || true
+		mv pullf.png pullx.png pullf.xvg pullx.xvg ./$AnaName || true
 		mv displacement_pullForce.xvg displacement_pullForce.png ./$AnaName || true
 	fi
 
