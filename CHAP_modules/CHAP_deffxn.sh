@@ -2397,36 +2397,46 @@ umbre_s15_findIniConf()
 	sleep 2
 }
 
+US_fxn()
+{
+	us_frame=$(echo "$line" | awk '{print $1}')
+	echo "$demA"" Now running NPT equilibration for configuration $us_frame"
+	sleep 1
+	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
+	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
+
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
+
+	echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
+	sleep 1
+
+	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
+	sleep 1
+	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
+	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
+
+	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
+
+	echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
+	sleep 1
+	config_no=$(( config_no + 1 ))
+}
+
 umbre_s16_USampling()
 {
 	echo "$demA"" Initiating umbrella sampling...""$demB"
 	sleep 2
 	window=0
+	config_no=0
 	if [[ "$stage" == 16 ]]; then window="$resume_win"
 	fi
 	while IFS= read -r line; do
 		if [[ $line == *"#"* ]] ; then continue
-		elif [[ $line != *"#"* ]] ; then
-			us_frame=$(echo "$line" | awk '{print $1}')
-			echo "$demA"" Now running NPT equilibration for configuration $us_frame"
-			sleep 1
-			eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
-			./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
-
-			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
-
-			echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
-			sleep 1
-		
-			echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
-			sleep 1
-			eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
-			topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
-
-			eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
-
-			echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
-			sleep 1
+		elif [[ $line != *"#"* && $stage != 16 ]] ; then US_fxn
+		elif [[ $line != *"#"* && $stage == 16 ]] && (( $config_no < "$resume_win" ))
+			then continue
+		elif [[ $line != *"#"* && $stage == 16 ]] && (( $config_no >= "$resume_win" ))
+			then US_fxn
 		fi
 		if [[ $window == 0 ]] ; then
 			echo "umbrella_win"$window"_conf"$us_frame".tpr" > tpr_files.dat
@@ -2437,7 +2447,7 @@ umbre_s16_USampling()
 			echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
 			echo "umbrella_win"$window"_conf"$us_frame"_pullx.xvg" >> pullx_files.dat
 		fi
-	
+
 		window=$(( window + 1 ))
 
 	done < configuratns_list.txt
