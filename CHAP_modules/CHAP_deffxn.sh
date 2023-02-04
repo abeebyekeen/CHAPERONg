@@ -2269,7 +2269,8 @@ read -p '*Do you want to run any post-simulation processing/analyses?(yes/no): '
 
 while [[ "$psa" != "yes" ]] && [[ "$psa" != "no" ]] && [[ "$psa" != '"yes"' ]] && [[ "$psa" != '"no"' ]] ; do
 	echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-	un umbrella sampling for an additional window
+	read -p '**Do you want to run any post-simulation processing/analyses?(yes/no): ' psa 
+	# un umbrella sampling for an additional window
 done
 
 if test "$psa" == "yes"; then Analysis
@@ -2280,7 +2281,26 @@ umbre_s13_xtractFrames()
 {
 	echo "$demA"" Now extracting frames from the steered MDS trajectory...""$demB"
 	sleep 2
-	echo 0 | eval $gmx_exe_path trjconv -s pull.tpr -f pull.xtc -o coordinate.gro -sep
+	currentcoords_SMDdir="$(pwd)""/coordinates_SMD"
+	ncoords_SMD=1
+	bkupcoords_SMDdir="$(pwd)""/#coordinates_SMD"".""backup.""$ncoords_SMD"
+	base_bkupcoords_SMDdir=$(basename "$bkupcoords_SMDdir")
+	if [[ -d "$currentcoords_SMDdir" ]]; then
+		echo $'\n'"$currentcoords_SMDdir"$' folder exists,\n'"backing it up as $base_bkupcoords_SMDdir"
+		sleep 1
+		while [[ -d "$bkupcoords_SMDdir" ]]; do
+			ncoords_SMD=$(( ncoords_SMD + 1 ))
+			bkupcoords_SMDdir="$(pwd)""/#coordinates_SMD"".""backup.""$ncoords_SMD"
+			base_bkupcoords_SMDdir=$(basename "$bkupcoords_SMDdir")
+		done
+		mv "$currentcoords_SMDdir" "$bkupcoords_SMDdir" && mkdir ./coordinates_SMD || true
+		echo $'\nBacking up the last coordinates_SMD folder and its contents as'\
+		$'\n'"$base_bkupcoords_SMDdir"$'\n\n\n'
+		sleep 1
+	elif [[ ! -d "$currentcoords_SMDdir" ]]; then mkdir coordinates_SMD
+	fi
+	# mv coordinate*.gro ./coordinates_SMD || true
+	echo 0 | eval $gmx_exe_path trjconv -s pull.tpr -f pull.xtc -o ./coordinates_SMD/coordinate.gro -sep
 	echo "$demA"" Extract frames from the steered MDS trajectory...DONE""$demB"
 	sleep 2
 }
@@ -2292,28 +2312,43 @@ umbre_s14_calcCOMdist()
 	group1_name=$(cat md_pull.mdp | grep "pull_group1_name" | awk '{print $3}')
 	group2_name=$(cat md_pull.mdp | grep "pull_group2_name" | awk '{print $3}')
 	StructNo=0
-	mkdir coordinates_SMD
-	mkdir distances_SMD
+
+	currentDist_SMDdir="$(pwd)""/distances_SMD"
+	ndist_SMD=1
+	bkupdist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$ndist_SMD"
+	base_dist_SMDdir=$(basename "$bkupdist_SMDdir")
+	if [[ -d "$currentDist_SMDdir" ]]; then
+		echo $'\n'"$currentDist_SMDdir"$' folder exists,\n'"backing it up as $base_dist_SMDdir"
+		sleep 1
+		while [[ -d "$bkupdist_SMDdir" ]]; do
+			ndist_SMD=$(( ndist_SMD + 1 ))
+			bkupdist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$ndist_SMD"
+			base_dist_SMDdir=$(basename "$bkupdist_SMDdir")
+		done
+		mv "$currentDist_SMDdir" "$bkupdist_SMDdir" && mkdir ./distances_SMD || true
+		echo $'\n'"Backing up the last distances_SMD folder and its contents as $base_dist_SMDdir"
+		sleep 1
+	elif [[ ! -d "$currentDist_SMDdir" ]]; then mkdir distances_SMD
+	fi
+
 	com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
 
-	for Structure in ./"coordinate"*".gro" ; do
+	for Structure in ./coordinates_SMD/"coordinate"*".gro" ; do
 		#calculate distance between the groups
-		eval $gmx_exe_path distance -s pull.tpr -f coordinate"$StructNo".gro -n index.ndx \
-		-select "$com_groups" -oall dist${StructNo}.xvg
+		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
+		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
 		sleep 1
 		if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
 			$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
 		then sleep 2
 		fi
 		#extract the distances into a summary file
-		distanc=$(tail -n 1 dist${StructNo}.xvg | awk '{print $2}')
+		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
 		if [[ $StructNo == 0 ]] ; then
 			echo "$StructNo"$'\t'"$distanc" > distances_summary.txt
 		else
 			echo "$StructNo"$'\t'"$distanc" >> distances_summary.txt
 		fi
-		mv dist${StructNo}.xvg ./distances_SMD
-		mv coordinate"$StructNo".gro ./coordinates_SMD
 		StructNo=$(( StructNo + 1 ))
 	done
 	echo "$demA"" Calculate COM distances...DONE""$demB"
@@ -2325,9 +2360,7 @@ umbre_s15_findIniConf()
 	echo "$demA"" Now identifying initial configurations for umbrella sampling...""$demB"
 	sleep 2
 	#create a new configuratns_list.txt file and backup existing one
-	if [[ ! -f "configuratns_list.txt" ]]; then
-		touch configuratns_list.txt
-		echo $'\n'"$demA"$' An empty configuratns_list.txt file has been created\n'
+	if [[ ! -f "configuratns_list.txt" ]]; then continue
 	elif [[ -f "configuratns_list.txt" ]]; then
 		configList="configuratns_list.txt"
 		nbkUP=1
@@ -2351,8 +2384,8 @@ umbre_s15_findIniConf()
 			sleep 2
 			cp "$configList" "$configList"".backup.1"
 		fi
-		touch configuratns_list.txt
 	fi
+	touch configuratns_list.txt
 
 	#run CHAP_extract_spaced_frame_dist.py script
 	echo " Running the CHAP_extract_spaced_frame_dist.py script..."
@@ -2369,6 +2402,8 @@ umbre_s16_USampling()
 	echo "$demA"" Initiating umbrella sampling...""$demB"
 	sleep 2
 	window=0
+	if [[ "$stage" == 16 ]]; then window="$resume_win"
+	fi
 	while IFS= read -r line; do
 		if [[ $line == *"#"* ]] ; then continue
 		elif [[ $line != *"#"* ]] ; then

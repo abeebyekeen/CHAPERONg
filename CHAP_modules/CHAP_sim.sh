@@ -348,12 +348,17 @@ US_simulate()
 	elif [[ "$stage" == 15 ]]; then umbre_s15_findIniConf
 		umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 16 ]]; then umbre_s16_USampling; umbre_s17_WHAM
+	elif [[ "$stage" == 16 ]]; then
+		echo $' Provide the window number to start/resume umbrella sampling from.'\
+		$'\n To start from the 1st window (window 0), enter zero (0).\n'
+		read -p ' Enter the window number here: ' resume_win
+		echo $'\n You entered: '"$resume_win"$'\n'
+		sleep 2
+		umbre_s16_USampling; umbre_s17_WHAM
 	elif [[ "$stage" == 17 ]]; then umbre_s17_WHAM
 	elif [[ "$stage" == 18 ]]; then umbre_s18_MoreWin; umbre_s17_WHAM
 	fi
 }
-
 
 system_typeReg()
 {
