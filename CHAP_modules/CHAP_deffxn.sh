@@ -2281,7 +2281,7 @@ umbre_s13_xtractFrames()
 {
 	echo "$demA"" Now extracting frames from the steered MDS trajectory...""$demB"
 	sleep 2
-	currentcoords_SMDdir="$(pwd)""/coordinates_SMD"
+	currentcoords_SMDdir="$(pwd)""/"
 	ncoords_SMD=1
 	bkupcoords_SMDdir="$(pwd)""/#coordinates_SMD"".""backup.""$ncoords_SMD"
 	base_bkupcoords_SMDdir=$(basename "$bkupcoords_SMDdir")
@@ -2314,20 +2314,9 @@ umbre_s14_calcCOMdist()
 	StructNo=0
 
 	currentDist_SMDdir="$(pwd)""/distances_SMD"
-	ndist_SMD=1
-	bkupdist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$ndist_SMD"
-	base_dist_SMDdir=$(basename "$bkupdist_SMDdir")
 	if [[ -d "$currentDist_SMDdir" ]]; then
-		echo $'\n'"$currentDist_SMDdir"$' folder exists,\n'"backing it up as $base_dist_SMDdir"
-		sleep 1
-		while [[ -d "$bkupdist_SMDdir" ]]; do
-			ndist_SMD=$(( ndist_SMD + 1 ))
-			bkupdist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$ndist_SMD"
-			base_dist_SMDdir=$(basename "$bkupdist_SMDdir")
-		done
-		mv "$currentDist_SMDdir" "$bkupdist_SMDdir" && mkdir ./distances_SMD || true
-		echo $'\n'"Backing up the last distances_SMD folder and its contents as $base_dist_SMDdir"
-		sleep 1
+		rm -f distances_SMD || true
+		mkdir distances_SMD || true
 	elif [[ ! -d "$currentDist_SMDdir" ]]; then mkdir distances_SMD
 	fi
 
@@ -2338,11 +2327,20 @@ umbre_s14_calcCOMdist()
 		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
 		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
 		sleep 1
-		if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
-			$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
-		then sleep 2
+		# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
+		# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
+		# then sleep 2
+		# fi
+
+		# no_of_structure_milestone=(50 100 150 200 250 300 350 400 450 500)
+		# if [[ "${no_of_structure_milestone[@]}" =~ "${StructNo}" ]]; then
+		# sleep 2
+		# fi
+
+		if (( StructNo % 50 == 0 )); then sleep 2
 		fi
-		#extract the distances into a summary file
+
+		# extract the distances into a summary file
 		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
 		if [[ $StructNo == 0 ]] ; then
 			echo "$StructNo"$'\t'"$distanc" > distances_summary.txt
@@ -2351,6 +2349,7 @@ umbre_s14_calcCOMdist()
 		fi
 		StructNo=$(( StructNo + 1 ))
 	done
+	rm -f distances_SMD
 	echo "$demA"" Calculate COM distances...DONE""$demB"
 	sleep 2
 }
@@ -2359,7 +2358,7 @@ umbre_s15_findIniConf()
 {
 	echo "$demA"" Now identifying initial configurations for umbrella sampling...""$demB"
 	sleep 2
-	#create a new configuratns_list.txt file and backup existing one
+	# create a new configuratns_list.txt file and backup existing one
 	if [[ ! -f "configuratns_list.txt" ]]; then continue
 	elif [[ -f "configuratns_list.txt" ]]; then
 		configList="configuratns_list.txt"
@@ -2387,13 +2386,13 @@ umbre_s15_findIniConf()
 	fi
 	touch configuratns_list.txt
 
-	#run CHAP_extract_spaced_frame_dist.py script
-	echo " Running the CHAP_extract_spaced_frame_dist.py script..."
+	#run CHAP_set_US_starting_configs.py script
+	echo " Identifying corresponding frames at the specified window spacing..."
 	sleep 2
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_extract_spaced_frame_dist.py || \
-	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_extract_spaced_frame_dist.py
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py || \
+	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py
 
-	echo " Run CHAP_extract_spaced_frame_dist.py...DONE""$demB"
+	echo " Identify corresponding frames at the specified window spacing...DONE""$demB"
 	sleep 2
 }
 
@@ -2402,8 +2401,10 @@ US_fxn()
 	us_frame=$(echo "$line" | awk '{print $1}')
 	echo "$demA"" Now running NPT equilibration for configuration $us_frame"
 	sleep 1
-	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
-	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
+
+	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro \
+	-p topol.top -r ./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o \
+	npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
@@ -2412,8 +2413,10 @@ US_fxn()
 
 	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
 	sleep 1
-	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
-	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
+
+	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro \
+	-t npt_win"$window"_conf"$us_frame".cpt -p topol.top -r npt_win"$window"_conf"$us_frame".gro \
+	-n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
@@ -2467,12 +2470,12 @@ umbre_s17_WHAM()
 {
 	echo "$demA Extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
-	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o -hist -unit kCal
+	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o PMF_profile.xvg -hist -unit kCal
 	sleep 2
 
-	minPMFdG=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
-	maxPMFdG=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | tail -1 | awk '{print $2}')
-	displacentATdGmin=$(grep -v "^[@#]" profile.xvg | sort -gk 2,2 | head -1 | awk '{print $1}')
+	minPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
+	maxPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | tail -1 | awk '{print $2}')
+	displacentATdGmin=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $1}')
 
 	# gromacs .xvg outputs often contain decimals in scientific notations and 
 	# sort command with the -g flag handles that.
@@ -2485,7 +2488,7 @@ umbre_s17_WHAM()
 	echo "$demA"$' Generating finished figures of key results of WHAM analysis...'"$demB"
 	sleep 2
 	gracebat -nxy histo.xvg -hdevice PNG -autoscale xy -printfile histograms.png -fixed 7500 4000 || true
-	gracebat profile.xvg -hdevice PNG -autoscale xy -printfile profile.png -fixed 7500 4000 -legend load || true
+	gracebat PMF_profile.xvg -hdevice PNG -autoscale xy -printfile PMF_profile.png -fixed 7500 4000 -legend load || true
 	gracebat profile_YminAdjusted.xvg -hdevice PNG -autoscale xy -printfile profile_YminAdjusted.png \
 	-fixed 7500 4000 -legend load || true
 	dG_PMF=$(awk "BEGIN {print $minPMFdG - $maxPMFdG}")
@@ -2510,7 +2513,7 @@ umbre_s17_WHAM()
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
 	fi
 	mv histo.xvg histograms.png profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
-	mv profile.xvg profile.png profile_YminAdjusted.png ./$AnaName || true
+	mv PMF_profile.xvg PMF_profile.png profile_YminAdjusted.png ./$AnaName || true
 
 	echo "$demA"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2

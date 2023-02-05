@@ -7,7 +7,7 @@ Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
 Date: 2022.02.11
 '''
 ##lines with ## are actual comments
-def get_spaced_frame_dist(phrase='smd_pull_spacing'):
+def get_spaced_frame_dist(phrase='us_window_spacing'):
 	with open("parFile.par") as par:
 		for parameter in par.readlines():
 			if phrase in parameter:
