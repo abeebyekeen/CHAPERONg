@@ -67,7 +67,7 @@
 # trFrac 	       =      x
 
 ; Parameter for umbrella sampling window spacing
-# smd_pull_spacing =      0.2
+# us_window_spacing =      0.2
 
 ; Absolute path to the gmx executable to use for 
 ; all gmx runs except those involving mmpbsa

@@ -24,6 +24,7 @@ fi
 #import module with collected parameters
 #. ./CHAP_colPar-4.00.sh
 
+valid_YesNo_response=("yes" "no" '"yes"' '"no"')
 
 ##Defining primary functions
 
@@ -147,10 +148,11 @@ s0GenTop()
 
 		read -p ' Do you want to proceed? (yes/no): ' procd2boxdef
 
-		while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" && \
-			"$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]]
-		do
-			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		while [[ ! " ${valid_YesNo_response[@]} " =~ " ${procd2boxdef} " ]] ; do
+		# while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" && \
+		# 	"$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]]
+		# do
+			echo $' Please enter the appropriate response (a "yes" or a "no")!!\n'
 			read -p ' Do you want to proceed? (yes/no): ' procd2boxdef
 		done
 		if [[ "$procd2boxdef" == "yes" || "$procd2boxdef" == '"yes"' ]] ; then echo ""
@@ -526,7 +528,8 @@ s0CharmmStd()
 
 	read -p 'Do you want to proceed? (yes/no): ' procds
 
-	while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
+	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
+	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
 		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
@@ -741,7 +744,8 @@ s0PrdrgStb()
 
 	read -p 'Do you want to proceed? (yes/no): ' procds
 
-	while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
+	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
+	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
 		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
@@ -998,7 +1002,8 @@ s0AcpypeStb()
 
 	read -p 'Do you want to proceed? (yes/no): ' procds
 
-	while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
+	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
+	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
 		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
@@ -1281,7 +1286,8 @@ s0ligpargenStb()
 
 	read -p 'Do you want to proceed? (yes/no): ' procds
 
-	while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
+	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
+	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
 		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
@@ -1308,8 +1314,10 @@ iniGenLigTop
 
 	read -p ' Initiate ligand preparation at stage: ' stepLigPrep
 
-	while [[ "$stepLigPrep" != 'a' && "$stepLigPrep" != 'b' && \
-		"$stepLigPrep" != 'c' && "$stepLigPrep" != 'd' ]] ; do
+	valid_entries=( "a" "b" "c" "d" )
+	while [[ ! "${valid_entries[@]}" =~ "${stepLigPrep}" ]] ; do
+	# while [[ "$stepLigPrep" != 'a' && "$stepLigPrep" != 'b' && \
+	# 	"$stepLigPrep" != 'c' && "$stepLigPrep" != 'd' ]] ; do
 		echo $'\nYou entered: '"$stepLigPrep"
 		echo $'Please enter a valid option (a, b, c or d)!!\n'
 		read -p ' Initiate ligand preparation at stage (Enter a, b, c or d): ' stepLigPrep
@@ -1357,9 +1365,9 @@ iniGenLigTop
 
 		read -p 'Do you want to proceed? (yes/no): ' procd2boxdef
 
-		while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" ]] && \
-			[[ "$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]]
-		do
+		while [[ ! "${valid_YesNo_response[@]}" =~ "${procd2boxdef}" ]] ; do
+		# while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" ]] && \
+		# 	[[ "$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]] ; do
 			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 			read -p 'Do you want to proceed? (yes/no): ' procd2boxdef
 		done
@@ -2174,7 +2182,8 @@ s12MDrun()
 		echo $'\n'
 		read -p ' Do you want to run any post-simulation processing/analyses?(yes/no): ' psa
 
-		while [[ "$psa" != "yes" && "$psa" != "no" && "$psa" != '"yes"' && "$psa" != '"no"' ]] ; do
+		while [[ ! "${valid_YesNo_response[@]}" =~ "${psa}" ]] ; do
+		# while [[ "$psa" != "yes" && "$psa" != "no" && "$psa" != '"yes"' && "$psa" != '"no"' ]] ; do
 			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 			read -p '*Do you want to run any post-simulation processing/analyses?(yes/no): ' psa 
 		done
@@ -2392,7 +2401,7 @@ umbre_s15_findIniConf()
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py || \
 	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py
 
-	echo " Identify corresponding frames at the specified window spacing...DONE""$demB"
+	echo " Identify initial configurations for umbrella sampling...DONE""$demB"
 	sleep 2
 }
 
@@ -2463,14 +2472,14 @@ umbre_s16_USampling()
 	sleep 2
 	#mv npt_win*_pull*.xvg umbrella_sampling/equilibration/
 	#mv umbrella_win*_pullx.xvg ./umbrella_sampling/data_collection
-
 }
 
 umbre_s17_WHAM()
 {
 	echo "$demA Extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
-	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o PMF_profile.xvg -hist -unit kCal
+	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o \
+	PMF_profile.xvg -hist umbrella_sampling_histograms0.xvg -unit kCal
 	sleep 2
 
 	minPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
@@ -2482,15 +2491,17 @@ umbre_s17_WHAM()
 	# LC_ALL=C is necessary for users whose locales use a comma instead of a period to indicate
 	# decimals, in which case the sort -g command would fail to sort dot decimals properly
 
-	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o profile_YminAdjusted.xvg \
-	-hist -unit kCal -zprof0 $displacentATdGmin || true
+	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o PMF_profile_YminAdjusted.xvg \
+	-hist umbrella_sampling_histograms.xvg -unit kCal -zprof0 $displacentATdGmin || true
 
 	echo "$demA"$' Generating finished figures of key results of WHAM analysis...'"$demB"
 	sleep 2
-	gracebat -nxy histo.xvg -hdevice PNG -autoscale xy -printfile histograms.png -fixed 7500 4000 || true
-	gracebat PMF_profile.xvg -hdevice PNG -autoscale xy -printfile PMF_profile.png -fixed 7500 4000 -legend load || true
-	gracebat profile_YminAdjusted.xvg -hdevice PNG -autoscale xy -printfile profile_YminAdjusted.png \
+	gracebat -nxy umbrella_sampling_histograms.xvg -hdevice PNG -autoscale xy -printfile \
+	umbrella_sampling_histograms.png -fixed 7500 4000 || true
+	gracebat PMF_profile.xvg -hdevice PNG -autoscale xy -printfile PMF_profile.png \
 	-fixed 7500 4000 -legend load || true
+	gracebat PMF_profile_YminAdjusted.xvg -hdevice PNG -autoscale xy -printfile \
+	PMF_profile_YminAdjusted.png -fixed 7500 4000 -legend load || true
 	dG_PMF=$(awk "BEGIN {print $minPMFdG - $maxPMFdG}")
 	echo $'Binding Free Energy (dG) = '"$dG_PMF"$' kCal/mol' > summary_dG.dat
 
@@ -2512,8 +2523,8 @@ umbre_s17_WHAM()
 		sleep 2
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
 	fi
-	mv histo.xvg histograms.png profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
-	mv PMF_profile.xvg PMF_profile.png profile_YminAdjusted.png ./$AnaName || true
+	mv umbrella_sampling_histograms.xvg umbrella_sampling_histograms.png PMF_profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
+	mv PMF_profile.xvg PMF_profile.png PMF_profile_YminAdjusted.png ./$AnaName || true
 
 	echo "$demA"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
@@ -2524,53 +2535,71 @@ umbre_s17_WHAM()
 
 umbre_s18_MoreWin()
 {
-	echo "$demA Running umbrella sampling for an additional window...""$demB"
-	sleep 2
-	read -p ' Enter the frame number of the SMD configuration to use: ' us_frame
-	echo $'\n You entered: '"$us_frame"
-	sleep 2
+	repeatUSmore="yes"
 
-	window=0
-	while [[ -f npt_win"$window"_* ]]; do
-		window=$(( window + 1 ))
+	while [[ "$repeatUSmore" == "yes" || "$repeatUSmore" == "y" || \
+		"$repeatUSmore" == '"yes"' || "$repeatUSmore" == '"y"' ]]
+	do
+		echo "$demA Running umbrella sampling for an additional window...""$demB"
+		sleep 2
+		read -p ' Enter the frame number of the SMD configuration to use: ' us_frame
+		echo $'\n You entered: '"$us_frame"
+		sleep 2
+
+		window=0
+		while [[ -f npt_win"$window"_* ]]; do
+			window=$(( window + 1 ))
+		done
+			
+		echo "$demA Now running NPT equilibration for configuration $us_frame"
+		sleep 1
+		eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
+		./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
+
+		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
+
+		echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
+		sleep 1
+
+		echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
+		sleep 1
+		eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
+		topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
+
+		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
+
+		echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
+		sleep 1
+		echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
+		echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
+		echo "umbrella_win"$window"_conf"$us_frame"_pullx.xvg" >> pullx_files.dat
+		echo "$demA"$' Umbrella sampling simulation has been completed for the additional window.\n\n'\
+		$' The names of the .tpr, pullf.xvg and pullx.xvg files have been appended to the\n'\
+		$' tpr_files.dat, pullf_files.dat and pullx_files.dat, respectively...'"$demB"
+		sleep 2
+
+		read -p ' Do you want to run umbrella sampling for more windows? (yes/no): ' repeatUSmore
+
+		# while [[ "$repeatUSmore" != "yes" && "$repeatUSmore" != "no" && \
+		# 	"$repeatUSmore" != '"yes"' && "$repeatUSmore" != '"no"' ]]
+		# do
+		# 	echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		# 	read -p ' Do you want to proceed? (yes/no): ' procd2pmf
+		# done
+
+		while [[ ! " ${valid_YesNo_response[@]} " =~ " ${repeatUSmore} " ]]; do
+			echo $' Please enter the appropriate response (a "yes" or a "no")!!\n'
+			read -p ' Do you want to run umbrella sampling for more windows? (yes/no): ' repeatUSmore
+		done
 	done
-		
-	echo "$demA Now running NPT equilibration for configuration $us_frame"
-	sleep 1
-	eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
-	./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
-
-	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
-
-	echo "$demA Run NPT equilibration for configuration $us_frame...DONE""$demB"
-	sleep 1
-
-	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
-	sleep 1
-	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
-	topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
-
-	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
-
-	echo "$demA Run umbrella sampling for configuration $us_frame...DONE""$demB"
-	sleep 1
-	echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
-	echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
-	echo "umbrella_win"$window"_conf"$us_frame"_pullx.xvg" >> pullx_files.dat
-	echo "$demA"$' Umbrella sampling simulation has been completed for the additional window.\n\n'\
-	$' The names of the .tpr, pullf.xvg and pullx.xvg files have been appended to the\n'\
-	$' tpr_files.dat, pullf_files.dat and pullx_files.dat, respectively.\n'\
-	$'*The files tpr_files.dat and pullf_files.dat will be used in the data analysis step...'"$demB"
-	sleep 2
 
 	read -p ' Do you want to proceed to PMF calculation? (yes/no): ' procd2pmf
 
-	while [[ "$procd2pmf" != "yes" && "$procd2pmf" != "no" && \
-		"$procd2pmf" != '"yes"' && "$procd2pmf" != '"no"' ]] ; do
-			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p ' Do you want to proceed? (yes/no): ' procd2pmf
-		done
-		if [[ "$procd2pmf" == "yes" || "$procd2pmf" == '"yes"' ]] ; then echo ""
-		elif [[ "$procd2pmf" == "no" || "$procd2pmf" == '"no"' ]] ; then exit 0
-		fi
+	while [[ ! " ${valid_YesNo_response[@]} " =~ " ${procd2pmf} " ]] ; do
+		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		read -p ' Do you want to proceed to PMF calculation? (yes/no): ' procd2pmf
+	done
+	if [[ "$procd2pmf" == "yes" || "$procd2pmf" == '"yes"' ]] ; then echo ""
+	elif [[ "$procd2pmf" == "no" || "$procd2pmf" == '"no"' ]] ; then exit 0
+	fi
 }
