@@ -339,24 +339,57 @@ US_simulate()
 	elif [[ "$stage" == 12 ]]; then umbre_s12_SMD2; umbre_s13_xtractFrames
 		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 13 ]]; then umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+	elif [[ "$stage" == 13 ]] && [[ -d "$movieDIRECORY" ]]; then
+cat << MovChoic
+$demA
+Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
+
+  a     Make a new movie
+  b     Adjust a previous one
+
+MovChoic
+
+		read -p '*Enter your choice here (a or b): ' moviechoic
+
+		while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
+			echo $'\nYou entered: '"$moviechoic"$'\n'
+			echo $'Please enter a valid letter!!\n'
+			read -p '*Enter your choice here (a or b): ' moviechoic
+		done
+		
+			if [[ "$moviechoic" == "a" ]]; then
+				ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+			elif [[ "$moviechoic" == "b" ]]; then
+				variables_for_SMD_Movie; analyser9update
+			fi
+
+		elif [[ "$analyse" == "9" ]] && [[ ! -d "$movieDIRECORY" ]]; then
+			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+		fi
+
+		if [[ "$analysis" == *" 9 "* ]]; then
+			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+		fi
+			
+
+	elif [[ "$stage" == 14 ]]; then umbre_s13_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 14 ]]; then umbre_s14_calcCOMdist
+	elif [[ "$stage" == 15 ]]; then umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 15 ]]; then umbre_s15_findIniConf
+	elif [[ "$stage" == 16 ]]; then umbre_s15_findIniConf
 		umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 16 ]]; then
+	elif [[ "$stage" == 17 ]]; then
 		echo $' Provide the window number to start/resume umbrella sampling from.'\
 		$'\n To start from the 1st window (window 0), enter zero (0).\n'
 		read -p ' Enter the window number here: ' resume_win
 		echo $'\n You entered: '"$resume_win"$'\n'
 		sleep 2
 		umbre_s16_USampling; umbre_s17_WHAM
-	elif [[ "$stage" == 17 ]]; then umbre_s17_WHAM
-	elif [[ "$stage" == 18 ]]; then umbre_s18_MoreWin; umbre_s17_WHAM
+	elif [[ "$stage" == 18 ]]; then umbre_s17_WHAM
+	elif [[ "$stage" == 19 ]]; then umbre_s18_MoreWin; umbre_s17_WHAM
 	fi
 }
 

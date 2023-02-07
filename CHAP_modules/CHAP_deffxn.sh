@@ -2102,6 +2102,33 @@ s11RelPosRe()
 	sleep 2
 }
 
+ScanTRAJ_SMD()
+{
+if [[ ! -f "SMD_trajectDetails.log" ]]; then
+	echo "$demA"$' Checking the SMD trajectory to extract info about the number of\n frames and simulation time'"$demB"
+	sleep 2
+	eval $gmx_exe_path check -f pull.xtc |& tee SMD_trajectDetails.log
+	No_of_frames=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
+	simDuratnps=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $NF}')
+	sim_timestep=$(cat SMD_trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
+	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
+	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
+	echo $simDuratnINTns > simulation_duration
+
+	echo "$demA"$' Extract number of frames and simulation duration from trajectory...DONE'"$demB"
+	sleep 2
+else
+	No_of_frames=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
+	simDuratnps=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $NF}')
+	sim_timestep=$(cat SMD_trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
+	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
+	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
+	echo $simDuratnINTns > simulation_duration
+fi
+}
+
 umbre_s11_SMD1()
 {
 	echo "$demA"" Now executing grompp for steered MD simulation...""$demB"
@@ -2161,6 +2188,7 @@ umbre_s12_SMD2()
 	echo "$demA"" Steered MD simulation completed...""$demB"
 	sleep 2
 }
+
 
 s12MDrun()
 {
@@ -2286,7 +2314,60 @@ if test "$psa" == "yes"; then Analysis
 fi
 }
 
-umbre_s13_xtractFrames()
+# define function for variables_for_SMD_Movie
+variables_for_SMD_Movie()
+{
+	message_Movie="Preparing to make a summary movie of the SMD trajectory"
+	trajectlog="SMD_trajectDetails.log"
+	simulationcontext="steered MD"
+	xtcFileMovie="pull"
+	tprFileMovie="pull"
+	outXTCmovie="pull_trjEvery""$skimov""skipForMovie"
+	movieDIRECORY="MOVIE_SMD"
+}
+
+umbre_s13_SMD_movie()
+{
+	analyser9; analyser9
+
+}
+
+umbre_s13_SMD_movie_adjust()
+{
+	if [[ "$stage" == 13 ]] && [[ -d "$movieDIRECORY" ]]; then
+cat << MovChoic
+$demA
+Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
+
+  a     Make a new movie
+  b     Adjust a previous one
+
+MovChoic
+
+		read -p '*Enter your choice here (a or b): ' moviechoic
+
+		while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
+			echo $'\nYou entered: '"$moviechoic"$'\n'
+			echo $'Please enter a valid letter!!\n'
+			read -p '*Enter your choice here (a or b): ' moviechoic
+		done
+		
+		if [[ "$moviechoic" == "a" ]]; then
+			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+		elif [[ "$moviechoic" == "b" ]]; then
+			variables_for_SMD_Movie; analyser9update
+		fi
+
+	elif [[ "$analyse" == "9" ]] && [[ ! -d "$movieDIRECORY" ]]; then
+		ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+	fi
+
+	if [[ "$analysis" == *" 9 "* ]]; then
+		ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+	fi
+}
+
+umbre_s14_xtractFrames()
 {
 	echo "$demA"" Now extracting frames from the steered MDS trajectory...""$demB"
 	sleep 2
@@ -2314,7 +2395,7 @@ umbre_s13_xtractFrames()
 	sleep 2
 }
 
-umbre_s14_calcCOMdist()
+umbre_s15_calcCOMdist()
 {
 	echo "$demA"" Now calculating COM distances...""$demB"
 	sleep 2
@@ -2363,7 +2444,7 @@ umbre_s14_calcCOMdist()
 	sleep 2
 }
 
-umbre_s15_findIniConf()
+umbre_s16_findIniConf()
 {
 	echo "$demA"" Now identifying initial configurations for umbrella sampling...""$demB"
 	sleep 2
@@ -2434,7 +2515,7 @@ US_fxn()
 	config_no=$(( config_no + 1 ))
 }
 
-umbre_s16_USampling()
+umbre_s17_USampling()
 {
 	echo "$demA"" Initiating umbrella sampling...""$demB"
 	sleep 2
@@ -2474,7 +2555,7 @@ umbre_s16_USampling()
 	#mv umbrella_win*_pullx.xvg ./umbrella_sampling/data_collection
 }
 
-umbre_s17_WHAM()
+umbre_s18_WHAM()
 {
 	echo "$demA Extracting the PMF and plotting the umbrella histograms...""$demB"
 	sleep 2
@@ -2530,10 +2611,9 @@ umbre_s17_WHAM()
 	sleep 2
 	echo "$demA Extract the PMF and plot the umbrella histograms...DONE""$demB"
 	sleep 2
-	
 }
 
-umbre_s18_MoreWin()
+umbre_s19_MoreWin()
 {
 	repeatUSmore="yes"
 
