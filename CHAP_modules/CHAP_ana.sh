@@ -1029,9 +1029,9 @@ variables_for_regMD_Movie()
 
 analyser9()
 {
-	echo "$demA $message_Movie"}
+	echo "$demA $message_Movie"
 
-if [[ $customframeNo == '' ]]; then
+	if [[ $customframeNo == '' ]]; then
 cat << askMovielength
 
 Do you want to proceed to making a movie summarized into 200 frames?
@@ -1068,14 +1068,15 @@ elif [[ "$customframeNo" != '' ]]; then
 fi
 
 if (( $No_of_frames >= "$customframeNo_int" )) ; then
-	skimov_raw=$(awk "BEGIN {print $No_of_frames / $customframeNo}")
+	skimov_raw=$(awk "BEGIN {print $No_of_frames / $customframeNo_int}")
 	skimov=$(echo ${skimov_raw%\.*})
 elif (( $No_of_frames < "$customframeNo_int" )) ; then 
 	skimov=1
 	echo "$demA"" Number of frames in the trajectory: ${No_of_frames}"\
 	$'\n'" Total number of frames in the trajectory is less than $customframeNo!"\
 	$'\n'" Using ${No_of_frames} frames directly.""$demB"
-	$customframeNo=$(echo ${No_of_frames})
+	customframeNo=$(echo ${No_of_frames})
+	customframeNo_int=$(echo ${No_of_frames})
 fi
 
 echo "$demA"$' Will now extract frames to be used for the movie...\n\n'
@@ -1083,7 +1084,7 @@ sleep 2
 #if [[ $sysType == 1 ]] || [[ $sysType == 2 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
 echo 0 | eval $gmx_exe_path trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tpr -o ${outXTCmovie}.xtc -skip $skimov
 #elif [[ $sysType == 1 ]] || [[ $sysType == 2 ]] && [[ $flw == 0 ]] ; then
-#gmx trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjEvery""$skimov""skipForMovie.xtc" -skip $skimov
+#gmx trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${outXTCmovie}.xtc" -skip $skimov
 #fi
 sleep 2
 echo "$demA"$' Preparing to extract $customframeNo snapshots...\n'
@@ -1158,9 +1159,9 @@ if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
 fi
 
 #mkdir ./frames
-#mv frame_*.png ./frames || true ; mv ../summaryForMovie.pdb ./ || true; mv ../"${filenm}""_trjEvery""$skimov""skipForMovie.xtc" ./ || true ; mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
+#mv frame_*.png ./frames || true ; mv ../summaryForMovie.pdb ./ || true; mv ../"${outXTCmovie}.xtc" ./ || true ; mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
 rm frame_*.png || true ; rm ../summaryForMovie.pdb || true
-rm ../"${filenm}""_trjEvery""$skimov""skipForMovie.xtc" || true 
+rm ../"${outXTCmovie}.xtc" || true 
 mv ../*.pse ./ || true ; rm ../*_movie_Pyscript.pml || true
 rm ./*_movie_Pyscript.pml || true
 rm ./PyMOLsession.pse || true

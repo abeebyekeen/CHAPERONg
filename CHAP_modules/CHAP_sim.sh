@@ -105,12 +105,13 @@ cat << ListStageUS
     10     NPT Equilibration (mdrun)
     11     Steered MDS (grompp)
     12     Steered MDS (mdrun)
-    13     Extract frames from the steered MDS trajectory
-    14     Calculate COM distances
-    15     Identify initial configurations for umbrella sampling
-    16     Umbrella sampling
-    17     Calculate PMF using WHAM
-    18     Run umbrella sampling for an additional window -- optional
+    13     Make a movie of the steered MD trajectory
+    14     Extract frames from the steered MDS trajectory
+    15     Calculate COM distances
+    16     Identify initial configurations for umbrella sampling
+    17     Umbrella sampling
+    18     Calculate PMF using WHAM
+    19     Run umbrella sampling for an additional window -- optional
 ListStageUS
 }
 
@@ -132,12 +133,13 @@ cat << ListStageUS
     10     NPT Equilibration (mdrun)
     11     Steered MDS (grompp)
     12     Steered MDS (mdrun)
-    13     Extract frames from the steered MDS trajectory
-    14     Calculate COM distances
-    15     Identify initial configurations for umbrella sampling
-    16     Umbrella sampling
-    17     Calculate PMF using WHAM
-    18     Run umbrella sampling for an additional window -- optional
+    13     Make a movie of the steered MD trajectory
+    14     Extract frames from the steered MDS trajectory
+    15     Calculate COM distances
+    16     Identify initial configurations for umbrella sampling
+    17     Umbrella sampling
+    18     Calculate PMF using WHAM
+    19     Run umbrella sampling for an additional window -- optional
 ListStageUS
 }
 
