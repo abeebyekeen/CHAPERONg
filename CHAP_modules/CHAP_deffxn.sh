@@ -2421,7 +2421,8 @@ $'preset.pretty(selection='"'all'"$')\n'\
 $'spectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
 $'set movie_loop, 0\nsmooth\norient\nviewport 760, 540\nzoom all, -10\n'\
 $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
-$'mclear\n'"cd ${movieDIRECORY}"$'\nsave PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
+$'mclear\n'"cd ${movieDIRECORY}"$'\nshow cell\nsave PyMOLsession_allSet.pse\n'\
+$'mpng frame_.png\nquit' > prep_movie_Pyscript.pml
 	
 echo "$demA"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"$demB"
 sleep 2
@@ -2473,12 +2474,12 @@ cd ..
 analyser9update()
 {
 
-echo "$demA"$'Preparing to make a summary movie from a preset PyMOL session\n'
+echo "$demA"$' Preparing to make a summary movie from a preset PyMOL session\n'
 sleep 2
 
 currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
 if [[ ! -d "$currentMOVIEdir" ]]; then
-	echo "No MOVIE directory from a previous run exists... Exiting"
+	echo " No MOVIE directory from a previous run exists. Exiting..."
 	exit 1
 fi
 nMOVIE=1
@@ -2487,14 +2488,14 @@ bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
 if [[ -f "$currentMOVIEgif" ]]; then
 	base_currentMOVIEgif=$(basename "$currentMOVIEgif")
 	base_bkupMOVIEgif=$(basename "$bkupMOVIEgif")
-	echo $'\n'"$base_currentMOVIEgif" "exists, backing it up as $base_bkupMOVIEgif"$'\n'
+	echo $'\n'" $base_currentMOVIEgif" "exists, backing it up as $base_bkupMOVIEgif"$'\n'
 	sleep 1
 	while [[ -f "$bkupMOVIEgif" ]]; do
 	nMOVIE=$(( nMOVIE + 1 ))
 	bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
 	done
 	mv "$currentMOVIEgif" "$bkupMOVIEgif" || true
-	echo $'\n'"Backing up the last .gif MOVIE as $base_bkupMOVIEgif"
+	echo $'\n'" Backing up the last .gif MOVIE as $base_bkupMOVIEgif"
 	sleep 1
 fi	
 
@@ -2504,37 +2505,37 @@ bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
 if [[ -f "$currentMOVIEmp4" ]]; then
 	base_currentMOVIEmp4=$(basename "$currentMOVIEmp4")
 	base_bkupMOVIEmp4=$(basename "$bkupMOVIEmp4")
-	echo $'\n'"$base_currentMOVIEmp4"" exists, backing it up as $base_bkupMOVIEmp4"$'\n'
+	echo $'\n'" $base_currentMOVIEmp4"" exists, backing it up as $base_bkupMOVIEmp4"$'\n'
 	sleep 1
 	while [[ -f "$bkupMOVIEmp4" ]]; do
 	nMOVIE=$(( nMOVIE + 1 ))
 	bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
 	done
 	mv "$currentMOVIEmp4" "$bkupMOVIEmp4" || true
-	echo $'\n'"Backing up the last .mp4 MOVIE as $base_bkupMOVIEmp4"
+	echo $'\n'" Backing up the last .mp4 MOVIE as $base_bkupMOVIEmp4"
 	sleep 1
 fi	
 	
 echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
 	
-echo "$demA"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"$demB"
+echo "$demA"$' Now, PyMOL will do the job. Sit back and have a cup of tea...Cheers!'"$demB"
 sleep 2
 pyM=0
 pymol prep_movie_Pyscript.pml || pyM=1
-echo "$demA"$'Extract frames as images...DONE'"$demB""$demA"$'Now converting images to movie...\n'
+echo "$demA"$' Extract frames as images...DONE\n\n Now converting images to movie...'"$demB"
 cd ./${movieDIRECORY}
 mov_make=0
 convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
 convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
 
 if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
-	echo "$demA"$'The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
+	echo "$demA"$' The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
 	$'PyMOL''"'" and will use it to make a movie which may, however, be of lesser quality""$demB"
 		
 	makeMoviePyx
 	makeMoviePyy
 		
-	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+	echo "$demA"$' Movie (lesser quality) made with PyMOL...\n'
 fi
 
 if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
@@ -2546,7 +2547,7 @@ if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
 	makeMoviePyx
 	makeMoviePyy
 		
-	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+	echo "$demA"$' Movie made with PyMOL...\n'
 fi
 
 rm frame_*.png || true 
@@ -2687,12 +2688,12 @@ umbre_s16_findIniConf()
 				currentconfigListbak="$configListbak""$nbkUP"
 			done
 			echo $'\nCHAPERONg will back that up as '"$currentconfigListbak"$' and'\
-			$'the '"$configList used in the last run as $configList"".backup.1""$demB"
+			$'the '"$configList used in the last run as $configList"".backup.1"
 			sleep 2
 			mv "$prevconfigListbak" "$currentconfigListbak"
 			cp "$configList" "$configList"".backup.1"
 		elif [[ ! -f "$prevconfigListbak" ]]; then
-			echo "$demA"" Backing up $configList used in the last run as $configList"".backup.1""$demB"
+			echo "$demA"" Backing up $configList used in the last run as $configList"".backup.1"
 			sleep 2
 			cp "$configList" "$configList"".backup.1"
 		fi
@@ -2700,12 +2701,12 @@ umbre_s16_findIniConf()
 	touch configuratns_list.txt
 
 	#run CHAP_set_US_starting_configs.py script
-	echo " Identifying corresponding frames at the specified window spacing..."
+	echo $'\n'" Identifying corresponding frames at the specified window spacing..."
 	sleep 2
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py || \
 	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py
 
-	echo " Identify initial configurations for umbrella sampling...DONE""$demB"
+	echo $'\n'" Identify initial configurations for umbrella sampling...DONE""$demB"
 	sleep 2
 }
 
@@ -2749,10 +2750,14 @@ umbre_s17_USampling()
 	while IFS= read -r line; do
 		if [[ $line == *"#"* ]] ; then continue
 		elif [[ $line != *"#"* && $stage != 16 ]] ; then US_fxn
-		elif [[ $line != *"#"* && $stage == 16 ]] && (( $config_no < "$resume_win" ))
+		elif [[ $line != *"#"* && $stage == 16 ]] ; then 
+			if (( $config_no < "$resume_win" ))
 			then continue
-		elif [[ $line != *"#"* && $stage == 16 ]] && (( $config_no >= "$resume_win" ))
+			fi
+		elif [[ $line != *"#"* && $stage == 16 ]] ; then
+			if (( $config_no >= "$resume_win" ))
 			then US_fxn
+			fi
 		fi
 		if [[ $window == 0 ]] ; then
 			echo "umbrella_win"$window"_conf"$us_frame".tpr" > tpr_files.dat

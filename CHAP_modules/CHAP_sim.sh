@@ -354,7 +354,7 @@ US_simulate()
 		umbre_s18_WHAM
 
 	elif [[ "$stage" == 17 ]]; then
-		echo $' Provide the window number to start/resume umbrella sampling from.'\
+		echo "$demA"$' Provide the window number to start/resume umbrella sampling from.'\
 		$'\n To start from the 1st window (window 0), enter zero (0).\n'
 		read -p ' Enter the window number here: ' resume_win
 		echo $'\n You entered: '"$resume_win"$'\n'

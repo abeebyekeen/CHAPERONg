@@ -108,8 +108,8 @@ read -p '*Enter one or more combinations of the options here (separated by a spa
 # create a bash array listing valid numbers
 valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
 
-while ! [[ $analyse =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] || \
-! [[ $analyse =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+while ! [[ $analyse =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
+	! [[ $analyse =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
 do
 	echo $'\nYou entered: '"$analyse"$'\n'
 	echo $'Please enter a valid number!!\n'
