@@ -2326,14 +2326,15 @@ variables_for_SMD_Movie()
 	movieDIRECORY="MOVIE_SMD"
 }
 
+# umbre_s13_SMD_movie()
+# {
+# 	ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9;
+
+# }
+
 umbre_s13_SMD_movie()
 {
-	analyser9; analyser9
-
-}
-
-umbre_s13_SMD_movie_adjust()
-{
+	ScanTRAJ_SMD; variables_for_SMD_Movie
 	if [[ "$stage" == 13 ]] && [[ -d "$movieDIRECORY" ]]; then
 cat << MovChoic
 $demA
@@ -2344,26 +2345,18 @@ Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
 
 MovChoic
 
-		read -p '*Enter your choice here (a or b): ' moviechoic
+		read -p ' *Enter your choice here (a or b): ' moviechoic
 
 		while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
-			echo $'\nYou entered: '"$moviechoic"$'\n'
-			echo $'Please enter a valid letter!!\n'
-			read -p '*Enter your choice here (a or b): ' moviechoic
+			echo $'\n You entered: '"$moviechoic"$'\n'
+			echo $' Please enter a valid letter!!\n'
+			read -p ' *Enter your choice here (a or b): ' moviechoic
 		done
 		
-		if [[ "$moviechoic" == "a" ]]; then
-			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
-		elif [[ "$moviechoic" == "b" ]]; then
-			variables_for_SMD_Movie; analyser9update
+		if [[ "$moviechoic" == "a" ]]; then analyser9
+		elif [[ "$moviechoic" == "b" ]]; then analyser9update
 		fi
-
-	elif [[ "$analyse" == "9" ]] && [[ ! -d "$movieDIRECORY" ]]; then
-		ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
-	fi
-
-	if [[ "$analysis" == *" 9 "* ]]; then
-		ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
+	elif [[ "$stage" == 13 ]] && [[ ! -d "$movieDIRECORY" ]]; then analyser9
 	fi
 }
 

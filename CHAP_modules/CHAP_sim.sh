@@ -276,110 +276,80 @@ US_simulate()
 
 	if [[ $sysType == 1 ]] && [[ "$stage" == 0 ]]; then s0GenTop; s1DefBox; s2Solvat
 		s3AddIons1;	s4AddIons2; s5EnMin1; s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1
-		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames; 
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames 
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ $sysType == 2 && "$stage" == '0a' ]] ; then s0GenTop; s0GenLigTop; s1DefBox
 		s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
-		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 	
 	elif [[ $sysType == 2 && "$stage" == '0b' ]] ; then s0GenLigTop; s1DefBox; s2Solvat
 		s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1
-		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 		
 	elif [[ "$stage" == 1 ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2
 		s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2
-		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames;	umbre_s14_calcCOMdist
+		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 2 ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1
 		s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_xtractFrames;	umbre_s14_calcCOMdist
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 3 ]]; then s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2
 		s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_xtractFrames;	umbre_s14_calcCOMdist
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 4 ]]; then s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1
-		s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 5 ]]; then s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
-		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 	
 	elif [[ "$stage" == 6 ]]; then s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
-		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 7 ]]; then s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2
-		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 8 ]]; then s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 9 ]]; then s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 10 ]]; then s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
 	elif [[ "$stage" == 11 ]]; then umbre_s11_SMD1; umbre_s12_SMD2
-		umbre_s13_xtractFrames; umbre_s14_calcCOMdist
+		umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
 		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
 
-	elif [[ "$stage" == 12 ]]; then umbre_s12_SMD2; umbre_s13_xtractFrames
-		umbre_s14_calcCOMdist; umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+	elif [[ "$stage" == 12 ]]; then umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
-	elif [[ "$stage" == 13 ]] && [[ -d "$movieDIRECORY" ]]; then
-cat << MovChoic
-$demA
-Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
+	elif [[ "$stage" == 13 ]]; then umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
-  a     Make a new movie
-  b     Adjust a previous one
+	elif [[ "$stage" == 14 ]]; then umbre_s14_xtractFrames;	umbre_s15_calcCOMdist
+		umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
-MovChoic
+	elif [[ "$stage" == 15 ]]; then umbre_s15_calcCOMdist; umbre_s16_findIniConf
+		umbre_s17_USampling; umbre_s18_WHAM
 
-		read -p '*Enter your choice here (a or b): ' moviechoic
-
-		while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
-			echo $'\nYou entered: '"$moviechoic"$'\n'
-			echo $'Please enter a valid letter!!\n'
-			read -p '*Enter your choice here (a or b): ' moviechoic
-		done
-		
-			if [[ "$moviechoic" == "a" ]]; then
-				ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
-			elif [[ "$moviechoic" == "b" ]]; then
-				variables_for_SMD_Movie; analyser9update
-			fi
-
-		elif [[ "$analyse" == "9" ]] && [[ ! -d "$movieDIRECORY" ]]; then
-			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
-		fi
-
-		if [[ "$analysis" == *" 9 "* ]]; then
-			ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9
-		fi
-			
-
-	elif [[ "$stage" == 14 ]]; then umbre_s13_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
-
-	elif [[ "$stage" == 15 ]]; then umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
-
-	elif [[ "$stage" == 16 ]]; then umbre_s15_findIniConf
-		umbre_s16_USampling; umbre_s17_WHAM
+	elif [[ "$stage" == 16 ]]; then umbre_s16_findIniConf; umbre_s17_USampling
+		umbre_s18_WHAM
 
 	elif [[ "$stage" == 17 ]]; then
 		echo $' Provide the window number to start/resume umbrella sampling from.'\
@@ -387,9 +357,9 @@ MovChoic
 		read -p ' Enter the window number here: ' resume_win
 		echo $'\n You entered: '"$resume_win"$'\n'
 		sleep 2
-		umbre_s16_USampling; umbre_s17_WHAM
-	elif [[ "$stage" == 18 ]]; then umbre_s17_WHAM
-	elif [[ "$stage" == 19 ]]; then umbre_s18_MoreWin; umbre_s17_WHAM
+		umbre_s17_USampling; umbre_s18_WHAM
+	elif [[ "$stage" == 18 ]]; then umbre_s18_WHAM
+	elif [[ "$stage" == 19 ]]; then umbre_s19_MoreWin; umbre_s18_WHAM
 	fi
 }
 
