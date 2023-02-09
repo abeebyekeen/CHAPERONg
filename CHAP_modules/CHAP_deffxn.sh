@@ -2325,7 +2325,7 @@ variables_for_SMD_Movie()
 	movieDIRECORY="MOVIE_SMD"
 }
 
-analyser9()
+analyser10()
 {
 	echo "$demA $message_Movie"
 
@@ -2471,7 +2471,7 @@ echo "$demA"$' Convert images to movie...DONE'"$demB"
 cd ..
 }
 
-analyser9update()
+analyser10update()
 {
 
 echo "$demA"$' Preparing to make a summary movie from a preset PyMOL session\n'
@@ -2559,7 +2559,7 @@ cd ..
 
 # umbre_s13_SMD_movie()
 # {
-# 	ScanTRAJ_SMD; variables_for_SMD_Movie; analyser9;
+# 	ScanTRAJ_SMD; variables_for_SMD_Movie; analyser10;
 
 # }
 
@@ -2584,10 +2584,10 @@ MovChoic
 			read -p ' *Enter your choice here (a or b): ' moviechoic
 		done
 		
-		if [[ "$moviechoic" == "a" ]]; then analyser9
-		elif [[ "$moviechoic" == "b" ]]; then analyser9update
+		if [[ "$moviechoic" == "a" ]]; then analyser10
+		elif [[ "$moviechoic" == "b" ]]; then analyser10update
 		fi
-	elif [[ "$stage" == 13 ]] && [[ ! -d "$movieDIRECORY" ]]; then analyser9
+	elif [[ "$stage" == 13 ]] && [[ ! -d "$movieDIRECORY" ]]; then analyser10
 	fi
 }
 

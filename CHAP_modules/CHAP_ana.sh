@@ -73,16 +73,17 @@ Option  Analysis
   6     Solvent accessible surface area (SASA)
   7     Principal component analysis (PCA)
   8     Secondary structure analysis
-  9     Make a movie of the simulation
-  10    Free energy calculations using the MMPBSA method (g_mmpbsa)
-  11    Construct a free energy surface (FES) with gmx sham
-  12    Construct FES using the CHAPERONg energetic landscape scripts
-  13    Construct an interactive 3D plot of the FES using md-davis
-  14    Plot an interactive hydrogen bond matrix with md-davis
-  15    Extract frames from the trajectory
-  16    Make index groups (make_ndx)
-  17    All analyses but 15 and 16
-  18    All analyses but 0, 15 and 16
+  9     Clustering
+  10    Make a movie of the simulation
+  11    Free energy calculations using the MMPBSA method (g_mmpbsa)
+  12    Construct a free energy surface (FES) with gmx sham
+  13    Construct FES using the CHAPERONg energetic landscape scripts
+  14    Construct an interactive 3D plot of the FES using md-davis
+  15    Plot an interactive hydrogen bond matrix with md-davis
+  16    Extract frames from the trajectory
+  17    Make index groups (make_ndx)
+  18    All analyses but 15 and 16
+  19    All analyses but 0, 15 and 16
   
 AnalysisList
 
@@ -106,13 +107,13 @@ AnalysisList
 read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 
 # create a bash array listing valid numbers
-valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18)
+valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19)
 
 while ! [[ $analyse =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
 	! [[ $analyse =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
 do
-	echo $'\nYou entered: '"$analyse"$'\n'
-	echo $'Please enter a valid number!!\n'
+	echo $'\n You entered: '"$analyse"$'\n'
+	echo $' Please enter a valid number!!\n'
 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 done
 
@@ -665,63 +666,62 @@ if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
 
 analyser6()
 {
-echo "$demA"$' Now calculating solvent accessible surface area (SASA)...\n'
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
-	echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
-	gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail		
-elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
-	eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o sasa_${filenm}.xvg -tu ns
-	gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ $sysType == 2 ]] && [[ $flw == 1 ]]; then
-	echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
-	sasa_Pro_${filenm}.xvg -tu ns
-	gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
-	echo "Protein" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
-	sasa_Pro_${filenm}.xvg -tu ns
-	gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-	echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
-	echo "DNA" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
-	sasa_DNA_${filenm}.xvg -tu ns
-	gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-	echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
-	echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
-	echo "Protein_DNA" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
-	sasa_Pro_DNA_${filenm}.xvg -tu ns
-	gracebat sasa_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-	echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"$demB"	
-elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
-	eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
-	gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
-	sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-fi
-echo "$demA"$' Compute solvent accessible surface area (SASA)...DONE'"$demB"
-sleep 2
-currentSASAdir="$(pwd)""/SASA"
-nSASA=1
-bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
-base_bkupSASAdir=$(basename "$bkupSASAdir")
-if [[ -d "$currentSASAdir" ]]; then
-	echo $'\n'"$currentSASAdir"$' folder exists,\n'"backing it up as $base_bkupSASAdir"
-	sleep 1
-	while [[ -d "$bkupSASAdir" ]]; do
-		nSASA=$(( nSASA + 1 ))
-		bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
-		base_bkupSASAdir=$(basename "$bkupSASAdir")
-	done
-	mv "$currentSASAdir" "$bkupSASAdir" && mkdir ./SASA || true
-	echo $'\n'"Backing up the last SASA folder and its contents as $base_bkupSASAdir"
-	sleep 1
+	echo "$demA"$' Now calculating solvent accessible surface area (SASA)...\n'
+	if [[ $flw == 1 && $sysType == 1 ]]; then
+		echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
+		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail		
+	elif [[ $sysType == 2 || "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
+		eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o sasa_${filenm}.xvg -tu ns
+		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	elif [[ $sysType == 2 && $flw == 1 ]]; then
+		echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
+		sasa_Pro_${filenm}.xvg -tu ns
+		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	elif [[ "$sysType" == 3 && $flw == 1 ]]; then
+		echo "Protein" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
+		sasa_Pro_${filenm}.xvg -tu ns
+		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
+		echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
+		echo "DNA" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
+		sasa_DNA_${filenm}.xvg -tu ns
+		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
+		echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
+		echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
+		echo "Protein_DNA" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
+		sasa_Pro_DNA_${filenm}.xvg -tu ns
+		gracebat sasa_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
+		echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"$demB"	
+	elif [[ $flw == 0 && $sysType == 1 ]]; then
+		eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
+		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	fi
+	echo "$demA"$' Compute solvent accessible surface area (SASA)...DONE'"$demB"
+	sleep 2
+	currentSASAdir="$(pwd)""/SASA"
+	nSASA=1
+	bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
+	base_bkupSASAdir=$(basename "$bkupSASAdir")
+	if [[ -d "$currentSASAdir" ]]; then
+		echo $'\n'"$currentSASAdir"$' folder exists,\n'"backing it up as $base_bkupSASAdir"
+		sleep 1
+		while [[ -d "$bkupSASAdir" ]]; do
+			nSASA=$(( nSASA + 1 ))
+			bkupSASAdir="$(pwd)""/#SASA"".""backup.""$nSASA"
+			base_bkupSASAdir=$(basename "$bkupSASAdir")
+		done
+		mv "$currentSASAdir" "$bkupSASAdir" && mkdir ./SASA || true
+		echo $'\n'"Backing up the last SASA folder and its contents as $base_bkupSASAdir"
+		sleep 1
+	elif [[ ! -d "$currentSASAdir" ]]; then mkdir ./SASA
+	fi
 	mv sasa*${filenm}.png sasa*${filenm}.xvg ./SASA || true
-elif [[ ! -d "$currentSASAdir" ]]; then
-	mkdir ./SASA; mv sasa*${filenm}.png sasa*${filenm}.xvg ./SASA || true
-fi
 	echo "$demA"$' Generate a finished figure of the SASA plot... DONE'"$demB"
 	sleep 2
 }
@@ -986,6 +986,65 @@ analyser8()
 
 if [[ "$analysis" == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
 
+analyser9()
+{
+	if [[ $method_cl =='' ]]
+	elif [[ $gpid != '' && "$nb" == '' ]] ; then gpidn="-gpu_id $gpid"
+	elif [[ "$gpid" != '' && "$nb" == 1 ]] ; then gpidn="-gpu_id $gpid -nb gpu"
+	elif [[ "$gpid" == '' && "$nb" == 1 ]] ; then gpidn="-nb gpu"
+	elif [[ "$gpid" == '' && "$nb" == '' ]] ; then gpidn=''
+	fi
+	
+	echo "$demA"$' Preparing to cluster frames from the trajectory...\n\n\n'
+	sleep 2
+	if [[ $flw == 1 && $sysType == 1 ]]; then
+		echo "MainChain" "Protein" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
+		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -sz cluster_size.xvg \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -cl clusters_representatives.pdb
+	elif [[ $flw == 0 && $sysType == 1 ]]; then
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
+		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
+	elif [[ $flw == 1 && $sysType == 2 ]] ; then
+		echo "MainChain" "Protein_$ligname" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
+		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx
+	elif [[ $flw == 0 && $sysType == 2 ]] ; then
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
+		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
+	elif [[ $flw == 1 && $sysType == 3 ]] ; then
+		echo "MainChain" "Protein_DNA" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
+		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx	
+	elif [[ $flw == 0 && $sysType == 3 ]] ; then
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
+		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
+	fi
+
+	currentClusteringdir="$(pwd)""/Clustering"
+	nClustering=1
+	bkupClusteringdir="$(pwd)""/#Clustering"".""backup.""$nClustering"
+	base_bkupClusteringdir=$(basename "$bkupClusteringdir")
+	if [[ -d "$currentClusteringdir" ]]; then
+		echo $'\n'"$currentClusteringdir"$' folder exists,\n'"backing it up as $base_bkupClusteringdir"
+		sleep 1
+		while [[ -d "$bkupClusteringdir" ]]; do
+			nClustering=$(( nClustering + 1 ))
+			bkupClusteringdir="$(pwd)""/#Clustering"".""backup.""$nClustering"
+			base_bkupClusteringdir=$(basename "$bkupClusteringdir")
+		done
+		mv "$currentClusteringdir" "$bkupClusteringdir" && mkdir ./Clustering || true
+		echo $'\n'"Backing up the last Clustering folder and its contents as $base_bkupClusteringdir"
+		sleep 1
+	elif [[ ! -d "$currentClusteringdir" ]]; then mkdir ./Clustering
+	fi
+	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx ./Clustering || true
+	echo "$demA"$' Cluster frames from the trajectory...DONE'"$demB"
+	sleep 2
+}
+
 makeMoviePy1()
 {
 echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
@@ -1027,7 +1086,7 @@ variables_for_regMD_Movie()
 	movieDIRECORY="MOVIE"
 }
 
-analyser9()
+analyser10()
 {
 	echo "$demA $message_Movie"
 
@@ -1172,7 +1231,7 @@ echo "$demA"$' Convert images to movie...DONE'"$demB"
 cd ..
 }
 
-analyser9update()
+analyser10update()
 {
 
 echo "$demA"$'Preparing to make a summary movie from a preset PyMOL session\n'
@@ -1277,20 +1336,20 @@ MovChoic
 	done
  
 	if [[ "$moviechoic" == "a" ]]; then
-		ScanTRAJ; variables_for_regMD_Movie; analyser9
+		ScanTRAJ; variables_for_regMD_Movie; analyser10
 	elif [[ "$moviechoic" == "b" ]]; then
-		variables_for_regMD_Movie; analyser9update
+		variables_for_regMD_Movie; analyser10update
 	fi
 
-elif [[ "$analyse" == "9" ]] && [[ ! -d "$movieDIRECORY" ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser9
+elif [[ "$analyse" == "10" ]] && [[ ! -d "$movieDIRECORY" ]]; then
+	ScanTRAJ; variables_for_regMD_Movie; analyser10
 fi
 
-if [[ "$analysis" == *" 9 "* ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser9
+if [[ "$analysis" == *" 10 "* ]]; then
+	ScanTRAJ; variables_for_regMD_Movie; analyser10
 fi
 	
-analyser10()
+analyser11()
 {
 if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
@@ -1453,7 +1512,7 @@ fi
 
 }
 
-if [[ "$analysis" == *" 10 "* ]]; then ScanTRAJ; analyser10 ; fi
+if [[ "$analysis" == *" 11 "* ]]; then ScanTRAJ; analyser11 ; fi
 
 useFoundPCA_sham()
 {
@@ -1806,7 +1865,7 @@ askFELuseexist
 fi
 }
 
-analyser11()
+analyser12()
 {
 	echo "$demA"$' Constructing free energy surface with gmx sham...\n'
 	order_parameters
@@ -2184,7 +2243,7 @@ extractMoreStructs
 	sleep 2
 }
 
-if [[ "$analysis" == *" 11 "* ]]; then analyser11 ; fi
+if [[ "$analysis" == *" 12 "* ]]; then analyser12 ; fi
 
 useFoundPCA_FESPy()
 {
@@ -2350,7 +2409,7 @@ useFoundRgRMSData_FESPy()
 
 }
 
-analyser12()
+analyser13()
 {	
 	echo "$demA"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
 	order_parameters
@@ -2747,7 +2806,7 @@ extractMoreStructs
 	fi
 }
 
-if [[ "$analysis" == *" 12 "* ]]; then analyser12 ; fi
+if [[ "$analysis" == *" 13 "* ]]; then analyser13 ; fi
 
 useFoundPCA_mdDavis()
 {
@@ -2841,7 +2900,7 @@ useFoundRgRMSData_mdDavis()
 
 }
 
-analyser13()
+analyser14()
 {	
 	echo "$demA"$' Constructing a 3D plot of the FES using md-davis...\n'
 	order_parameters
@@ -2911,7 +2970,7 @@ analyser13()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 13 "* ]]; then analyser13 ; fi
+if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
 
 getHBdataforMatrix()
 {
@@ -3008,7 +3067,7 @@ hbcutAsk
 	echo $' Preparing the H-bond matrix...DONE'"$demB"
 }
 
-analyser14()
+analyser15()
 {
 	getHBdataforMatrix
 	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
@@ -3057,9 +3116,9 @@ askFELuseexist
 
 }
 
-if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
+if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
 
-analyser15()
+analyser16()
 {	
 read -p '*Please enter the number of frames to skip at intervals: ' ski
 if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
@@ -3100,17 +3159,17 @@ sleep 2
 }
 
 
-# if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
+# if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
 
-if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
+if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
 
-if [[ "$analysis" == *" 16 "* ]]; then makeNDXGroup2 ; fi
+if [[ "$analysis" == *" 17 "* ]]; then makeNDXGroup2 ; fi
 
-if [[ "$analysis" == *" 17 "* ]]; then analyser0; ScanTRAJ; analyser1; analyser2
+if [[ "$analysis" == *" 18 "* ]]; then analyser0; ScanTRAJ; analyser1; analyser2
 	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
-	analyser9; analyser10; analyser11; analyser12; analyser13; analyser14
-elif [[ "$analysis" == *" 18 "* ]]; then ScanTRAJ; analyser1; analyser2; analyser3
+	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
+elif [[ "$analysis" == *" 19 "* ]]; then ScanTRAJ; analyser1; analyser2; analyser3
 	analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
-	analyser9; analyser10; analyser11; analyser12; analyser13; analyser14
+	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
 fi
 }

@@ -42,15 +42,15 @@
 # movieFrame	   =      200
 
 ; Name of the positive ion
-# pname            =      NA
+# posname          =      NA
 
 ; Name of the negative ion
-# nname            =      CL
+# negname          =      CL
 
 ; Salt concentration (mol/L)
 # conc             =      0.1
 
-; Simulation temperature (in degree Celcius)
+; Simulation temperature (in kelvin)
 # temp             =      300 
 
 ; Number of allowed warnings 
@@ -72,5 +72,8 @@
 ; Absolute path to the gmx executable to use for 
 ; all gmx runs except those involving mmpbsa
 # gmx_exe          =      x
+
+; Method to use for cluster determination
+# clustr_methd     =      gromos
 
 
