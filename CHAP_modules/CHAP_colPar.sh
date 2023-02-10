@@ -91,8 +91,9 @@ Optional (int=integer; str=string):
 --clustr_cut <float> RMSD cut-off (nm) for cluster membership (default: 1.0)
 --clustr_methd <str> Method for cluster determination: gromos (default),
                      linkage, jarvis-patrick, monte-carlo, diagonalization
---frame_begin <int>  Time (ps) of first frame to read from trajectory
---frame_end <int>    Time (ps) of last frame to read from trajectory
+--frame_beginT <int> Time (ps) of first frame to read from trajectory
+--frame_endT <int>   Time (ps) of last frame to read from trajectory
+--dt <int>           Interval (ps) at which frame is taken from trajectory
 --mmFrame <int>      Number of frames to be extracted for g_mmpbsa
 --movieFrame <int>   Number of frames to extract and use for movie
 --trFrac <int>       Fraction of trajectory to use for g_mmpbsa
@@ -112,12 +113,12 @@ demB=$'\n'"#====================================================================
 # Initialize (default) parameters
 btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
 wat=""; nb='' ; termini=0 ; gmx_exe_path="gmx"
-flw=0; ffUse=""; gpid=''; filenm=''; Temp=300
-ntmpi=0; ntomp=0; skp=''; nohp=''
+automode="semi"; ffUse=""; gpid=''; filenm=''; Temp=300
+ntmpi=0; ntomp=0; skp=''; nohp='' ; mmpbframesNo=''
 pn=''; nn=''; ion_conc='' ; customframeNo=''
-PBCcorrectType='' ; trajFraction=''
+PBCcorrectType='' ; trajFraction='' ; dt=1
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
-parfilename='' ; mmpbframesNo=''
+parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
 #gmxV=''
 
@@ -139,6 +140,8 @@ read_parFile()
 			elif [[ "$par" == "ntmpi" ]]; then ntmpi="$par_input"
 			elif [[ "$par" == "ntomp" ]]; then ntomp="$par_input"
 			elif [[ "$par" == "mmgpath" ]]; then mmGMX="1"; mmGMXpath="$par_input"
+			elif [[ "$par" == "frame_beginT" ]]; then frame_b="$par_input"
+			elif [[ "$par" == "frame_endT" ]]; then frame_e="$par_input"
 			elif [[ "$par" == "movieFrame" ]]; then customframeNo="$par_input"
 			elif [[ "$par" == "posname" ]]; then pn="$par_input"
 			elif [[ "$par" == "negname" ]]; then nn="$par_input"
@@ -151,6 +154,7 @@ read_parFile()
 			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path="$par_input"
 			elif [[ "$par" == "clustr_methd" ]]; then method_clust="$par_input"
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
+			elif [[ "$par" == "dt" ]]; then dt="$par_input"
 			fi
 		done < "$parfilename"
 	fi
@@ -161,17 +165,20 @@ read_parFile()
 while [ "$1" != "" ]; do	
 	case "$1" in
 	--parFile) shift; parfilename="$1"; read_parFile;;	
-	-a | --auto) flw=1;;
+	-a | --auto) automode="full";;
 	-b | --bt) shift; btype="$1";;
 	-c | --conc) shift; ion_conc="$1";;
 	--clustr_cut) shift; cut_cl="$1";;
 	--clustr_methd) shift; method_clust="$1";;
 	--dist) shift; edgeDist="$1";;
+	--dt) shift; dt="$1";;
 	--bg) nohp=1;;
 	-p | --deffnm) shift; filenm="$1";;
 	-E | --gmx_exe) shift; gmx_exe_path="$1";;
 	-f | --ff) shift; ffUse="$1";;
 	-F | --mmFrame) shift; mmpbframesNo="$1";;
+	--frame_beginT) shift; frame_b="$1";;
+	--frame_endT) shift; frame_e="$1";;
 	-g | --nb) nb=1;;
 	-G | --gpu_id) shift; gpid="$1";;
 	-h | --help) Help; Credit; exit 0;;
@@ -250,13 +257,13 @@ fi
 
 pnam_nnam=''
 
-if [[ "$pn" != '' ]] || [[ "$nn" != '' ]] && [[ "$ion_conc" == '' ]]; then
+if [[ "$pn" != '' || "$nn" != '' ]] && [[ "$ion_conc" == '' ]]; then
 	pnam_nnam="-pname $pn -nname $nn"
-elif [[ "$pn" != '' ]] || [[ "$nn" != '' ]] && [[ "$ion_conc" != '' ]]; then
+elif [[ "$pn" != '' || "$nn" != '' ]] && [[ "$ion_conc" != '' ]]; then
 	pnam_nnam="-pname $pn -nname $nn -conc ${ion_conc}"
-elif [[ "$pn" == '' ]] || [[ "$nn" == '' ]] && [[ "$ion_conc" == '' ]]; then
+elif [[ "$pn" == '' || "$nn" == '' ]] && [[ "$ion_conc" == '' ]]; then
 	pnam_nnam=''
-elif [[ "$pn" == '' ]] || [[ "$nn" == '' ]] && [[ "$ion_conc" != '' ]]; then
+elif [[ "$pn" == '' || "$nn" == '' ]] && [[ "$ion_conc" != '' ]]; then
 	pnam_nnam="-conc ${ion_conc}"
 fi
 
@@ -264,7 +271,7 @@ fi
 THREA="-nt ""${nt}"; hbthread="-nthreads ""0"
 threader="-ntmpi ""${ntmpi}"" -ntomp ""${ntomp}"
 
-if [[ "$nt" == 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then threader='' && THREA=''
+if [[ "$nt" == 0 && "$ntmpi" == 0 && "$ntomp" == 0 ]]; then threader='' && THREA=''
 elif [[ "$nt" != 0 ]] && [[ "$ntmpi" != 0 ]] && [[ "$ntomp" == 0 ]]; then
 	threader="-ntmpi ""${ntmpi}" && THREA="-nt ""${nt}" && hbthread="-nthreads ""${nt}"
 elif [[ "$nt" == 0 ]] && [[ "$ntmpi" != 0 ]] && [[ "$ntomp" != 0 ]]; then
@@ -274,7 +281,6 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" != 0 ]] && [[ "$ntomp" != 0 ]]; then
 elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 	threader='' && THREA="-nt ""${nt}" && hbthread="-nthreads ""${nt}"
 fi
-
 
 echo \
   $'\n###############################################################################'\

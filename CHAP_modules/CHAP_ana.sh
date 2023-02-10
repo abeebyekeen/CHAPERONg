@@ -30,9 +30,15 @@ filesuffx=''
 . "$CHAPERONg_PATH/CHAP_modules/CHAP_deffxn.sh"
 
 
-if [[ "$sysType" == 1 ]]; then wraplabel="noPBC"
-elif [[ "$sysType" == 2 ]]; then wraplabel="center"
-elif [[ "$sysType" == 3 ]]; then wraplabel="center"
+if [[ "$sysType" == 1 ]]; then
+	sysType="protein_only"
+	wraplabel="noPBC"
+elif [[ "$sysType" == 2 ]]; then
+	sysType="protein_lig"
+	wraplabel="center"
+elif [[ "$sysType" == 3 ]]; then
+	sysType="protein_dna"
+	wraplabel="center"
 fi
 
 #if [[ "$PBCcorrectType" != '' ]] && [[ "$PBCcorrectType" == 'noPBC' || "$PBCcorrectType" == 'nojump' || "$PBCcorrectType" == 'fit' || "$PBCcorrectType" == 'center' ]]
@@ -82,8 +88,9 @@ Option  Analysis
   15    Plot an interactive hydrogen bond matrix with md-davis
   16    Extract frames from the trajectory
   17    Make index groups (make_ndx)
-  18    All analyses but 15 and 16
-  19    All analyses but 0, 15 and 16
+  18    All analyses but 16 and 17
+  19    All analyses but 0, 16 and 17
+  20    All analyses but 0, 9, 16 and 17
   
 AnalysisList
 
@@ -119,7 +126,7 @@ done
 
 analysis=" $analyse "
 
-if [[ "$analyse" == "9" ]]; then
+if [[ "$analyse" == "10" ]]; then
 	analysis="$analyse"
 fi
 
@@ -135,6 +142,7 @@ if [[ ! -f "trajectDetails.log" ]]; then
 	eval $gmx_exe_path check -f "${filenm}"_"${wraplabel}".xtc |& tee trajectDetails.log
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
+	simDuratnpsINT=$(echo ${simDuratnps%\.*})
 	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
 	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
 	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
@@ -146,6 +154,7 @@ if [[ ! -f "trajectDetails.log" ]]; then
 else
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
+	simDuratnpsINT=$(echo ${simDuratnps%\.*})
 	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
 	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
 	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
@@ -203,7 +212,7 @@ echo "Protein" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".
 analyser0()
 {	
 echo "$demA"$' Now recentering the protein and rewrapping molecules within the unit cell...\n'
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
@@ -220,7 +229,7 @@ if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	fi
 				
-elif [[ $flw != 1 ]] && [[ $sysType == 1 ]]; then
+elif [[ $automode != "full" && $sysType == "protein_only" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
 		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
 		sleep 1
@@ -249,7 +258,7 @@ elif [[ $flw != 1 ]] && [[ $sysType == 1 ]]; then
 		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	fi
 		
-elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'fit' ]] ; then
@@ -270,7 +279,7 @@ elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
 		echo 1 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
 	fi
 
-elif [[ $flw != 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode != "full" && $sysType == "protein_lig" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
 		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
 		sleep 1
@@ -301,7 +310,7 @@ elif [[ $flw != 1 ]] && [[ $sysType == 2 ]]; then
 		eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o "${filenm}"_fit.xtc -fit rot+trans
 	fi
 
-elif [[ $flw == 1 ]] && [[ $sysType == 3 ]]; then
+elif [[ $automode == "full" && $sysType == "protein_dna" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
 		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact || DNAwrapAlt
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
@@ -312,7 +321,7 @@ elif [[ $flw == 1 ]] && [[ $sysType == 3 ]]; then
 		sleep 1
 		echo "Protein_DNA" 0 | eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 	fi
-elif [[ $flw != 1 ]] && [[ $sysType == 3 ]]; then
+elif [[ $automode != "full" ]] && [[ $sysType == "protein_dna" ]]; then
 	echo $'**Choose "Protein_DNA" for centering and "System" (0) for output when prompted\n'
 	eval $gmx_exe_path trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
 	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
@@ -405,13 +414,13 @@ analyser2()
 {
 	echo "$demA"$' Now calculating RMSD...\n'
 	sleep 2
-	if [[ $sysType == 1 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
+	if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 		echo "Backbone" "Backbone" | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
 			
 		gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
 		-fixed 7500 4000 -legend load || notifyImgFail
 		
-	elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+	elif [[ $automode == "full" ]] && [[ $sysType == "protein_lig" ]]; then
 		echo 4 4 | eval $gmx_exe_path rms -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsd.xvg -tu ns
 			
 		gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
@@ -445,7 +454,7 @@ if [[ "$analysis" == *" 2 "* ]]; then analyser2 ; fi
 analyser3()
 {
 echo "$demA"$' Now calculating RMSF...\n'
-if [[ $flw == 1 ]]; then
+if [[ $automode == "full" ]]; then
 	echo "Backbone" "Backbone" | eval $gmx_exe_path rmsf -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_BB-rmsf.xvg -res
 	echo "$demA"$' RMSF with backbone lsq fitting and calculation...DONE'"$demB"
 	sleep 2
@@ -478,7 +487,7 @@ if [[ "$analysis" == *" 3 "* ]]; then analyser3 ; fi
 analyser4()
 {
 echo "$demA"$' Now calculating Rg...\n'
-if [[ $flw == 1 ]]; then
+if [[ $automode == "full" ]]; then
 	echo "Protein" | eval $gmx_exe_path gyrate -s "${filenm}".tpr -f "${filenm}"_"${wraplabel}".xtc -o ${filenm}_Rg.xvg
 	echo "$demA"$' Compute radius of gyration...DONE'"$demB"
 	sleep 2
@@ -587,7 +596,7 @@ sleep 2
 analyser5()
 {
 echo "$demA"$' Now executing H-bond analysis...\n'
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 1 | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
@@ -604,7 +613,7 @@ if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
 	gracebat hbnum_intraPro_${filenm}.xvg hbnum_Pro-SOL_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_intraPro_Pro-SOL_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 
-elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	echo 1 "$ligname" | eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
 	-hbm hb_matrix_ProLig_${filenm}.xpm -hbn hb_index_ProLig_${filenm}.ndx -tu ns $hbthread || altHBOND
 	echo "$demA"$' Protein-ligand hydrogen bonding analysis...DONE'"$demB"
@@ -618,14 +627,14 @@ elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
 	hbnum_ProLig_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ $sysType == 1 ]] && [[ $flw == 0 ]] ; then
+elif [[ $sysType == "protein_only" && $automode == "semi" ]] ; then
 	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
 	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-elif [[ $sysType == 2 || "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
+elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "semi" ]] ; then
 	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread || \
 	eval $gmx_exe_path hbond -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
@@ -634,7 +643,7 @@ elif [[ $sysType == 2 || "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-elif [[ "$sysType" == 3 ]] && [[ $flw == 1 ]] ; then
+elif [[ $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 	hbond_DNA1 || hbond_DNA2
 	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
 	sleep 2
@@ -667,20 +676,20 @@ if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
 analyser6()
 {
 	echo "$demA"$' Now calculating solvent accessible surface area (SASA)...\n'
-	if [[ $flw == 1 && $sysType == 1 ]]; then
+	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail		
-	elif [[ $sysType == 2 || "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
+	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "semi" ]] ; then
 		eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-	elif [[ $sysType == 2 && $flw == 1 ]]; then
+	elif [[ $sysType == "protein_lig" && $automode == "full" ]]; then
 		echo 1 | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_Pro_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-	elif [[ "$sysType" == 3 && $flw == 1 ]]; then
+	elif [[ $sysType == "protein_dna" && $automode == "full" ]]; then
 		echo "Protein" | eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_Pro_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
@@ -697,7 +706,7 @@ analyser6()
 		gracebat sasa_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
 		echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"$demB"	
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval $gmx_exe_path sasa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -731,7 +740,7 @@ if [[ "$analysis" == *" 6 "* ]]; then analyser6 ; fi
 analyser7()
 {
 	echo "$demA"$' Now running principal component analysis (PCA)...\n'
-	if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 4 4 | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
 		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
@@ -741,7 +750,7 @@ analyser7()
 			
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
 		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-	elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		echo $'**Choose "Backbone" (4) twice when prompted\n'
 		eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
 		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
@@ -751,7 +760,7 @@ analyser7()
 		-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
 		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-	elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 1 ]] ; then
+	elif [[ $sysType == "protein_lig" ]] || [[ $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 		echo "Backbone" "Backbone" | eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx \
 		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
 		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
@@ -760,7 +769,7 @@ analyser7()
 		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -n index.ndx -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
 		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
-	elif [[ $sysType == 2 ]] || [[ "$sysType" == 3 ]] && [[ $flw == 0 ]] ; then
+	elif [[ $sysType == "protein_lig" ]] || [[ $sysType == "protein_dna" ]] && [[ $automode == "semi" ]] ; then
 		echo $'**Choose "Backbone" (4) twice when prompted\n'
 		eval $gmx_exe_path covar -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 		-n index.ndx -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
@@ -949,7 +958,8 @@ analyser8()
 		eval $gmx_exe_path xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype1.eps || true
 		echo "$demA"$' Converting eps to pdf...\n'
 		sleep 1
-		ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
+		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
+		# ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
 		#ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size2.pdf || true
 		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size1.pdf || true
 		#ps2pdf ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size1.pdf || true
@@ -988,38 +998,37 @@ if [[ "$analysis" == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
 
 analyser9()
 {
-	if [[ $method_cl =='' ]]
-	elif [[ $gpid != '' && "$nb" == '' ]] ; then gpidn="-gpu_id $gpid"
-	elif [[ "$gpid" != '' && "$nb" == 1 ]] ; then gpidn="-gpu_id $gpid -nb gpu"
-	elif [[ "$gpid" == '' && "$nb" == 1 ]] ; then gpidn="-nb gpu"
-	elif [[ "$gpid" == '' && "$nb" == '' ]] ; then gpidn=''
+	if [[ $frame_b == 0 && $frame_e == 0 ]] ; then clustr_range="-b 0"
+	elif [[ $frame_b == 0 && $frame_e != 0 ]] ; then clustr_range="-b 0 -e $frame_e"
+	elif [[ $frame_b != 0 && $frame_e == 0 ]] ; then clustr_range="-b $frame_b"
+	elif [[ $frame_b != 0 && $frame_e != 0 ]] ; then clustr_range="-b $frame_b -e $frame_e"
 	fi
-	
+
 	echo "$demA"$' Preparing to cluster frames from the trajectory...\n\n\n'
 	sleep 2
-	if [[ $flw == 1 && $sysType == 1 ]]; then
+	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo "MainChain" "Protein" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
-		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -sz cluster_size.xvg \
-		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -cl clusters_representatives.pdb
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
+		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -sz -cl clusters_representatives.pdb \
+		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx cluster_size.xvg -dt $dt
+	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
-		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -dt $dt \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
-	elif [[ $flw == 1 && $sysType == 2 ]] ; then
+	elif [[ $automode == "full" && $sysType == "protein_lig" ]] ; then
 		echo "MainChain" "Protein_$ligname" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
-		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -dt $dt \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx
-	elif [[ $flw == 0 && $sysType == 2 ]] ; then
-		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
-		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
+	elif [[ $automode == "semi" && $sysType == "protein_lig" ]] ; then
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust -dt $dt \
+		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
-	elif [[ $flw == 1 && $sysType == 3 ]] ; then
-		echo "MainChain" "Protein_DNA" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
-		-method $method_clust -cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
+	elif [[ $automode == "full" && $sysType == "protein_dna" ]] ; then
+		echo "MainChain" "Protein_DNA" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -dt $dt \
+		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx	
-	elif [[ $flw == 0 && $sysType == 3 ]] ; then
-		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
-		-cutoff $cut_cl -b $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
+	elif [[ $automode == "semi" && $sysType == "protein_dna" ]] ; then
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust -dt $dt \
+		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
 	fi
 
@@ -1040,10 +1049,14 @@ analyser9()
 		sleep 1
 	elif [[ ! -d "$currentClusteringdir" ]]; then mkdir ./Clustering
 	fi
-	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx ./Clustering || true
+	eval $gmx_exe_path xpm2ps -f rmsd-clust.xpm -o rmsd-clust.eps
+	ps2pdf rmsd-clust.eps rmsd-clust.pdf || true
+	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx rmsd-clust.* ./Clustering || true
 	echo "$demA"$' Cluster frames from the trajectory...DONE'"$demB"
 	sleep 2
 }
+
+if [[ "$analysis" == *" 9 "* ]]; then analyser9 ; fi
 
 makeMoviePy1()
 {
@@ -1148,15 +1161,15 @@ echo 0 | eval $gmx_exe_path trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tp
 sleep 2
 echo "$demA"$' Preparing to extract $customframeNo snapshots...\n'
 sleep 2
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
+elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 	eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-elif [[ $flw == 0 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 	eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
 fi
 currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
@@ -1354,7 +1367,7 @@ analyser11()
 if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
 	#if [[ $sysType == 1 ]]; then indexer=''
- 	if [[ $sysType == 2 || $sysType == 3 ]] ; then indexer='-n index.ndx' ; fi
+ 	if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then indexer='-n index.ndx' ; fi
 	echo "$demA"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
 
 	if [[ $trajFraction == '' ]]; then trajFraction=3 ; fi
@@ -1395,7 +1408,7 @@ if [[ $mmGMXpath != '' ]] ; then
 		sleep 2
 		echo "$demA"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
 		sleep 2
-		if [[ $flw == 1 ]]; then
+		if [[ $automode == "full" ]]; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
@@ -1409,7 +1422,7 @@ if [[ $mmGMXpath != '' ]] ; then
 			echo "$demA Extract $mmpbframesNo frames from the trajectory...DONE""$demB"
 			sleep 2
 		
-		elif [[ $flw != 1 ]]; then
+		elif [[ $automode != "full" ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_"${wraplabel}".xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
@@ -1429,11 +1442,11 @@ if [[ $mmGMXpath != '' ]] ; then
 		sleep 2
 
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
-		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
+		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
-		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
+		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
@@ -1442,11 +1455,11 @@ if [[ $mmGMXpath != '' ]] ; then
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
 		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
-		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
+		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s \
 			"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \
 			echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
-		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
+		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			g_mmpbsa -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
 			-pbsa -decomp || echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		fi
@@ -1463,18 +1476,18 @@ if [[ $mmGMXpath != '' ]] ; then
 	-nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
 
 	if [[ "$mmGMX" == "1" ]] ; then
-		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
+		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
-		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
+		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		fi
 	elif [[ "$mmGMX" == '' ]] ; then
-		if [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw == 1 ]]; then
+		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
 			echo "$demA"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
-		elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $flw != 1 ]] ; then
+		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
 			echo "$demA"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
 		fi
@@ -1523,7 +1536,8 @@ useFoundPCA_sham()
 			
 	eval $gmx_exe_path xpm2ps -f ./PCA/FEL_PCA_sham_$filenm.xpm -o ./PCA/FEL_PCA_sham_$filenm.eps -rainbow red || true
 		
-	ps2pdf -sPAPERSIZE=ledger ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_landscape.pdf || true
+	ps2pdf ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_landscape.pdf || true
+	# ps2pdf -sPAPERSIZE=ledger ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_landscape.pdf || true
 			
 	ps2pdf ./PCA/FEL_PCA_sham_$filenm.eps ./PCA/FEL_PCA_sham_${filenm}_portrait.pdf || true
 
@@ -1555,139 +1569,6 @@ useFoundPCA_sham()
 	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
 	sleep 2
 	ana_folder="PCA_FES_sham"
-	# # extract lowest free energy structures
-	# echo "$demA Identifying the lowest energy bins and frames"$'\n'
-	# sleep 2
-	# min0_bin_index=$(grep -F '0.000' ./PCA_FES_sham/shamlog.log | tail -n 1 | awk '{print $5}')
-	# echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
-	# sleep 2
-	# echo $'\n Three representative structures will be extracted from this bin\n'
-	# sleep 1
-	# # min0_index_spaced=" $min0_index "
-	# min0_struct1_frame=$(grep -A1 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# min0_struct2_frame=$(grep -A2 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# min0_struct3_frame=$(grep -A3 "\[ $min0_bin_index \]" ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# # min0_struct1=(grep -FA1 \["$min0_index_spaced"\] ./PCA_FES_sham/bindex.ndx | tail -n 1)
-	# ScanTRAJ
-	# # sim_timestep
-	# echo $' Identifying the corresponding times for the lowest energy structures...'
-	# sleep 2
-	# min0_struct1_time=$(awk "BEGIN {print $sim_timestep * $min0_struct1_frame}")
-	# min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
-	# min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
-
-	# echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
-	# sleep 2
-	# structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
-	# structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
-	# structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
-
-	# if [[ $flw == 1 && $sysType == 1 ]]; then
-	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-	# 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	# elif [[ $flw == 0 && $sysType == 1 ]]; then
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	# elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-	# 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	# elif [[ $flw == 0 && $sysType == 2 ]]; then
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-	# 	"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-	# 	"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-	# 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-	# 	"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	# elif [[ $flw == 1 && $sysType == 2 ]]; then
-	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
-	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
-	# 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-	# 	-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	# fi
-	# echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
-	# sleep 2
-	# mv "$structure1" "$structure2" "$structure3" ./PCA_FES_sham/ || true
-
-# cat << inform
-#  All outputs from of the PCA-derived free energy surface have been saved to
-#  the folder PCA_FES_sham.
-
-#  In the prompt below, you may check the shamlog.log file to find the index of
-#  the bin of interest you may wish to extract from, and the bindex.ndx file to
-#  identify the frames in the bin.
-
-# inform
-
-# 	get_more_structs=1
-# 	while [[ "$get_more_structs" == 1 ]]
-# 	do
-		
-# cat << extractMoreStructs
-#  Do you want extract additional structures from the trajectory?
-
-#   1) Yes
-#   2) No
-
-# extractMoreStructs
-
-# 		read -p ' Enter a response here (1 or 2): ' get_more_structs
-		
-# 		while [[ "$get_more_structs" != 1 && "$get_more_structs" != 2 ]]
-# 		do
-# 			echo $' \nPlease enter the appropriate response (1 or 2)!!\n'
-# 			echo $' Extract additional structures from the trajectory??\n  1) Yes\n  2) No\n'
-# 			read -p ' Enter 1 or 2 here: ' get_more_structs
-# 		done
-		
-# 		if [[ "$get_more_structs" == 2 ]] ; then
-# 			echo ""
-# 		elif [[ "$get_more_structs" == 1 ]] ; then
-# 			echo ""
-# 			read -p ' Specify the frame number of the structure to extract: ' frame_no
-
-# 			echo $'\n Identifying the corresponding time for the specified frame...'
-# 			sleep 2
-# 			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
-# 			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
-
-# 			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
-# 			sleep 2
-
-# 			if [[ $flw == 1 && $sysType == 1 ]]; then
-# 				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-# 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-# 			elif [[ $flw == 0 && $sysType == 1 ]]; then
-# 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-# 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-# 			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
-# 				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-# 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-# 			elif [[ $flw == 0 && $sysType == 2 ]]; then
-# 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
-# 				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-# 			elif [[ $flw == 1 && $sysType == 2 ]]; then
-# 				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
-# 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-# 			fi
-# 			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
-# 			sleep 2
-# 			mv "$spec_struct" ./PCA_FES_sham/ || true
-# 		fi
-# 	done
 }
 
 useFoundRgRMSData_sham()
@@ -1699,7 +1580,8 @@ useFoundRgRMSData_sham()
 			
 	eval $gmx_exe_path xpm2ps -f FEL_sham_RgVsRMSD_$filenm.xpm -o FEL_sham_RgVsRMSD_$filenm.eps -rainbow red || true
 		
-	ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
+	ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
+	# ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
 			
 	ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_portrait.pdf || true
 
@@ -1760,7 +1642,7 @@ if [[ $orderPair_choice == 1 ]] ; then
 	sleep 2
 	exist2dPCA="$(pwd)""/PCA/PCA_2dproj_""$filenm"".xvg"
 	if [[ -f "$exist2dPCA" ]] ; then
-		if [[ "$flw" == 0 ]] ; then
+		if [[ $automode == "semi" ]] ; then
 			echo $'CHAPERONg: Pre-calculated PCA_2d projection file found!\nFile found:'" $exist2dPCA"
 			sleep 2
 cat << askFELuseexist
@@ -1779,7 +1661,7 @@ askFELuseexist
 				echo $'Please enter a valid number (1, 2 or 3)!!\n'
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
-		elif [[ "$flw" == 1 ]] ; then
+		elif [[ $automode == "full" ]] ; then
 			echo "$demA"$' Pre-calculated PCA_2d projection data found!\n File found:'" $exist2dPCA"\
 			$'\n *CHAPERONg in auto mode\n'" $exist2dPCA will be used for FES plotting"
 			sleep 2
@@ -1791,7 +1673,7 @@ askFELuseexist
 elif [[ $orderPair_choice == 2 ]] ; then
 	existRg="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
 	if [[ -f "$existRg" ]] ; then
-		if [[ "$flw" == 0 ]] ; then
+		if [[ $automode == "semi" ]] ; then
 			echo "$demA"$' Pre-calculated Rg data found!\n File found:'" $existRg"$'\n'
 			sleep 2
 cat << askFELuseexist
@@ -1810,7 +1692,7 @@ askFELuseexist
 				echo $'Please enter a valid number (1, 2 or 3)!!\n'
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
-		elif [[ "$flw" == 1 ]] ; then
+		elif [[ $automode == "full" ]] ; then
 			echo "$demA"$' Pre-calculated Rg data found!\nFile found:'" $existRg"\
 			$'\n *CHAPERONg in auto mode\n'" $existRg will be used for FES plotting"
 			sleep 2
@@ -1824,7 +1706,7 @@ askFELuseexist
 	#check for pre-calculated RMSD data
 	existRMSD="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
 	if [[ -f "$existRMSD" ]] ; then
-		if [[ "$flw" == 0 ]] ; then
+		if [[ $automode == "semi" ]] ; then
 			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"$'\n'
 			sleep 2
 cat << askFELuseexist
@@ -1843,7 +1725,7 @@ askFELuseexist
 				echo $'Please enter a valid number (1, 2 or 3)!!\n'
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
-		elif [[ "$flw" == 1 ]] ; then
+		elif [[ $automode == "full" ]] ; then
 			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"\
 			$'\n *CHAPERONg in auto mode\n'" $existRMSD will be used for FES plotting"
 			sleep 2
@@ -1869,7 +1751,7 @@ analyser12()
 {
 	echo "$demA"$' Constructing free energy surface with gmx sham...\n'
 	order_parameters
-	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
+	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_sham
 		elif [[ "$PCFile" == 2 ]]; then analyser7; useFoundPCA_sham	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -1885,7 +1767,8 @@ analyser12()
 				
 				eval $gmx_exe_path xpm2ps -f FEL_PCA_sham_$filenm.xpm -o FEL_PCA_sham_$filenm.eps -rainbow red || true
 
-				ps2pdf -sPAPERSIZE=ledger FEL_PCA_sham_$filenm.eps FEL_PCA_sham_${filenm}_landscape.pdf || true
+				ps2pdf FEL_PCA_sham_$filenm.eps FEL_PCA_sham_${filenm}_landscape.pdf || true
+				# ps2pdf -sPAPERSIZE=ledger FEL_PCA_sham_$filenm.eps FEL_PCA_sham_${filenm}_landscape.pdf || true
 
 				ps2pdf FEL_PCA_sham_$filenm.eps FEL_PCA_sham_${filenm}_portrait.pdf || true
 			
@@ -1917,8 +1800,8 @@ analyser12()
 				sleep 1
 			fi
 		fi			
-	elif [[ $orderPair_choice == 1 && $flw == 1 ]] ; then useFoundPCA_sham
-	elif [[ $orderPair_choice == 2 && $flw == 0 ]] ; then
+	elif [[ $orderPair_choice == 1 && $automode == "full" ]] ; then useFoundPCA_sham
+	elif [[ $orderPair_choice == 2 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundRgRMSData_sham
 		elif [[ "$PCFile" == 2 ]]; then analyser2; analyser4; useFoundRgRMSData_sham	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -1970,7 +1853,8 @@ inputFormat
 			if [[ "$felcal" == 0 ]] ; then
 				eval $gmx_exe_path xpm2ps -f FEL_sham_RgVsRMSD_$filenm.xpm -o FEL_sham_RgVsRMSD_$filenm.eps -rainbow red || true
 	
-				ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
+				ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
+				# ps2pdf -sPAPERSIZE=ledger FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_landscape.pdf || true
 		
 				ps2pdf FEL_sham_RgVsRMSD_$filenm.eps FEL_sham_RgVsRMSD_${filenm}_portrait.pdf || true
 
@@ -2012,7 +1896,7 @@ inputFormat
 				sleep 1
 			fi
 		fi
- 	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then useFoundRgRMSData_sham
+ 	elif [[ $orderPair_choice == 2 && $automode == "full" ]] ; then useFoundRgRMSData_sham
 
 	elif [[ $orderPair_choice == 3 ]] ; then
 cat << inputFormat
@@ -2060,8 +1944,10 @@ inputFormat
 			eval $gmx_exe_path xpm2ps -f FEL_sham_OrderParameterPair_$filenm.xpm -o \
 			FEL_sham_OrderParameterPair_${filenm}.eps -rainbow red || true
 
-			ps2pdf -sPAPERSIZE=ledger FEL_sham_OrderParameterPair_$filenm.eps \
+			ps2pdf FEL_sham_OrderParameterPair_$filenm.eps \
 			FEL_sham_OrderParameterPair_${filenm}_landscape.pdf || true
+			# ps2pdf -sPAPERSIZE=ledger FEL_sham_OrderParameterPair_$filenm.eps \
+			# FEL_sham_OrderParameterPair_${filenm}_landscape.pdf || true
 	
 			ps2pdf FEL_sham_OrderParameterPair_$filenm.eps \
 			FEL_sham_OrderParameterPair_${filenm}_portrait.pdf || true
@@ -2132,35 +2018,35 @@ inputFormat
 	structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
 	structure3="${filenm}"_LowestEnergyBin_structure3_frame"$min0_struct3_frame".pdb
 
-	if [[ $flw == 1 && $sysType == 1 ]]; then
+	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
 		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
 		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure1" -dump "$min0_struct1_time"
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure2" -dump "$min0_struct2_time"
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+	elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
 		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
 		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 0 && $sysType == 2 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 		"${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 		"${filenm}".tpr -n index.ndx -o "$structure2" -dump "$min0_struct2_time"
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 		"${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
-	elif [[ $flw == 1 && $sysType == 2 ]]; then
+	elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 		-s "${filenm}".tpr -n index.ndx -o "$structure1" -dump "$min0_struct1_time"
 		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
@@ -2217,19 +2103,19 @@ extractMoreStructs
 			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
 			sleep 2
 
-			if [[ $flw == 1 && $sysType == 1 ]]; then
+			if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 1 ]]; then
+			elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 				-s "${filenm}".tpr -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+			elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 0 && $sysType == 2 ]]; then
+			elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 				"${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
-			elif [[ $flw == 1 && $sysType == 2 ]]; then
+			elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc \
 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
 			fi
@@ -2413,7 +2299,7 @@ analyser13()
 {	
 	echo "$demA"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
 	order_parameters
- 	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
+ 	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_FESPy
 		elif [[ "$PCFile" == 2 ]]; then analyser7; useFoundPCA_FESPy	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -2421,8 +2307,8 @@ analyser13()
 			exist2dPCA="$precalcPCfile"
 			useFoundPCA_FESPy
 		fi			
- 	elif [[ $orderPair_choice == 1 && $flw == 1 ]] ; then useFoundPCA_FESPy
-	elif [[ $orderPair_choice == 2 && $flw == 0 ]] ; then
+ 	elif [[ $orderPair_choice == 1 && $automode == "full" ]] ; then useFoundPCA_FESPy
+	elif [[ $orderPair_choice == 2 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundRgRMSData_FESPy
 		elif [[ "$PCFile" == 2 ]]; then analyser2; analyser4; useFoundRgRMSData_FESPy	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -2448,7 +2334,7 @@ analyser13()
 			useFoundRgRMSData_FESPy
 		fi
 
-	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then
+	elif [[ $orderPair_choice == 2 && $automode == "full" ]] ; then
 		useFoundRgRMSData_FESPy
 		# mv RgVsRMSD.xvg ./"$results_folder" || true
 	elif [[ $orderPair_choice == 3 ]] ; then
@@ -2625,19 +2511,19 @@ inputFormat
 			echo "$demA"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
 			sleep 2
 
-			if [[ $flw == 1 && $sysType == 1 ]]; then
+			if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 				echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 				-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-			elif [[ $flw == 0 && $sysType == 1 ]]; then
+			elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 				-o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-			elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+			elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 				echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 				-n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-			elif [[ $flw == 0 && $sysType == 2 ]]; then
+			elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 				eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
 				index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
-			elif [[ $flw == 1 && $sysType == 2 ]]; then
+			elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 				echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 				"${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 			fi
@@ -2756,19 +2642,19 @@ extractMoreStructs
 					echo "$demA"$' Extracting structure from the trajectory at the specified time...\n\n'
 					sleep 2
 
-					if [[ $flw == 1 && $sysType == 1 ]]; then
+					if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 						echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 						-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-					elif [[ $flw == 0 && $sysType == 1 ]]; then
+					elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 						eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 						-o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-					elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+					elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 						echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr \
 						-n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-					elif [[ $flw == 0 && $sysType == 2 ]]; then
+					elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 						eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n \
 						index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
-					elif [[ $flw == 1 && $sysType == 2 ]]; then
+					elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 						echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s \
 						"${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 					fi
@@ -2904,7 +2790,7 @@ analyser14()
 {	
 	echo "$demA"$' Constructing a 3D plot of the FES using md-davis...\n'
 	order_parameters
- 	if [[ $orderPair_choice == 1 && "$flw" == 0 ]] ; then
+ 	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_mdDavis
 		elif [[ "$PCFile" == 2 ]]; then analyser7; useFoundPCA_mdDavis	
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -2912,8 +2798,8 @@ analyser14()
 			exist2dPCA="$precalcPCfile"
 			useFoundPCA_mdDavis
 		fi			
- 	elif [[ $orderPair_choice == 1 && $flw == 1 ]] ; then useFoundPCA_mdDavis
-	elif [[ $orderPair_choice == 2 && $flw == 0 ]] ; then
+ 	elif [[ $orderPair_choice == 1 && $automode == "full" ]] ; then useFoundPCA_mdDavis
+	elif [[ $orderPair_choice == 2 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundRgRMSData_mdDavis
 		elif [[ "$PCFile" == 2 ]]; then analyser2; analyser4; useFoundRgRMSData_mdDavis
 		elif [[ "$PCFile" == 3 ]]; then echo ""
@@ -2926,7 +2812,7 @@ analyser14()
 			existRMSD="$precalcRMSD"	
 			useFoundRgRMSData_mdDavis
  		fi
-	elif [[ $orderPair_choice == 2 && $flw == 1 ]] ; then
+	elif [[ $orderPair_choice == 2 && $automode == "full" ]] ; then
 		useFoundRgRMSData_mdDavis
  	elif [[ $orderPair_choice == 3 ]] ; then
 		read -p ' Provide the path to the 1st order_parameter.xvg data: ' OrderParameter1
@@ -2974,15 +2860,15 @@ if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
 
 getHBdataforMatrix()
 {
-	if [[ $sysType == 1 ]]; then
+	if [[ $sysType == "protein_only" ]]; then
         existXVGin="$(pwd)""/hbond/hbnum_intraPro_${filenm}.xvg"
         existMATRIXin="$(pwd)""/hbond/hb_matrix_intraPro_${filenm}.xpm"
         existINDEXin="$(pwd)""/hbond/hb_index_intraPro_${filenm}.ndx"
-    elif [[ $sysType == 2 ]]; then
+    elif [[ $sysType == "protein_lig" ]]; then
         existXVGin="$(pwd)""/hbond/hbnum_ProLig_${filenm}.xvg"
         existMATRIXin="$(pwd)""/hbond/hb_matrix_ProLig_${filenm}.xpm"
         existINDEXin="$(pwd)""/hbond/hb_index_ProLig_${filenm}.ndx"
-    elif [[ $sysType == 3 ]]; then
+    elif [[ $sysType == "protein_dna" ]]; then
         existXVGin="$(pwd)""/hbond/hbnum_Pro_DNA_${filenm}.xvg"
         existMATRIXin="$(pwd)""/hbond/hb_matrix_Pro_DNA_${filenm}.xpm"
         existINDEXin="$(pwd)""/hbond/hb_index_Pro_DNA_${filenm}.ndx"
@@ -3011,15 +2897,15 @@ hbondMatrix_useFoundData()
 
 	echo "$demA"$' Extracting a reference structure from the trajectory...\n\n\n'
 	sleep 2
-	if [[ $flw == 1 && $sysType == 1 ]]; then
+	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
-	elif [[ $flw == 0 && $sysType == 1 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
-	elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+	elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 		echo "Protein_DNA" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
-	elif [[ $flw == 0 && $sysType == 2 ]]; then
+	elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 		eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
-	elif [[ $flw == 1 && $sysType == 2 ]]; then
+	elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 		echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
 	fi
 	echo "$demA"$' Extract a reference structure from the trajectory...DONE\n'
@@ -3032,7 +2918,7 @@ hbondMatrix_useFoundData()
 	sleep 2
 	md-davis hbond -x ${existMATRIXin} -i ${existINDEXin} -s hbond_matrix/${filenm}_referenceStructure.pdb --save_pickle hbond_matrix/hb_data.p -g ${hbondList} > hbond_matrix/hb_counts.dat
 
-	if [[ $flw == 0 ]]; then
+	if [[ $automode == "semi" ]]; then
 cat << hbcutAsk
 
   Proceed to plotting the H-bond matrix with a 33 % occurrence cut-off?
@@ -3048,7 +2934,7 @@ hbcutAsk
 			echo $'Please enter a valid number (1 or 2)!!\n'
 			read -p '  Enter 1 or 2 here: ' HBcutOff_ask
 		done
-	elif [[ $flw == 1 ]]; then HBcutOff_ask=1
+	elif [[ $automode == "full" ]]; then HBcutOff_ask=1
 	fi	
 	if [[ $HBcutOff_ask == 1 ]] ; then
 		echo $'\n Plotting the hydrogen bonds matrix...\n'
@@ -3072,7 +2958,7 @@ analyser15()
 	getHBdataforMatrix
 	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
 		then
-		if [[ "$flw" == 0 ]] ; then
+		if [[ $automode == "semi" ]] ; then
 			echo "$demA"$' Pre-calculated H-bond data found!\n\nFiles found:'\
 			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"
 			sleep 2
@@ -3102,7 +2988,7 @@ askFELuseexist
 				echo ""
 				read -p ' Provide the path to the pre-calculated H-bond index file: ' existINDEXin
 			fi
-		elif [[ "$flw" == 1 ]] ; then
+		elif [[ $automode == "full" ]] ; then
 			echo $'CHAPERONg: Pre-calculated H-bond data found!\n\nFiles found:'\
 			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"\
 			$'\n\n *CHAPERONg in auto mode; the data will be used for plotting H-bond matrix'
@@ -3125,12 +3011,12 @@ if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
 fi
 echo "You entered: $ski"$'\n'
 echo "$demA"$' Now extracting chosen frames...\n'
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 0 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjSystem_Every""$ski""skip.xtc" $skp
 	echo 1 | eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trjProtein_Every""$ski""skip.xtc" $skp
-elif [[ $flw == 0 ]] || [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_lig" ]]; then
 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -n index.ndx -o "${filenm}""_trj_Every""$ski""skip.xtc" $skp
-elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
+elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trj_Every""$ski""skip.xtc" $skp
 else
 	eval $gmx_exe_path trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${filenm}""_trj_Every""$ski""skip.xtc" $skp
@@ -3165,11 +3051,17 @@ if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
 
 if [[ "$analysis" == *" 17 "* ]]; then makeNDXGroup2 ; fi
 
-if [[ "$analysis" == *" 18 "* ]]; then analyser0; ScanTRAJ; analyser1; analyser2
-	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
+if [[ "$analysis" == *" 18 "* ]]
+then analyser0; ScanTRAJ; analyser1; analyser2;	analyser3; analyser4; analyser5
+	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
 	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
-elif [[ "$analysis" == *" 19 "* ]]; then ScanTRAJ; analyser1; analyser2; analyser3
-	analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
+elif [[ "$analysis" == *" 19 "* ]]
+then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
+	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
 	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
+elif [[ "$analysis" == *" 20 "* ]]
+then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
+	analyser6; analyser7; analyser8; analyser9; analyser11; analyser12
+	analyser13; analyser14; analyser15
 fi
 }

@@ -150,9 +150,9 @@ RegMDsimulate()
 
 	checkstage=""
 	for i in {0..15} ; do
-		if [[ $sysType == 1 || $sysType == 3 ]] && [[ "$stage" == "$i" ]]
-			then checkstage="yes"; break
-		elif [[ "$sysType" == 2 ]] && [[ "$stage" == "$i" || "$stage" == "0a" || \
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] && \
+			[[ "$stage" == "$i" ]] ; then checkstage="yes"; break
+		elif [[ $sysType == "protein_lig" ]] && [[ "$stage" == "$i" || "$stage" == "0a" || \
 			"$stage" == "0b" || "$stage" == "6a" || "$stage" == "6b" ]]
 			then checkstage="yes"; break
 		fi
@@ -164,67 +164,67 @@ RegMDsimulate()
 		read -p ' Initiation stage: ' stage
 
 		for i in {0..15} ; do
-			if [[ $sysType == 1 || $sysType == 3 ]] && [[ "$stage" == "$i" ]]
+			if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] && [[ "$stage" == "$i" ]]
 				then checkstage="yes"; break
-			elif [[ "$sysType" == 2 ]] && [[ "$stage" == "$i" || "$stage" == "0a" || \
+			elif [[ $sysType == "protein_lig" ]] && [[ "$stage" == "$i" || "$stage" == "0a" || \
 			"$stage" == "0b" || "$stage" == "6a" || "$stage" == "6b" ]]
 				then checkstage="yes"; break
 			fi
 		done
 	done
 
-	if [[ $sysType == 2 ]]; then
+	if [[ $sysType == "protein_lig" ]]; then
 		echo "$demA"$'\n*What is the name of your ligand (same as for/in your topol.top file)?\n'
 		read -p '**Ligand name (without any extension): ' ligname
 		echo $'\nYou entered: '"$ligname"$'\n'
 	fi
 
-	if [[ $sysType == 1 || $sysType == 3 ]] && [[ "$stage" == 0 ]] ; then
+	if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] && [[ "$stage" == 0 ]] ; then
 		s0GenTop; s1DefBox; s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1;
 		s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 
-	elif [[ $sysType == 2 && "$stage" == '0a' ]] ; then s0GenTop; s0GenLigTop
+	elif [[ $sysType == "protein_lig" && "$stage" == '0a' ]] ; then s0GenTop; s0GenLigTop
 		s1DefBox; s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes
 		s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 	
-	elif [[ $sysType == 2 && "$stage" == '0b' ]] ; then s0GenLigTop
+	elif [[ $sysType == "protein_lig" && "$stage" == '0b' ]] ; then s0GenLigTop
 		s1DefBox; s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes
 		s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		
 	elif [[ "$stage" == 1 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2
 			s5EnMin1;s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2
+		elif [[ $sysType == "protein_lig" ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2
 			s6aLigRes; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	elif [[ "$stage" == 2 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1
 			s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2;
+		elif [[ $sysType == "protein_lig" ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2;
 			s6aLigRes; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	elif [[ "$stage" == 3 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s3AddIons1; s4AddIons2; 
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s3AddIons1; s4AddIons2; 
 			s5EnMin1; s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes
+		elif [[ $sysType == "protein_lig" ]]; then s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes
 			s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	elif [[ "$stage" == 4 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s4AddIons2; s5EnMin1
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s4AddIons2; s5EnMin1
 			s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes;
+		elif [[ $sysType == "protein_lig" ]]; then s4AddIons2; s5EnMin1; s6EnMin2; s6aLigRes;
 			s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	elif [[ "$stage" == 5 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s5EnMin1; s6EnMin2
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s5EnMin1; s6EnMin2
 			s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s5EnMin1; s6EnMin2; s6aLigRes; s6bTempCoup
+		elif [[ $sysType == "protein_lig" ]]; then s5EnMin1; s6EnMin2; s6aLigRes; s6bTempCoup
 			s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	elif [[ "$stage" == 6 ]]; then
-		if [[ $sysType == 1 || $sysType == 3 ]]; then s6EnMin2; s7NVTeq1
+		if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]]; then s6EnMin2; s7NVTeq1
 			s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
-		elif [[ $sysType == 2 ]]; then s6EnMin2; s6aLigRes; s6bTempCoup; s7NVTeq1
+		elif [[ $sysType == "protein_lig" ]]; then s6EnMin2; s6aLigRes; s6bTempCoup; s7NVTeq1
 			s8NVTeq2; s9NPTeq1; s10NPTeq2; s11RelPosRe; s12MDrun
 		fi
 	
@@ -270,23 +270,23 @@ US_simulate()
 			fi
 		done
 	done
-	if [[ $sysType == 2 ]]; then
+	if [[ $sysType == "protein_lig" ]]; then
 		echo "$demA"$'\n*What is the name of your ligand (same as for/in your topol.top file)?\n'
 		read -p '**Ligand name (without any extension): ' ligname
 		echo $'\nYou entered: '"$ligname"$'\n'
 	fi
 
-	if [[ $sysType == 1 ]] && [[ "$stage" == 0 ]]; then s0GenTop; s1DefBox; s2Solvat
+	if [[ $sysType == "protein_only" ]] && [[ "$stage" == 0 ]]; then s0GenTop; s1DefBox; s2Solvat
 		s3AddIons1;	s4AddIons2; s5EnMin1; s6EnMin2; s7NVTeq1; s8NVTeq2; s9NPTeq1
 		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames 
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
-	elif [[ $sysType == 2 && "$stage" == '0a' ]] ; then s0GenTop; s0GenLigTop; s1DefBox
+	elif [[ $sysType == "protein_lig" && "$stage" == '0a' ]] ; then s0GenTop; s0GenLigTop; s1DefBox
 		s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
 		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 	
-	elif [[ $sysType == 2 && "$stage" == '0b' ]] ; then s0GenLigTop; s1DefBox; s2Solvat
+	elif [[ $sysType == "protein_lig" && "$stage" == '0b' ]] ; then s0GenLigTop; s1DefBox; s2Solvat
 		s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1
 		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
@@ -394,12 +394,15 @@ done
 if [[ "${filenm}" == '' ]]; then filenm="md_${coordinates}"; fi
 		
 if [[ "$sysType" == 1 ]]; then
+	sysType="protein_only"
 	wraplabel=noPBC
 	md_proOnly
 elif [[ "$sysType" == 2 ]]; then
+	sysType="protein_lig"
 	md_Complex
 	wraplabel=center
 elif [[ "$sysType" == 3 ]]; then
+	sysType="protein_dna"
 	md_proOnly
 	wraplabel=center
 fi
@@ -434,8 +437,12 @@ done
 if [[ "${filenm}" == '' ]]; then filenm="md_${coordinates}"; fi
 
 #present a list of stages to initiate/resume simulation from
-if [[ "$sysType" == 1 ]]; then US_mdProPro
-elif [[ "$sysType" == 2 ]]; then US_mdProLig
+if [[ "$sysType" == 1 ]]; then
+	sysType="protein_only"
+	US_mdProPro
+elif [[ "$sysType" == 2 ]]; then
+	sysType="protein_lig"
+	US_mdProLig
 fi
 
 }
@@ -463,6 +470,14 @@ BiasednessAgain
 	read -p " *Enter 1 or 2 here: " mdType
 done
 
-if [[ "$mdType" == 1 ]]; then system_typeReg; RegMDsimulate ; Credit
-elif [[ "$mdType" == 2 ]]; then system_typeUS; US_simulate ; Credit
+if [[ "$mdType" == 1 ]]; then
+	mdType="regularMD"
+	system_typeReg
+	RegMDsimulate
+	Credit
+elif [[ "$mdType" == 2 ]]; then
+	mdType="umbrellaSampl"
+	system_typeUS
+	US_simulate
+	Credit
 fi

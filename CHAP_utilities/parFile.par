@@ -38,6 +38,12 @@
 ; Absolute path to gmx binary to be used for mmpbsa
 # mmgpath          =      /home/abeeb/local/gromacs5.1/bin/gmx
 
+; Time (ps) of first frame to read from trajectory
+# frame_beginT     =      0
+
+; Time (ps) of last frame to read from trajectory
+# frame_endT       =      0
+
 ; Number of frames to extract and use for movie
 # movieFrame	   =      200
 
@@ -76,4 +82,5 @@
 ; Method to use for cluster determination
 # clustr_methd     =      gromos
 
-
+; Time interval (ps) at which frame is taken from the trajectory
+# dt               =      1

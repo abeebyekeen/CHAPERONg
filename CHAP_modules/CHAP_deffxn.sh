@@ -141,7 +141,7 @@ s0GenTop()
 	echo "$demA Generate protein topology...DONE""$demB"
 	sleep 2
 
-	if [[ "$mdType" == 2 ]] ; then
+	if [[ $mdType == "umbrellaSampl" ]] ; then
 		echo "$demA"$'\n Before you proceed, ensure you modify your topology to indicate the'\
 		$'immobile\n reference for the pulling simulation.\n\n'\
 		$'When you are done, enter "yes" below to proceed to unit cell definition...\n'
@@ -1358,7 +1358,7 @@ iniGenLigTop
 	elif [[ "$stepLigPrep" == 'b' && "$pltfrm" == 4 ]] ; then s0PrdrgStb
 	fi
 
-	if [[ "$mdType" == 2 ]] ; then
+	if [[ $mdType == "umbrellaSampl" ]] ; then
 		echo "$demA"$'\n Before you proceed, ensure you modify your topology to indicate the'\
 		$'immobile\n reference for the pulling simulation.\n\n'\
 		$'When you are done, enter "yes" below to proceed to unit cell definition...\n'
@@ -1410,17 +1410,17 @@ s1DefBox()
 {
 	echo "$demA"" Defining simulation box...""$demB"
 	sleep 2
-	if [[ "$mdType" == 1 ]] && [[ $sysType == 1 || $sysType == 3 ]] ; then
+	if [[ $mdType == "regularMD" ]] && [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] ; then
 		eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
-	elif [[ "$mdType" == 1 && "$sysType" == 2 ]]; then
+	elif [[ $mdType == "regularMD" && $sysType == "protein_lig" ]]; then
 		eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
-	elif [[ "$mdType" == 2 && "$sysType" == 1 ]] ; then
+	elif [[ $mdType == "umbrellaSampl" && $sysType == "protein_only" ]] ; then
 		eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
-	elif [[ "$mdType" == 2 && $sysType == 2 ]] ; then
+	elif [[ $mdType == "umbrellaSampl" && $sysType == "protein_lig" ]] ; then
 		eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -c -d ${edgeDist} -bt ${btype}
 	fi
 
-	if [[ "$mdType" == 2 ]] ; then
+	if [[ $mdType == "umbrellaSampl" ]] ; then
 		sleep 2
 		echo "$demA"$'\n'" A placeholder unit cell of the type "$'"'"${btype}"$'"'" has been generated. Inspect the"\
 		$'\n unit cell (you may check '"${coordinates}_newbox.gro"') and/or provide'\
@@ -1437,9 +1437,9 @@ s1DefBox()
 			echo ""
 			read -p 'Box dimensions (x y z):' boxVector
 			echo ""
-			if [[ "$sysType" == 1 ]] ; then
+			if [[ $sysType == "protein_only" ]] ; then
 				eval $gmx_exe_path editconf -f ${coordinates}_processed.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
-			elif [[ "$sysType" == 2 ]] ; then
+			elif [[ $sysType == "protein_lig" ]] ; then
 				eval $gmx_exe_path editconf -f ${coordinates}.gro -o ${coordinates}_newbox.gro -center $centerVector -box $boxVector
 			fi
 			echo "Provide dimensions or proceed to solvation?"
@@ -1545,7 +1545,7 @@ s6EnMin2()
 	echo "$demA"$' Calculate post-EM thermodynamics parameters...DONE'"$demB"
 	sleep 2
 
-	if [[ "$sysType" == 3 ]] ; then
+	if [[ $sysType == "protein_dna" ]] ; then
 		echo "$demA""CHAPERONg will run a check to detect the group numbers of protein and DNA...""$demB"
 		sleep 2
 		echo q | eval $gmx_exe_path make_ndx -f em.gro -o temp.ndx  > tempNDXfile
@@ -1576,7 +1576,7 @@ ProvProDNAMakNdx
 	echo "$demA"" Make a Protein-DNA index group...DONE""$demB"
 	sleep 2
 
-	if [[ "$sysType" == 3 ]] && [[ $flw == 1 ]]; then
+	if [[ $sysType == "protein_dna" && $automode == "full" ]]; then
 		echo "$demA""CHAPERONg will now check your mdp files and make corrections on the tc-grps if needed...""$demB" 
 		sleep 2
 		for mdparafile in nvt.mdp npt.mdp md.mdp; do
@@ -1640,7 +1640,7 @@ ProvProDNAMakNdx
 		fi
 	fi	
 
-	elif [[ "$sysType" == 2 ]] ; then
+	elif [[ $sysType == "protein_lig" ]] ; then
 
 		echo "$demA"$' Confirm if you want to make custom index group(s) before proceeding.'\
 		$'\n\n You should respond with a "yes" or a "no" below.'\
@@ -1731,7 +1731,7 @@ ProvMakNdx
 		echo $' You may want to check your "topol.top" file now to verify the modifications.\n'\
 		$'WHEN YOU ARE DONE, you can proceed to temperature coupling with a "yes" below\n'
 
-		if [[ "$mdType" == 1 ]] ; then
+		if [[ $mdType == "regularMD" ]] ; then
 			read -p 'Do you want to proceed to temperature coupling? (yes/no): ' restr 
 
 			while [[ "$restr" != "yes" && "$restr" != "no" && "$restr" != '"yes"' && "$restr" != '"no"' ]]
@@ -1784,7 +1784,7 @@ eval $gmx_exe_path make_ndx -f em.gro -o index.ndx << TempCoupIN3
 q
 TempCoupIN3
 
-		if [[ "$sysType" == 2 && "$flw" == 1 ]] ; then
+		if [[ $sysType == "protein_lig" && $automode == "full" ]] ; then
 			echo $'\n'"$demA"$' Running a check to detect the type(s) of'\
 			$'ions that GMX added to your system...\n\n'
 			sleep 2
@@ -1816,7 +1816,7 @@ TempCoupIN3
 			fi	
 			echo $'\n Checking your mdp files to make corrections to the tc-grps if needed...\n'
 			sleep 2
-			if [[ "$mdType" == 1 ]] ; then
+			if [[ $mdType == "regularMD" ]] ; then
 				for mdparafile in nvt.mdp npt.mdp md.mdp; do
 					nbkUP=1
 					mdpbak="$mdparafile"".backup."
@@ -1860,7 +1860,7 @@ TempCoupIN3
 				echo "$demB""$demA""npt.mdp, nvt.mdp and md.mdp successfully checked and/or modified accorgingly."
 				sleep 2
 
-			elif [[ ! -f nvt.mdp ]] && [[ "$mdType" == 2 ]] ; then
+			elif [[ ! -f nvt.mdp ]] && [[ $mdType == "umbrellaSampl" ]] ; then
 				for mdparafile in npt.mdp md_pull.mdp npt_umbrella.mdp md_umbrella.mdp
 				do
 					nbkUP=1
@@ -1906,7 +1906,7 @@ TempCoupIN3
 				$'\n been checked and/or modified accorgingly.'
 				sleep 2
 			
-			elif [[ -f nvt.mdp ]] && [[ "$mdType" == 2 ]] ; then
+			elif [[ -f nvt.mdp ]] && [[ $mdType == "umbrellaSampl" ]] ; then
 				for mdparafile in nvt.mdp npt.mdp md_pull.mdp npt_umbrella.mdp md_umbrella.mdp
 				do
 					nbkUP=1
@@ -1957,7 +1957,7 @@ TempCoupIN3
 				
 			echo $'\n *When you are done, enter "yes" below to proceed to equilibration...'"$demB"
 
-		elif [[ "$sysType" == 2 && "$flw" == 0 ]] ; then
+		elif [[ $sysType == "protein_lig" && $automode == "semi" ]] ; then
 			echo "$demA"$'Because you are not running CHAPERONg in the "auto mode", you may\n'\
 			$'need to confirm that you have set the tc-groups in your mdp files as necessary'
 		fi
@@ -1978,7 +1978,7 @@ TempCoupIN3
 
 s7NVTeq1()
 {
-	if [[ $mdType == 2 ]] ; then
+	if [[ $mdType == "umbrellaSampl" ]] ; then
 		echo "$demA"$'\n'
 		read -p 'Do you want to run an optional NVT equilibration? (yes/no): ' runNVTeq
 		
@@ -1988,14 +1988,14 @@ s7NVTeq1()
 			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
 			read -p 'Do you want to run an optional NVT equilibration? (yes/no): ' runNVTeq
 		done
-	elif [[ $mdType == 1 ]] ; then runNVTeq="yes"
+	elif [[ $mdType == "regularMD" ]] ; then runNVTeq="yes"
 	fi
 
-	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
+	if [[ $sysType == "protein_only" && $runNVTeq == "yes" ]] ; then
 		echo "$demA"" Now running NVT Equilibration...""$demB"
 		sleep 2
 		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -o nvt.tpr -maxwarn $WarnMax
-	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
+	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $runNVTeq == "yes" ]] ; then
 		echo "$demA"" Now running NVT Equilibration...""$demB"
 		sleep 2
 		eval $gmx_exe_path grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr -maxwarn $WarnMax
@@ -2031,14 +2031,14 @@ s9NPTeq1()
 {
 	echo "$demA"" Now running NPT Equilibration...""$demB"
 	sleep 2
-	if [[ $sysType == 1 && $runNVTeq == "yes" ]] ; then
+	if [[ $sysType == "protein_only" && $runNVTeq == "yes" ]] ; then
 		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $WarnMax
-	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "yes" ]] ; then
+	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $runNVTeq == "yes" ]] ; then
 		eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
 	#if NVT equilibration was skipped
-	elif [[ $sysType == 1 && $runNVTeq == "no" ]] ; then
+	elif [[ $sysType == "protein_only" && $runNVTeq == "no" ]] ; then
 		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $WarnMax
-	elif [[ $sysType == 2 || $sysType == 3 ]] && [[ $runNVTeq == "no" ]] ; then
+	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $runNVTeq == "no" ]] ; then
 		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
 	fi
 }
@@ -2070,7 +2070,7 @@ s10NPTeq2()
 	mv postNPT_Pressure.xvg postNPT_Pressure.png ./postEM_thermodynamics || true
 
 
-	if [[ $sysType == 1 && $mdType == 2 ]] ; then
+	if [[ $sysType == "protein_only" && $mdType == "umbrellaSampl" ]] ; then
 		read -p 'Do you need to make custom index for pulling groups? (yes/no): ' cstmndx
 		
 		while [[ "$cstmndx" != "yes" && "$cstmndx" != "no" && \
@@ -2093,9 +2093,9 @@ s11RelPosRe()
 {
 	echo "$demA"" Releasing position restraints...""$demB"
 	sleep 2
-	if [[ $sysType == 1 ]]; then
+	if [[ $sysType == "protein_only" ]]; then
 		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -o ${filenm}.tpr -maxwarn $WarnMax
-	elif [[ $sysType == 2 || $sysType == 3 ]] ; then
+	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then
 		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $WarnMax
 	fi
 	echo "$demA"" Release position restraints... DONE""$demB"
@@ -2387,15 +2387,15 @@ echo 0 | eval $gmx_exe_path trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tp
 sleep 2
 echo "$demA"$' Preparing to extract $customframeNo snapshots...\n'
 sleep 2
-if [[ $flw == 1 ]] && [[ $sysType == 1 ]]; then
+if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-elif [[ $flw == 0 ]] && [[ $sysType == 1 ]]; then
+elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 	eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-elif [[ $flw == 0 || $flw == 1 ]] && [[ $sysType == 3 ]]; then
+elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
 	echo "Protein_DNA" | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-elif [[ $flw == 0 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
 	eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-elif [[ $flw == 1 ]] && [[ $sysType == 2 ]]; then
+elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	echo "Protein_$ligname" | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
 fi
 currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
