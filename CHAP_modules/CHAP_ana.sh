@@ -79,18 +79,19 @@ Option  Analysis
   6     Solvent accessible surface area (SASA)
   7     Principal component analysis (PCA)
   8     Secondary structure analysis
-  9     Clustering
-  10    Make a movie of the simulation
-  11    Free energy calculations using the MMPBSA method (g_mmpbsa)
-  12    Construct a free energy surface (FES) with gmx sham
-  13    Construct FES using the CHAPERONg energetic landscape scripts
-  14    Construct an interactive 3D plot of the FES using md-davis
-  15    Plot an interactive hydrogen bond matrix with md-davis
-  16    Extract frames from the trajectory
-  17    Make index groups (make_ndx)
-  18    All analyses but 16 and 17
-  19    All analyses but 0, 16 and 17
-  20    All analyses but 0, 9, 16 and 17
+  9     Clustering analysis
+  10    Kernel density estimation
+  11    Make a movie of the simulation
+  12    Free energy calculations using the MMPBSA method (g_mmpbsa)
+  13    Free energy surface (FES) with gmx sham
+  14    Free energy surface using the CHAPERONg FES scripts
+  15    Interactive 3D plot of the FES (using md-davis)
+  16    Interactive hydrogen bond matrix (using md-davis)
+  17    Extract frames from the trajectory
+  18    Make index groups (make_ndx)
+  19    All analyses but 16 and 17
+  20    All analyses but 0, 16 and 17
+  21    All analyses but 0, 9, 16 and 17
   
 AnalysisList
 
@@ -331,7 +332,7 @@ fi
 echo "$demA"$' Recenter the protein and rewrap molecules within the unit cell...DONE'"$demB"
 sleep 2
 }
-if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
+if [[ $analysis == *" 0 "* ]]; then analyser0; fi
 
 analyser1()
 {
@@ -396,7 +397,7 @@ analyser1()
 	sleep 2
 
 }
-if [[ "$analysis" == *" 1 "* ]]; then analyser1; fi
+if [[ $analysis == *" 1 "* ]]; then analyser1; fi
 
 altRMSD()
 {
@@ -449,7 +450,7 @@ analyser2()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 2 "* ]]; then analyser2 ; fi
+if [[ $analysis == *" 2 "* ]]; then analyser2 ; fi
 
 analyser3()
 {
@@ -482,7 +483,7 @@ createDIR
 echo "$demA"$' Generate finished figure(s) of the RMSF plot(s)... DONE'"$demB"
 sleep 2
 }
-if [[ "$analysis" == *" 3 "* ]]; then analyser3 ; fi
+if [[ $analysis == *" 3 "* ]]; then analyser3 ; fi
 	
 analyser4()
 {
@@ -518,7 +519,7 @@ echo "$demA"$' Generate a finished figure of the Rg plot... DONE'"$demB"
 sleep 2
 }
 
-if [[ "$analysis" == *" 4 "* ]]; then analyser4 ; fi
+if [[ $analysis == *" 4 "* ]]; then analyser4 ; fi
 
 altHBOND()
 {
@@ -671,7 +672,7 @@ fi
 echo "$demA"$' Generate finished figure(s) of the hbond plot(s)... DONE'"$demB"
 }
 
-if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
+if [[ $analysis == *" 5 "* ]]; then analyser5 ; fi
 
 analyser6()
 {
@@ -735,7 +736,7 @@ analyser6()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 6 "* ]]; then analyser6 ; fi
+if [[ $analysis == *" 6 "* ]]; then analyser6 ; fi
 
 analyser7()
 {
@@ -802,7 +803,7 @@ analyser7()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 7 "* ]]; then analyser7 ; fi
+if [[ $analysis == *" 7 "* ]]; then analyser7 ; fi
 	
 dsspCheck="Avail"
 DSSPfail()
@@ -994,7 +995,7 @@ analyser8()
 	fi
 }
 
-if [[ "$analysis" == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
+if [[ $analysis == *" 8 "* ]]; then ScanTRAJ; analyser8 ; fi
 
 analyser9()
 {
@@ -1007,25 +1008,28 @@ analyser9()
 	echo "$demA"$' Preparing to cluster frames from the trajectory...\n\n\n'
 	sleep 2
 	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
-		echo "MainChain" "Protein" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
-		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -sz -cl clusters_representatives.pdb \
-		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx cluster_size.xvg -dt $dt
+		echo "Backbone" "Protein" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc \
+		-s ${filenm}.tpr -method $method_clust -cutoff $cut_cl -g clustering_details.log \
+		-cl clusters_representatives.pdb -dist clusters_rmsd_distribution.xvg $clustr_range \
+		-clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -dt $dt
 	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
-		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust \
-		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -dt $dt \
-		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
+		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log \
+		-cl clusters_representatives.pdb -dt $dt -dist clusters_rmsd_distribution.xvg \
+		-clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
 	elif [[ $automode == "full" && $sysType == "protein_lig" ]] ; then
-		echo "MainChain" "Protein_$ligname" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
-		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -dt $dt \
-		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx
+		echo "Backbone" "Protein_$ligname" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc \
+		-s ${filenm}.tpr -method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log \
+		-cl clusters_representatives.pdb -dt $dt -dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg \
+		-clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx
 	elif [[ $automode == "semi" && $sysType == "protein_lig" ]] ; then
-		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust -dt $dt \
-		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
+		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr \
+		-method $method_clust -dt $dt -cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
 		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg
 	elif [[ $automode == "full" && $sysType == "protein_dna" ]] ; then
-		echo "MainChain" "Protein_DNA" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -dt $dt \
-		-method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb \
-		-dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx	
+		echo "Backbone" "Protein_DNA" | eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc \
+		-s ${filenm}.tpr -dt $dt -method $method_clust -cutoff $cut_cl $clustr_range -g clustering_details.log \
+		-cl clusters_representatives.pdb -dist clusters_rmsd_distribution.xvg -clid cluster_id.xvg -clndx clusters_index.ndx -sz cluster_size.xvg -n index.ndx	
 	elif [[ $automode == "semi" && $sysType == "protein_dna" ]] ; then
 		eval $gmx_exe_path cluster -f "${filenm}"_"${wraplabel}".xtc -s ${filenm}.tpr -method $method_clust -dt $dt \
 		-cutoff $cut_cl $clustr_range -g clustering_details.log -cl clusters_representatives.pdb -n index.ndx \
@@ -1056,7 +1060,18 @@ analyser9()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 9 "* ]]; then analyser9 ; fi
+if [[ $analysis == *" 9 "* ]]; then analyser9 ; fi
+
+
+analyser10()
+{
+	printf "$demA Preparing to estimate probability density function...\n\n\n\n"
+	sleep 2
+
+
+}
+
+if [[ $analysis == *" 10 "* ]]; then analyser10 ; fi
 
 makeMoviePy1()
 {
@@ -1075,15 +1090,15 @@ pymol make2_movie_Pyscript.pml
 ##function specific for movie update
 makeMoviePyx()
 {
-echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
-$'\nquit' > make1_movie_Pyscript.pml
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
 pymol make1_movie_Pyscript.pml
 }
 ##function specific for movie update	
 makeMoviePyy()
 {
-echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
-$'\nquit' > make2_movie_Pyscript.pml
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
 pymol make2_movie_Pyscript.pml
 }
 
@@ -1099,7 +1114,7 @@ variables_for_regMD_Movie()
 	movieDIRECORY="MOVIE"
 }
 
-analyser10()
+analyser11()
 {
 	echo "$demA $message_Movie"
 
@@ -1115,8 +1130,8 @@ askMovielength
 
 	read -p ' Enter 1 or 2 here: ' movieLeng
 		while [[ "$movieLeng" != 1 && "$movieLeng" != 2 ]]; do
-			echo $'\nYou entered: '"$movieLeng"
-			echo $'Please enter a valid number (1 or 2)!!\n'
+			printf "\n You entered: $movieLeng \n"
+			printf ' Please enter a valid number (1 or 2)!!\n\n'
 			read -p ' Enter 1 or 2 here: ' movieLeng
 		done
 	if [[ $movieLeng == 1 ]] ; then
@@ -1127,12 +1142,12 @@ askMovielength
 
 		echo "$demA Above is a summary of your $simulationcontext trajectory."
 		sleep 1
-		echo $' You may find the info useful to provide a response to the prompt below.'
+		printf ' You may find the info useful to provide a response to the prompt below.\n'
 		sleep 2
-		echo "$demA"$' How many frames do you want the movie to be composed of?\n'
+		printf "$demA How many frames do you want the movie to be composed of?\n\n"
 		sleep 1
 		read -p ' *Please enter a value here: ' customframeNo
-		echo " You entered: $customframeNo"$'\n'
+		printf " You entered: $customframeNo \n\n"
 		customframeNo_int=$(echo ${customframeNo%\.*})
 	fi 
 elif [[ "$customframeNo" != '' ]]; then
@@ -1244,7 +1259,7 @@ echo "$demA"$' Convert images to movie...DONE'"$demB"
 cd ..
 }
 
-analyser10update()
+analyser11update()
 {
 
 echo "$demA"$'Preparing to make a summary movie from a preset PyMOL session\n'
@@ -1349,20 +1364,20 @@ MovChoic
 	done
  
 	if [[ "$moviechoic" == "a" ]]; then
-		ScanTRAJ; variables_for_regMD_Movie; analyser10
+		ScanTRAJ; variables_for_regMD_Movie; analyser11
 	elif [[ "$moviechoic" == "b" ]]; then
-		variables_for_regMD_Movie; analyser10update
+		variables_for_regMD_Movie; analyser11update
 	fi
 
 elif [[ "$analyse" == "10" ]] && [[ ! -d "$movieDIRECORY" ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser10
+	ScanTRAJ; variables_for_regMD_Movie; analyser11
 fi
 
-if [[ "$analysis" == *" 10 "* ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser10
+if [[ $analysis == *" 11 "* ]]; then
+	ScanTRAJ; variables_for_regMD_Movie; analyser11
 fi
 	
-analyser11()
+analyser12()
 {
 if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
@@ -1525,7 +1540,7 @@ fi
 
 }
 
-if [[ "$analysis" == *" 11 "* ]]; then ScanTRAJ; analyser11 ; fi
+if [[ $analysis == *" 12 "* ]]; then ScanTRAJ; analyser12 ; fi
 
 useFoundPCA_sham()
 {
@@ -1747,7 +1762,7 @@ askFELuseexist
 fi
 }
 
-analyser12()
+analyser13()
 {
 	echo "$demA"$' Constructing free energy surface with gmx sham...\n'
 	order_parameters
@@ -2129,7 +2144,7 @@ extractMoreStructs
 	sleep 2
 }
 
-if [[ "$analysis" == *" 12 "* ]]; then analyser12 ; fi
+if [[ $analysis == *" 13 "* ]]; then analyser13 ; fi
 
 useFoundPCA_FESPy()
 {
@@ -2295,7 +2310,7 @@ useFoundRgRMSData_FESPy()
 
 }
 
-analyser13()
+analyser14()
 {	
 	echo "$demA"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
 	order_parameters
@@ -2692,7 +2707,7 @@ extractMoreStructs
 	fi
 }
 
-if [[ "$analysis" == *" 13 "* ]]; then analyser13 ; fi
+if [[ $analysis == *" 14 "* ]]; then analyser14 ; fi
 
 useFoundPCA_mdDavis()
 {
@@ -2786,7 +2801,7 @@ useFoundRgRMSData_mdDavis()
 
 }
 
-analyser14()
+analyser15()
 {	
 	echo "$demA"$' Constructing a 3D plot of the FES using md-davis...\n'
 	order_parameters
@@ -2856,7 +2871,7 @@ analyser14()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
+if [[ $analysis == *" 15 "* ]]; then analyser15 ; fi
 
 getHBdataforMatrix()
 {
@@ -2953,7 +2968,7 @@ hbcutAsk
 	echo $' Preparing the H-bond matrix...DONE'"$demB"
 }
 
-analyser15()
+analyser16()
 {
 	getHBdataforMatrix
 	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
@@ -3002,7 +3017,7 @@ askFELuseexist
 
 }
 
-if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
+if [[ $analysis == *" 16 "* ]]; then analyser16 ; fi
 
 analyser16()
 {	
@@ -3044,24 +3059,21 @@ echo "$demA"" Make index group ${nameForIndex}... DONE""$demB"
 sleep 2
 }
 
+if [[ $analysis == *" 17 "* ]]; then analyser16 ; fi
 
-# if [[ "$analysis" == *" 15 "* ]]; then analyser15 ; fi
+if [[ $analysis == *" 18 "* ]]; then makeNDXGroup2 ; fi
 
-if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
-
-if [[ "$analysis" == *" 17 "* ]]; then makeNDXGroup2 ; fi
-
-if [[ "$analysis" == *" 18 "* ]]
+if [[ $analysis == *" 19 "* ]]
 then analyser0; ScanTRAJ; analyser1; analyser2;	analyser3; analyser4; analyser5
 	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
-	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
-elif [[ "$analysis" == *" 19 "* ]]
+	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
+elif [[ $analysis == *" 20 "* ]]
 then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
 	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
-	analyser10; analyser11; analyser12; analyser13; analyser14; analyser15
-elif [[ "$analysis" == *" 20 "* ]]
+	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
+elif [[ $analysis == *" 21 "* ]]
 then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
-	analyser6; analyser7; analyser8; analyser9; analyser11; analyser12
-	analyser13; analyser14; analyser15
+	analyser6; analyser7; analyser8; analyser9; analyser12; analyser13
+	analyser14; analyser15; analyser16
 fi
 }

@@ -93,7 +93,7 @@ Optional (int=integer; str=string):
                      linkage, jarvis-patrick, monte-carlo, diagonalization
 --frame_beginT <int> Time (ps) of first frame to read from trajectory
 --frame_endT <int>   Time (ps) of last frame to read from trajectory
---dt <int>           Interval (ps) at which frame is taken from trajectory
+--dt <int>           Interval (ps) at which frames are taken from trajectory
 --mmFrame <int>      Number of frames to be extracted for g_mmpbsa
 --movieFrame <int>   Number of frames to extract and use for movie
 --trFrac <int>       Fraction of trajectory to use for g_mmpbsa
