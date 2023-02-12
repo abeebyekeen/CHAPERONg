@@ -24,7 +24,7 @@ import scipy.stats as st
 lineNo=0
 # Read in the data for PDF estimation
 # print (" Reading in parameters for FES calculations"+"\n")
-# with open("CHAP_kde_datasets.in") as in_par:
+# with open("CHAP_kde_dataset_list.dat") as in_par:
 # 	alldatasets = in_par.readlines()
 #	for lineNo, line in enumerate(alldatasets):
 
@@ -61,8 +61,8 @@ bin_width_scott = (3.5 * stdev) / (len(dist) ** (1 / 3))
 bin_count_scott = int(np.ceil((data_range) / bin_width_scott))
 time.sleep(1)
 
-with open("CHAP_kde_Par.in", "a") as in_par:
-	in_par.write(f'bin_count,{bin_count}')
+# with open("CHAP_kde_Par.in", "a") as in_par:
+# 	in_par.write(f'bin_count,{bin_count}')
 
 # Determine the number of bins using the sqrt method
 num_of_bins_sqrt = int(np.ceil(math.sqrt(len(dist))))

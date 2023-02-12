@@ -1172,6 +1172,17 @@ askDataExist
 # fi
 done
 
+printf "$demA Generate input files for KDE...DONE\n\n"
+sleep 2
+printf " Initiating the probability density function calculations\n\n"
+
+python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
+python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
+
+exit 0
+
+
+
 }
 
 if [[ "$analysis" == *" 10 "* ]]; then analyser10 ; fi
