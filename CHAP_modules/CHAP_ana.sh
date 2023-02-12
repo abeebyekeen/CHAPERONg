@@ -1104,26 +1104,10 @@ printf "$demA Generating the input files for KDE\n"
 sleep 2
 for i in ${data_kde_ext[*]} ; do
 	if (( $count_data_in == 0 )) ; then
-		echo "$i"
-		echo "$i"
-		echo "$i""a"
-		sleep 3
 		echo "Data for ${filenm}" > CHAP_kde_dataset_list.dat
-		# if [[ "$i" == 1 ]] ; then echo "RMSD" > CHAP_kde_dataset_list.dat
-		# elif [[ "$i" == 2 ]] ; then echo "Rg" > CHAP_kde_dataset_list.dat
-		# elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
-		# 	echo "Hbond_protein-protein" > CHAP_kde_dataset_list.dat
-		# 	echo "Hbond_protein-water" > CHAP_kde_dataset_list.dat
-		# elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
-		# 	echo "Hbond_intra-protein" > CHAP_kde_dataset_list.dat
-		# 	echo "Hbond_protein-lig" > CHAP_kde_dataset_list.dat
-		# elif [[ "$i" == 4 ]] ; then echo "SASA" > CHAP_kde_dataset_list.dat				
-		# fi
-	elif (( $count_data_in > 0 )) ; then
-		echo "$i"
-		echo "$i"
-		echo "$i""b"
-		sleep 3
+		count_data_in=$(( count_data_in + 1 ))				
+	fi
+	if (( $count_data_in > 0 )) ; then
 		if [[ "$i" == 1 ]] ; then echo "RMSD" >> CHAP_kde_dataset_list.dat
 		elif [[ "$i" == 2 ]] ; then echo "Rg" >> CHAP_kde_dataset_list.dat
 		elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
@@ -1132,15 +1116,10 @@ for i in ${data_kde_ext[*]} ; do
 		elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
 			echo "Hbond_intra-protein" >> CHAP_kde_dataset_list.dat
 			echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 4 ]] ; then
-					echo "$i"
-		echo "$i"
-		echo "$i""c"
-		sleep 3
-			echo "SASA" >> CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 4 ]] ; then	echo "SASA" >> CHAP_kde_dataset_list.dat
 		fi
+		count_data_in=$(( count_data_in + 1 ))
 	fi
-	count_data_in=$(( count_data_in + 1 ))
 done
 
 # if [[ "${data_kde_ext[@]}" =~ 2 ]] ; then
@@ -1171,15 +1150,15 @@ while IFS= read -r line; do
 		existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
 	elif [[ "$line" == "SASA" ]] ; then
 		dataIN="SASA"
-		# existData="$(pwd)""/SASA/"${"sasa"*"${filenm}.xvg"}
-		existData=$(echo "$(pwd)""/SASA/""sasa"*"${filenm}.xvg") || \
-		existData=$(echo "$(pwd)""/SASA/""sasa_Pro_${filenm}.xvg") || \
-		existData=$(echo "$(pwd)""/SASA/""sasa_${filenm}.xvg")
+		existData=$(echo "$(pwd)""/SASA/""sasa"*"${filenm}.xvg")
+		if [[ ! -f "$existData" ]] ; then
+			existData=$(echo "$(pwd)""/SASA/""sasa_Pro_${filenm}.xvg")
+		fi
+		if [[ ! -f "$existData" ]] ; then	
+			existData=$(echo "$(pwd)""/SASA/""sasa_${filenm}.xvg")
+		fi
 	fi
-	echo "|| ""$existData" " ||"
-	echo "|| ""$existData" " ||"
-	echo "|| ""$existData" " ||"
-	sleep 2
+
 	if [[ ! -f "$existData" ]] ; then
 		if [[ "$dataIN" == "RMSD" ]] ; then analyser2
 		elif [[ "$dataIN" == "Rg" ]] ; then analyser4
@@ -1225,7 +1204,7 @@ askDataExist
 			sleep 1
 		fi
 	fi
-	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat"
+	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
 done < CHAP_kde_dataset_list.dat
 
 printf "\n Generate input files for KDE...DONE $demB"

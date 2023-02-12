@@ -94,11 +94,11 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			if int(lineNo) == 1 :
 				with open("CHAP_kde_Par.in", "w") as in_par:
 					in_par.write(f"{input_data}\n")
-					in_par.write(f'bin_count,{bin_count}\n')
+					in_par.write(f'bin_count,{bin_count}\n\n\n')
 			elif int(lineNo) > 1 :
 				with open("CHAP_kde_Par.in", "a") as in_par:
 					in_par.write(f"{input_data}\n")
-					in_par.write(f'bin_count,{bin_count}\n')				
+					in_par.write(f'bin_count,{bin_count}\n\n\n')				
 
 			# Scott (1979) method
 			stdev = dist.std()
