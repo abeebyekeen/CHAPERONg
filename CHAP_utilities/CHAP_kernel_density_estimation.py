@@ -55,29 +55,19 @@ print(f'  Number of bins deduced using the Freedman-Diaconis (1981) rule')
 time.sleep(2)
 print(f'\n    bin_count = {bin_count}')
 
+with open("CHAP_kde_Par.in", "w") as in_par:
+	in_par.write(f"{input_data}\n")
+	in_par.write(f'bin_count,{bin_count}')
+
 # Scott (1979) method
 stdev = dist.std()
 bin_width_scott = (3.5 * stdev) / (len(dist) ** (1 / 3))
 bin_count_scott = int(np.ceil((data_range) / bin_width_scott))
 time.sleep(1)
 
-# with open("CHAP_kde_Par.in", "a") as in_par:
-# 	in_par.write(f'bin_count,{bin_count}')
-
 # Determine the number of bins using the sqrt method
 num_of_bins_sqrt = int(np.ceil(math.sqrt(len(dist))))
 num_of_bins_rice = int(np.ceil( 2 * (len(dist) ** (1 / 3))))
-
-print(f"\n Optimal binning parameters have been estimated.\
-	\n These parameters have been written to file (CHAP_kde_Par.in).\
-	\n\n Do you want to proceed?\n  (1) Yes\n  (2) No\n")
-
-prmpt = " Enter a response here (1 or 2): "
-response = int(input(prmpt))
-
-while response != 1 and response != 2:
-	print("\n ENTRY REJECTED!\n **Please enter the appropriate option (1 or 2)\n")
-	response = int(input(prmpt))
 
 if int(lineNo) == 0:
 	with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
@@ -97,6 +87,17 @@ elif int(lineNo) > 0:
 		bin_summary.write(f"Square root\t\t  | {num_of_bins_sqrt}\n")
 		bin_summary.write(f"Rice\t\t\t  | {num_of_bins_rice}\n")
 		bin_summary.write(f"Scott\t\t\t  | {bin_count_scott}\n")
+
+print(f"\n Optimal binning parameters have been estimated.\
+	\n These parameters have been written to file (CHAP_kde_Par.in).\
+	\n\n Do you want to proceed?\n  (1) Yes\n  (2) No\n")
+
+prmpt = " Enter a response here (1 or 2): "
+response = int(input(prmpt))
+
+while response != 1 and response != 2:
+	print("\n ENTRY REJECTED!\n **Please enter the appropriate option (1 or 2)\n")
+	response = int(input(prmpt))
 
 if response == 2:
 	sys.exit(0)
