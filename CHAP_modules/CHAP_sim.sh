@@ -39,6 +39,7 @@ md_proOnly()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStage
+
 ---------------------------------------------------------------
  StageNo | Step to begin/resume workflow
 ---------+-----------------------------------------------------
@@ -65,6 +66,7 @@ md_Complex()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageComplx
+
 ---------------------------------------------------------------
  StageNo | Step to begin/resume workflow
 ---------+-----------------------------------------------------
@@ -94,6 +96,7 @@ US_mdProLig()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageUS
+
 -----------------------------------------------------------------
  StageNo | Step to begin/resume workflow
 ---------+-------------------------------------------------------
@@ -125,6 +128,7 @@ US_mdProPro()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageUS
+
  StageNo   Step to begin/resume workflow
 ---------------------------------------------------------------
  StageNo | Step to begin/resume workflow
