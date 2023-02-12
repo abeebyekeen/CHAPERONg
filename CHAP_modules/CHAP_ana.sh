@@ -3177,17 +3177,16 @@ if [[ "$analysis" == *" 17 "* ]]; then analyser16 ; fi
 
 if [[ "$analysis" == *" 18 "* ]]; then makeNDXGroup2 ; fi
 
-if [[ "$analysis" == *" 19 "* ]]
-then analyser0; ScanTRAJ; analyser1; analyser2;	analyser3; analyser4; analyser5
-	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
+if [[ "$analysis" == *" 19 "* ]] ; then
+	analyser0; ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
+	analyser6; analyser7; analyser8; analyser9; analyser10; variables_for_regMD_Movie
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 20 "* ]]
-then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
-	analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
+elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1
+	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
+	analyser8; analyser9; analyser10; variables_for_regMD_Movie
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 21 "* ]]
-then ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
-	analyser6; analyser7; analyser8; analyser9; analyser12; analyser13
-	analyser14; analyser15; analyser16
+elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2
+	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser9
+	analyser10; analyser12; analyser13; analyser14; analyser15; analyser16
 fi
 }
