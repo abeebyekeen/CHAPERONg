@@ -1075,7 +1075,7 @@ Select your choice(s) from the options listed below:
 Option  Data
   1     Root mean square deviation (RMSD)
   2     Radius of gyration (Rg)
-  3     Hydrogen bonds (hbond)
+  3     Hydrogen bonds (Hbond)
   4     Solvent accessible surface area (SASA)
   
 AnalysisList
@@ -1122,6 +1122,55 @@ for i in ${data_kde_ext[*]} ; do
 	count_data_in=$(( count_data_in + 1 ))
 done
 
+# if [[ "${data_kde_ext[@]}" =~ 2 ]] ; then
+for i in ${data_kde_ext[*]} ; do
+	if [[ "$i" == 1 ]] ; then
+		dataIN="RMSD"
+		existData="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
+	elif [[ "$i" == 2 ]] ; then
+		dataIN="Rg"
+		existData="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
+	elif [[ "$i" == 3 ]] ; then
+		dataIN="Hbond"
+		existData=
+	elif [[ "$i" == 4 ]] ; then
+		dataIN="SASA"
+		existData=
+	fi
+	if [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
+		printf "$demA Pre-calculated $dataIN data found!\n File found: $existData \n"
+		sleep 2
+cat << askDataExist
+
+Do you want to use this file for kernel density estimation?
+
+  1) Yes, use the file above
+  2) No, repeat $dataIN calculations and use the new output for density estimation
+  3) No, I want to provide another file to be used
+
+askDataExist
+
+		read -p ' Enter 1, 2 or 3 here: ' DataFile
+		while [[ "$DataFile" != 1 && "$DataFile" != 2 && "$DataFile" != 3 ]]; do
+			echo $'\nYou entered: '"$DataFile"
+			echo $'Please enter a valid number (1, 2 or 3)!!\n'
+			read -p ' Enter 1, 2 or 3 here: ' DataFile
+		done
+	elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
+		printf "$demA Pre-calculated $dataIN data found!\n File found: $existData \n"
+		sleep 1
+		printf "\n *CHAPERONg in auto mode\n $existData will be used for density estimation\n"
+		sleep 2
+	elif [[ ! -f "$existData" ]] ; then
+		if [[ "$dataIN" == "RMSD" ]] ; then analyser2
+		elif [[ "$dataIN" == "Rg" ]] ; then analyser4
+		elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
+		elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+		fi
+	fi
+	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}.dat"
+# fi
+done
 
 }
 
