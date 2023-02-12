@@ -9,17 +9,52 @@
 # Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
 # Date: 2023.01.16
 
-import matplotlib
-# Configure the non-interactive backend
-matplotlib.use('AGG')
-import matplotlib.pyplot as plt
-import math
-import time
-import numpy as np
-import pd as pd
-import sys
-import scipy.stats as st
 
+import math
+import sys
+import time
+missingLib = []
+try:
+	import matplotlib
+except ModuleNotFoundError:
+	print("The matplotlib library has not been installed!\n")
+	missingLib.append("matplotlib")
+else:
+	# Configure the non-interactive backend
+	matplotlib.use('AGG')
+	import matplotlib.pyplot as plt
+try:
+	import numpy as np
+except ModuleNotFoundError:
+	print(" The numpy library has not been installed!\n")
+	missingLib.append("numpy")
+try:
+	import pandas as pd
+except ModuleNotFoundError:
+	print(" The pandas library has not been installed!\n")
+	missingLib.append("pandas")
+try:
+	import scipy.stats as st
+except ModuleNotFoundError:
+	print(" The scipy library has not been installed!\n")
+	missingLib.append("scipy")
+try:
+	import seaborn
+except ModuleNotFoundError:
+	print(" The seaborn library has not been installed!\n")
+	missingLib.append("seaborn")
+
+if len(missingLib) >= 1 :
+	print('\n\n#================================= CHAPERONg =================================#\n')
+	print(" One or more required libraries have not been installed\n")
+	if len(missingLib) == 1 :
+		print(" Missing library:\n")
+	elif len(missingLib) > 1 :
+		print(" Missing libraries:\n")
+	for lib in missingLib:
+		print(f"  {lib}\n")
+	sys.exit(0)
+			
 
 lineNo=0
 # Read in the data for PDF estimation

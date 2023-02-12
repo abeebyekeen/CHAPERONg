@@ -69,29 +69,31 @@ fi
 cat << AnalysisList
 
 Select your choice(s) from the options listed below:
-Option  Analysis
-  0     Recenter, rewrap & correct molecules for pbc (trjconv)
-  1     Quality assurance analyses (thermodynamic properties)
-  2     Root mean square deviation (RMSD)
-  3     Root mean square fluctuation (RMSF)
-  4     Radius of gyration (Rg)
-  5     Hydrogen bonding analysis (hbond)
-  6     Solvent accessible surface area (SASA)
-  7     Principal component analysis (PCA)
-  8     Secondary structure analysis
-  9     Clustering analysis
-  10    Kernel density estimation
-  11    Make a movie of the simulation
-  12    Free energy calculations using the MMPBSA method (g_mmpbsa)
-  13    Free energy surface (FES) with gmx sham
-  14    Free energy surface using the CHAPERONg FES scripts
-  15    Interactive 3D plot of the FES (using md-davis)
-  16    Interactive hydrogen bond matrix (using md-davis)
-  17    Extract frames from the trajectory
-  18    Make index groups (make_ndx)
-  19    All analyses but 16 and 17
-  20    All analyses but 0, 16 and 17
-  21    All analyses but 0, 9, 16 and 17
+--------------------------------------------------------------------
+Option | Analysis
+-------|------------------------------------------------------------
+  0    | Recenter, rewrap & correct molecules for pbc (trjconv)
+  1    | Quality assurance analyses (thermodynamic properties)
+  2    | Root mean square deviation (RMSD)
+  3    | Root mean square fluctuation (RMSF)
+  4    | Radius of gyration (Rg)
+  5    | Hydrogen bonding analysis (hbond)
+  6    | Solvent accessible surface area (SASA)
+  7    | Principal component analysis (PCA)
+  8    | Secondary structure analysis
+  9    | Clustering analysis
+  10   | Kernel density estimation
+  11   | Make a movie of the simulation
+  12   | Free energy calculations using the MMPBSA method (g_mmpbsa)
+  13   | Free energy surface (FES) with gmx sham
+  14   | Free energy surface using the CHAPERONg FES scripts
+  15   | Interactive 3D plot of the FES (using md-davis)
+  16   | Interactive hydrogen bond matrix (using md-davis)
+  17   | Extract frames from the trajectory
+  18   | Make index groups (make_ndx)
+  19   | All analyses but 16 and 17
+  20   | All analyses but 0, 16 and 17
+  21   | All analyses but 0, 9, 16 and 17
   
 AnalysisList
 
@@ -1067,16 +1069,18 @@ analyser10()
 {
 	printf "$demA Preparing to estimate probability density function using KDE...\n\n"
 	sleep 2
-	echo " Select the data for PDF estimation"
+	echo " Select the input data for PDF estimation"
 	sleep 1
 cat << AnalysisList
 
-Select your choice(s) from the options listed below:
-Option  Data
-  1     Root mean square deviation (RMSD)
-  2     Radius of gyration (Rg)
-  3     Hydrogen bonds (Hbond)
-  4     Solvent accessible surface area (SASA)
+ Select your choice(s) from the options listed below:
+ ------------------------------------------------
+ Option |  Data
+ -------|----------------------------------------
+   1    |  Root mean square deviation (RMSD)
+   2    |  Radius of gyration (Rg)
+   3    |  Hydrogen bonds (Hbond)
+   4    |  Solvent accessible surface area (SASA)
   
 AnalysisList
 
@@ -1175,6 +1179,7 @@ done
 printf "$demA Generate input files for KDE...DONE\n\n"
 sleep 2
 printf " Initiating the probability density function calculations\n\n"
+sleep 2
 
 python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
 python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
