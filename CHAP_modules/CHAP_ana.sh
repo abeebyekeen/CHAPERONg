@@ -71,7 +71,7 @@ cat << AnalysisList
 Select your choice(s) from the options listed below:
 --------------------------------------------------------------------
 Option | Analysis
--------|------------------------------------------------------------
+-------+------------------------------------------------------------
   0    | Recenter, rewrap & correct molecules for pbc (trjconv)
   1    | Quality assurance analyses (thermodynamic properties)
   2    | Root mean square deviation (RMSD)
@@ -1076,7 +1076,7 @@ cat << AnalysisList
  Select your choice(s) from the options listed below:
  ------------------------------------------------
  Option |  Data
- -------|----------------------------------------
+ -------+----------------------------------------
    1    |  Root mean square deviation (RMSD)
    2    |  Radius of gyration (Rg)
    3    |  Hydrogen bonds (Hbond)
@@ -1103,45 +1103,71 @@ count_data_in=0
 printf "$demA Generating the input files for KDE\n\n"
 for i in ${data_kde_ext[*]} ; do
 	if (( $count_data_in == 0 )) ; then
-		if [[ "$i" == 1 ]] ; then
-			echo "RMSD" > CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 2 ]] ; then
-			echo "Rg" > CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 3 ]] ; then
-			echo "Hbond" > CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 4 ]] ; then
-			echo "SASA" > CHAP_kde_dataset_list.dat				
+		if [[ "$i" == 1 ]] ; then echo "RMSD" > CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 2 ]] ; then echo "Rg" > CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
+			echo "Hbond_protein-protein" > CHAP_kde_dataset_list.dat
+			echo "Hbond_protein-water" > CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
+			echo "Hbond_intra-protein" > CHAP_kde_dataset_list.dat
+			echo "Hbond_protein-lig" > CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 4 ]] ; then echo "SASA" > CHAP_kde_dataset_list.dat				
 		fi
 	elif (( $count_data_in > 0 )) ; then
-		if [[ "$i" == 1 ]] ; then
-			echo "RMSD" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 2 ]] ; then
-			echo "Rg" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 3 ]] ; then
-			echo "Hbond" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 4 ]] ; then
-			echo "SASA" >> CHAP_kde_dataset_list.dat
+		if [[ "$i" == 1 ]] ; then echo "RMSD" >> CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 2 ]] ; then echo "Rg" >> CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
+			echo "Hbond_protein-protein" >> CHAP_kde_dataset_list.dat
+			echo "Hbond_protein-water" >> CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
+			echo "Hbond_intra-protein" >> CHAP_kde_dataset_list.dat
+			echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
+		elif [[ "$i" == 4 ]] ; then echo "SASA" >> CHAP_kde_dataset_list.dat
 		fi
 	fi
 	count_data_in=$(( count_data_in + 1 ))
 done
 
 # if [[ "${data_kde_ext[@]}" =~ 2 ]] ; then
-for i in ${data_kde_ext[*]} ; do
-	if [[ "$i" == 1 ]] ; then
+# for i in ${data_kde_ext[*]} ; do
+while IFS= read -r line; do
+	printf " Preparing data for $line...\n\n"
+	sleep 2
+	if [[ "$line" == "RMSD" ]] ; then
 		dataIN="RMSD"
 		existData="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
-	elif [[ "$i" == 2 ]] ; then
+	elif [[ "$line" == "Rg" ]] ; then
 		dataIN="Rg"
 		existData="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
-	elif [[ "$i" == 3 ]] ; then
-		dataIN="Hbond"
-		existData=
-	elif [[ "$i" == 4 ]] ; then
+	elif [[ "$line" == "Hbond_protein-protein" ]] ; then
+		dataIN="$line"
+		existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
+	elif [[ "$line" == "Hbond_protein-water" ]] ; then
+		dataIN="$line"
+		existData="$(pwd)""/hbond/""hbnum_Pro-SOL_${filenm}.xvg"
+	elif [[ "$line" == "Hbond_intra-protein" ]] ; then
+		dataIN="$line"
+		existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
+	elif [[ "$line" == "Hbond_protein-lig" ]] ; then
+		dataIN="$line"
+		existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
+	elif [[ "$line" == 4 ]] ; then
 		dataIN="SASA"
-		existData=
+		existData="$(pwd)""/SASA/""sasa*${filenm}.xvg"
 	fi
-	if [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
+
+	if [[ ! -f "$existData" ]] ; then
+		if [[ "$dataIN" == "RMSD" ]] ; then analyser2
+		elif [[ "$dataIN" == "Rg" ]] ; then analyser4
+		elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
+		elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+		fi
+	elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
+		printf "$demA Pre-calculated $dataIN data found!\n File found: $existData \n"
+		sleep 1
+		printf "\n *CHAPERONg in auto mode\n $existData will be used for density estimation\n"
+		sleep 2
+	elif [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
 		printf "$demA Pre-calculated $dataIN data found!\n File found: $existData \n"
 		sleep 2
 cat << askDataExist
@@ -1160,23 +1186,25 @@ askDataExist
 			echo $'Please enter a valid number (1, 2 or 3)!!\n'
 			read -p ' Enter 1, 2 or 3 here: ' DataFile
 		done
-	elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
-		printf "$demA Pre-calculated $dataIN data found!\n File found: $existData \n"
-		sleep 1
-		printf "\n *CHAPERONg in auto mode\n $existData will be used for density estimation\n"
-		sleep 2
-	elif [[ ! -f "$existData" ]] ; then
-		if [[ "$dataIN" == "RMSD" ]] ; then analyser2
-		elif [[ "$dataIN" == "Rg" ]] ; then analyser4
-		elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
-		elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+		if [[ "$DataFile" == 1 ]]; then
+			cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat"
+		elif [[ "$DataFile" == 2 ]]; then
+			if [[ "$dataIN" == "RMSD" ]] ; then analyser2
+			elif [[ "$dataIN" == "Rg" ]] ; then analyser4
+			elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
+			elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+			fi
+		elif [[ "$DataFile" == 3 ]]; then echo ""
+			read -p ' Provide the path to the data to use for density estimation: ' existData
+
+			echo "$demA"$' Preparing density estimation using user-provided data...\n\n'
+			sleep 1
 		fi
 	fi
-	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}.dat"
-# fi
-done
+	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat"
+done < CHAP_kde_dataset_list.dat
 
-printf "$demA Generate input files for KDE...DONE\n\n"
+printf " Generate input files for KDE...DONE\n\n"
 sleep 2
 printf " Initiating the probability density function calculations\n\n"
 sleep 2
@@ -1184,6 +1212,11 @@ sleep 2
 python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
 python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
 
+
+
+
+printf " Estimate probability density function using KDE...DONE $demB"
+sleep 2
 exit 0
 
 

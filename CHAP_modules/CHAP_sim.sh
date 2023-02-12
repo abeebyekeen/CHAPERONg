@@ -39,23 +39,25 @@ md_proOnly()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStage
- StageNo   Step to begin/resume workflow
-    0      Prepare protein topology (pdb2gmx)
-    1      Define box (editconf)
-    2      Solvate (solvate)
-    3      Add ions (grompp)
-    4      Add ions (genion)
-    5      Energy minimization (grompp)
-    6      Energy minimization (mdrun)
-    7      NVT Equilibration (grompp)
-    8      NVT Equilibration (mdrun)
-    9      NPT Equilibration (grompp)
-    10     NPT Equilibration (mdrun)
-    11     Release position restraints (for "production mdrun")
-    12     Production md (mdrun)
-    13     Extend/resume a previously run/terminated simulation
-    14     Make index group(s) (make_ndx)
-    15     Post-simulation processing & analyses
+---------------------------------------------------------------
+ StageNo | Step to begin/resume workflow
+---------+-----------------------------------------------------
+    0    | Prepare protein topology (pdb2gmx)
+    1    | Define box (editconf)
+    2    | Solvate (solvate)
+    3    | Add ions (grompp)
+    4    | Add ions (genion)
+    5    | Energy minimization (grompp)
+    6    | Energy minimization (mdrun)
+    7    | NVT Equilibration (grompp)
+    8    | NVT Equilibration (mdrun)
+    9    | NPT Equilibration (grompp)
+    10   | NPT Equilibration (mdrun)
+    11   | Release position restraints (for "production mdrun")
+    12   | Production md (mdrun)
+    13   | Extend/resume a previously run/terminated simulation
+    14   | Make index group(s) (make_ndx)
+    15   | Post-simulation processing & analyses
 ListStage
 }
 
@@ -63,26 +65,28 @@ md_Complex()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageComplx
- StageNo   Step to begin/resume workflow
-    0a     Prepare protein topology
-    0b     Prepare ligand topology
-    1      Define box (editconf)
-    2      Solvation (solvate)
-    3      Add ions (grompp)
-    4      Add ions (genion)
-    5      Energy minimization (grompp)
-    6      Energy minimization (mdrun)
-    6a     Ligand restraint
-    6b     Temperature coupling
-    7      NVT Equilibration (grompp)
-    8      NVT Equilibration (mdrun)
-    9      NPT Equilibration (grompp)
-    10     NPT Equilibration (mdrun)
-    11     Release position restraints (for "production mdrun")
-    12     Production md (mdrun)
-    13     Extend/resume a previously run/terminated simulation
-    14     Make index group(s) (make_ndx)
-    15     Post-simulation processing & analyses
+---------------------------------------------------------------
+ StageNo | Step to begin/resume workflow
+---------+-----------------------------------------------------
+    0a   | Prepare protein topology
+    0b   | Prepare ligand topology
+    1    | Define box (editconf)
+    2    | Solvation (solvate)
+    3    | Add ions (grompp)
+    4    | Add ions (genion)
+    5    | Energy minimization (grompp)
+    6    | Energy minimization (mdrun)
+    6a   | Ligand restraint
+    6b   | Temperature coupling
+    7    | NVT Equilibration (grompp)
+    8    | NVT Equilibration (mdrun)
+    9    | NPT Equilibration (grompp)
+    10   | NPT Equilibration (mdrun)
+    11   | Release position restraints (for "production mdrun")
+    12   | Production md (mdrun)
+    13   | Extend/resume a previously run/terminated simulation
+    14   | Make index group(s) (make_ndx)
+    15   | Post-simulation processing & analyses
 ListStageComplx
 }
 
@@ -90,28 +94,30 @@ US_mdProLig()
 {
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageUS
- StageNo   Step to begin/resume workflow
-    0a     Prepare protein topology
-    0b     Prepare ligand topology
-    1      Define box (editconf)
-    2      Solvate (solvate)
-    3      Add ions (grompp)
-    4      Add ions (genion)
-    5      Energy minimization (grompp)
-    6      Energy minimization (mdrun)
-    7      NVT Equilibration (grompp) -- optional
-    8      NVT Equilibration (mdrun) -- optional
-    9      NPT Equilibration (grompp)
-    10     NPT Equilibration (mdrun)
-    11     Steered MDS (grompp)
-    12     Steered MDS (mdrun)
-    13     Make a movie of the steered MD trajectory
-    14     Extract frames from the steered MDS trajectory
-    15     Calculate COM distances
-    16     Identify initial configurations for umbrella sampling
-    17     Umbrella sampling
-    18     Calculate PMF using WHAM
-    19     Run umbrella sampling for an additional window -- optional
+-----------------------------------------------------------------
+ StageNo | Step to begin/resume workflow
+---------+-------------------------------------------------------
+    0a   | Prepare protein topology
+    0b   | Prepare ligand topology
+    1    | Define box (editconf)
+    2    | Solvation (solvate)
+    3    | Add ions (grompp)
+    4    | Add ions (genion)
+    5    | Energy minimization (grompp)
+    6    | Energy minimization (mdrun)
+    7    | NVT Equilibration (grompp) -- optional
+    8    | NVT Equilibration (mdrun) -- optional
+    9    | NPT Equilibration (grompp)
+    10   | NPT Equilibration (mdrun)
+    11   | Steered MDS (grompp)
+    12   | Steered MDS (mdrun)
+    13   | Make a movie of the steered MD trajectory
+    14   | Extract frames from the steered MDS trajectory
+    15   | Calculate COM distances
+    16   | Identify initial configurations for umbrella sampling
+    17   | Umbrella sampling
+    18   | Calculate PMF using WHAM
+    19   | Umbrella sampling for additional window(s) -- optional
 ListStageUS
 }
 
@@ -120,26 +126,29 @@ US_mdProPro()
 echo "$demA"$' Enter a stage number to start/resume the pipeline'
 cat << ListStageUS
  StageNo   Step to begin/resume workflow
-    0      Prepare protein topology
-    1      Define box (editconf)
-    2      Solvate (solvate)
-    3      Add ions (grompp)
-    4      Add ions (genion)
-    5      Energy minimization (grompp)
-    6      Energy minimization (mdrun)
-    7      NVT Equilibration (grompp) -- optional
-    8      NVT Equilibration (mdrun) -- optional
-    9      NPT Equilibration (grompp)
-    10     NPT Equilibration (mdrun)
-    11     Steered MDS (grompp)
-    12     Steered MDS (mdrun)
-    13     Make a movie of the steered MD trajectory
-    14     Extract frames from the steered MDS trajectory
-    15     Calculate COM distances
-    16     Identify initial configurations for umbrella sampling
-    17     Umbrella sampling
-    18     Calculate PMF using WHAM
-    19     Run umbrella sampling for an additional window -- optional
+---------------------------------------------------------------
+ StageNo | Step to begin/resume workflow
+---------+-----------------------------------------------------
+    0    | Prepare protein topology (pdb2gmx)
+    1    | Define box (editconf)
+    2    | Solvate (solvate)
+    3    | Add ions (grompp)
+    4    | Add ions (genion)
+    5    | Energy minimization (grompp)
+    6    | Energy minimization (mdrun)
+    7    | NVT Equilibration (grompp) -- optional
+    8    | NVT Equilibration (mdrun) -- optional
+    9    | NPT Equilibration (grompp)
+    10   | NPT Equilibration (mdrun)
+    11   | Steered MDS (grompp)
+    12   | Steered MDS (mdrun)
+    13   | Make a movie of the steered MD trajectory
+    14   | Extract frames from the steered MDS trajectory
+    15   | Calculate COM distances
+    16   | Identify initial configurations for umbrella sampling
+    17   | Umbrella sampling
+    18   | Calculate PMF using WHAM
+    19   | Umbrella sampling for additional window(s) -- optional
 ListStageUS
 }
 
