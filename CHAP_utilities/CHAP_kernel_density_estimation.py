@@ -93,8 +93,8 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 
 			if int(lineNo) == 1 :
 				with open("CHAP_kde_Par.in", "w") as in_par:
-					in_par.write(f"{input_data}\n")
-					in_par.write(f'bin_count,{bin_count}\n\n\n')
+					in_par.write(f'{input_data}\n'
+								 f'bin_count,{bin_count}\n\n\n')
 			elif int(lineNo) > 1 :
 				with open("CHAP_kde_Par.in", "a") as in_par:
 					in_par.write(f"{input_data}\n")
@@ -131,9 +131,11 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 									  f"Rice\t\t\t  | {num_of_bins_rice}\n"
 									  f"Scott\t\t\t  | {bin_count_scott}\n\n\n")
 
-			print("\n Optimal binning parameters have been estimated."
-				  "\n These parameters have been written to file (CHAP_kde_Par.in)."
-				  "\n\n  Do you want to proceed?\n   (1) Yes\n   (2) No\n")
+			print("\n  Optimal binning parameters have been estimated."
+				  '\n  Parameters have been written to the file "CHAP_kde_Par.in".'
+				  '\n\n  You can modify the parameters if required.'
+				  '\n   Enter "Yes" below when you are ready.'
+				  "\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n")
 
 			prmpt = "  Enter a response here (1 or 2): "
 			response = int(input(prmpt))
@@ -205,7 +207,7 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			print (f" Estimating the probability density function for {input_data}\n")
 			time.sleep(2)
 			kde_xs = np.linspace(min(data_in), max(data_in), 300)
-			kde = st.gaussian_kde(data_in)
+			kde = st.gaussian_kde(data_in, bw_method=None)
 			kde_ys = kde.pdf(kde_xs)
 			out_kde = input_data+"_KDEdata.xvg"
 			with open (out_kde, 'w') as outdkefile:
