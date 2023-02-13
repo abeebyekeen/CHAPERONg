@@ -1209,7 +1209,7 @@ done < CHAP_kde_dataset_list.dat
 
 printf "\n Generate input files for KDE...DONE $demB"
 sleep 2
-printf " Initializing the probability density function calculations\n\n"
+printf " Initializing probability density function calculations\n\n"
 sleep 2
 
 python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \

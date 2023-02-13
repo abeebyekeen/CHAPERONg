@@ -156,11 +156,14 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 					for parameter in in_par.readlines():
 						if "bin_count" in parameter:
 							para_data = parameter.rstrip('\n').split(",")
-							bin_custom = int(para_data[1])
+							bin_custom = int(para_data[1].strip())
 						elif "bandwith_method" in parameter:
-							para_data = parameter.rstrip('\n').split(",")
-							band = str(para_data[1])
-							if 
+							para_data = parameter.rstrip(' \n').split(",")
+							bandwt = para_data[1].strip()
+							if (bandwt.isalpha()) == True :
+								bandwidth = bandwt
+							elif (bandwt.isalpha()) == False :
+								bandwidth = float(bandwt)
 				bin_set = bin_custom
 
 			print (f" Generating and plotting the histogram of the {input_data}\n")
@@ -213,7 +216,7 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			print (f" Estimating the probability density function for {input_data}\n")
 			time.sleep(2)
 			kde_xs = np.linspace(min(data_in), max(data_in), 300)
-			kde = st.gaussian_kde(data_in, bw_method=bandwt)
+			kde = st.gaussian_kde(data_in, bw_method=bandwidth)
 			kde_ys = kde.pdf(kde_xs)
 			out_kde = input_data+"_KDEdata.xvg"
 			with open (out_kde, 'w') as outdkefile:
@@ -237,6 +240,6 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			plt.title(f'Kernel Density Estimation Plot of the {input_data}')
 			figname = input_data + "_KDE_plot.png"
 			plt.savefig(figname, dpi=600)
-			print (f" Estimate the probability density function for {input_data}...DONE\n"
+			print (f" Estimate probability density function for {input_data}...DONE\n"
 				    "#=============================================================================#\n")
 			
