@@ -94,11 +94,13 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			if int(lineNo) == 1 :
 				with open("CHAP_kde_Par.in", "w") as in_par:
 					in_par.write(f'{input_data}\n'
-								 f'bin_count,{bin_count}\n\n\n')
+								 f'bin_count,{bin_count}\n'
+								  "bandwith_method,silverman\n\n\n")
 			elif int(lineNo) > 1 :
 				with open("CHAP_kde_Par.in", "a") as in_par:
-					in_par.write(f"{input_data}\n")
-					in_par.write(f'bin_count,{bin_count}\n\n\n')				
+					in_par.write(f'{input_data}\n'
+								 f'bin_count,{bin_count}\n'
+								  "bandwith_method,silverman\n\n\n")				
 
 			# Scott (1979) method
 			stdev = dist.std()
@@ -155,6 +157,10 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 						if "bin_count" in parameter:
 							para_data = parameter.rstrip('\n').split(",")
 							bin_custom = int(para_data[1])
+						elif "bandwith_method" in parameter:
+							para_data = parameter.rstrip('\n').split(",")
+							band = str(para_data[1])
+							if 
 				bin_set = bin_custom
 
 			print (f" Generating and plotting the histogram of the {input_data}\n")
@@ -207,7 +213,7 @@ with open("CHAP_kde_dataset_list.dat") as in_par:
 			print (f" Estimating the probability density function for {input_data}\n")
 			time.sleep(2)
 			kde_xs = np.linspace(min(data_in), max(data_in), 300)
-			kde = st.gaussian_kde(data_in, bw_method=None)
+			kde = st.gaussian_kde(data_in, bw_method=bandwt)
 			kde_ys = kde.pdf(kde_xs)
 			out_kde = input_data+"_KDEdata.xvg"
 			with open (out_kde, 'w') as outdkefile:
