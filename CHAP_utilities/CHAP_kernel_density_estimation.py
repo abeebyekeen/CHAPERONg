@@ -16,49 +16,49 @@ import shutil
 import sys
 import time
 
-def check_and_import_lib ():
-	missingLib = []
-	try:
-		import matplotlib
-	except ModuleNotFoundError:
-		print("The matplotlib library has not been installed!\n")
-		missingLib.append("matplotlib")
-	else:
-		# Configure the non-interactive backend
-		matplotlib.use('AGG')
-		import matplotlib.pyplot as plt
-	try:
-		import numpy as np
-	except ModuleNotFoundError:
-		print(" The numpy library has not been installed!\n")
-		missingLib.append("numpy")
-	try:
-		import pandas as pd
-	except ModuleNotFoundError:
-		print(" The pandas library has not been installed!\n")
-		missingLib.append("pandas")
-	try:
-		import scipy.stats as st
-	except ModuleNotFoundError:
-		print(" The scipy library has not been installed!\n")
-		missingLib.append("scipy")
+# def check_and_import_lib
+missingLib = []
+try:
+	import matplotlib
+except ModuleNotFoundError:
+	print("The matplotlib library has not been installed!\n")
+	missingLib.append("matplotlib")
+else:
+	# Configure the non-interactive backend
+	matplotlib.use('AGG')
+	import matplotlib.pyplot as plt
+try:
+	import numpy as np
+except ModuleNotFoundError:
+	print(" The numpy library has not been installed!\n")
+	missingLib.append("numpy")
+try:
+	import pandas as pd
+except ModuleNotFoundError:
+	print(" The pandas library has not been installed!\n")
+	missingLib.append("pandas")
+try:
+	import scipy.stats as st
+except ModuleNotFoundError:
+	print(" The scipy library has not been installed!\n")
+	missingLib.append("scipy")
 
-	if len(missingLib) >= 1 :
-		print('\n\n#================================= CHAPERONg =================================#\n')
-		print(" One or more required libraries have not been installed\n")
-		# if len(missingLib) == 1 : print(" Missing library:\n")
-		# elif len(missingLib) > 1 : print(" Missing libraries:\n")
-		# Ternary Operator
-		# print(" Missing library:\n") if len(missingLib) == 1 else print(" Missing libraries:\n")
-		print(" Missing library:\n" if len(missingLib) == 1 else " Missing libraries:\n")
-		suggestmsg = "pip install "
-		for lib in missingLib:
-			print(f"  {lib}\n")
-			if lib == "numpy" : lib = "numpy==1.23.4"
-			suggestmsg = suggestmsg + f'{lib} '
-		print(f' {suggestmsg}\n\n or\n\n'
-			' See https://www.abeebyekeen.com/chaperong-online-documentation/')
-		sys.exit(0)
+if len(missingLib) >= 1 :
+	print('\n\n#================================= CHAPERONg =================================#\n')
+	print(" One or more required libraries have not been installed\n")
+	# if len(missingLib) == 1 : print(" Missing library:\n")
+	# elif len(missingLib) > 1 : print(" Missing libraries:\n")
+	# Ternary Operator
+	# print(" Missing library:\n") if len(missingLib) == 1 else print(" Missing libraries:\n")
+	print(" Missing library:\n" if len(missingLib) == 1 else " Missing libraries:\n")
+	suggestmsg = "pip install "
+	for lib in missingLib:
+		print(f"  {lib}\n")
+		if lib == "numpy" : lib = "numpy==1.23.4"
+		suggestmsg = suggestmsg + f'{lib} '
+	print(f' {suggestmsg}\n\n or\n\n'
+		' See https://www.abeebyekeen.com/chaperong-online-documentation/')
+	sys.exit(0)
 
 def make_dir_for_KDE(motherDir='Kernel_Density_Estimation', backupDir='Kernel_Density_Estimation'):
 	backup_count = 1
@@ -66,9 +66,13 @@ def make_dir_for_KDE(motherDir='Kernel_Density_Estimation', backupDir='Kernel_De
 		backupDir = f'#{backupDir}.backup.{backup_count}'
 		backup_count += 1
 	shutil.move(motherDir, backupDir)
-	
 
+outputList = []
 
+def organize_out_files(motherDir='Kernel_Density_Estimation'):
+	for file in outputList:
+		try: shutil.copy2(file, motherDir)
+		except FileNotFoundError: pass
 
 def estimate_PDF_with_KDE():
 # Read in the data for PDF estimation
@@ -109,16 +113,20 @@ def estimate_PDF_with_KDE():
 				time.sleep(2)
 				print(f'\n    bin_count = {bin_count}')
 
+				def writeOut_parameters():
+					in_par.write(f'{input_data}\n'
+								f'bin_count,{bin_count}\n'
+								"bandwith_method,silverman\n\n\n")					
+
 				if int(lineNo) == 1 :
 					with open("CHAP_kde_Par.in", "w") as in_par:
-						in_par.write(f'{input_data}\n'
-									f'bin_count,{bin_count}\n'
-									"bandwith_method,silverman\n\n\n")
+						writeOut_parameters()
+
 				elif int(lineNo) > 1 :
 					with open("CHAP_kde_Par.in", "a") as in_par:
-						in_par.write(f'{input_data}\n'
-									f'bin_count,{bin_count}\n'
-									"bandwith_method,silverman\n\n\n")				
+						writeOut_parameters()
+
+				outputList.append('CHAP_kde_Par.in')
 
 				# Scott (1979) method
 				stdev = dist.std()
@@ -147,6 +155,8 @@ def estimate_PDF_with_KDE():
 				elif int(lineNo) > 1:
 					with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 						write_binning_parameters()
+						
+				outputList.append('kde_bins_estimated_summary.dat')
 
 				print("\n  Optimal binning parameters have been estimated."
 					'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
@@ -191,6 +201,8 @@ def estimate_PDF_with_KDE():
 				plt.title("Histogram of the "+input_data)
 				figname = input_data + "_histogram.png"
 				plt.savefig(figname, dpi=600)
+				
+				outputList.append(figname)
 
 				# Create a new figure for the KDE
 				plt.figure()
@@ -200,7 +212,7 @@ def estimate_PDF_with_KDE():
 							label=input_data, color='#4CE418', alpha=0.9)
 
 				# The first elements are the ys, the second are the xs.
-				ys = a[0]; xs = a[1]
+				# ys = a[0]; xs = a[1]
 
 				# The x-axis values are boundaries, starting with the lower bound of the first 
 				# and ending with the upper bound of the last.
@@ -235,6 +247,8 @@ def estimate_PDF_with_KDE():
 								f'@ s0 legend "{dataName}_{input_data}"\n')
 				pd.DataFrame({'x_upper':a[1][1:], 'y': a[0]}).to_csv(out_hist,
 								header=False, index=False, sep="\t", mode='a')
+				
+				outputList.append(out_hist)
 
 				print (f" Estimating the probability density function for {input_data}\n")
 				time.sleep(2)
@@ -255,6 +269,9 @@ def estimate_PDF_with_KDE():
 								f'@ s0 legend "{dataName}_{input_data}"\n')
 				pd.DataFrame({'x':kde_xs, 'y': kde_ys}).to_csv(out_kde,
 								header=False, index=False, sep="\t", mode='a')
+				
+				outputList.append(out_kde)
+
 				kdeLabel = input_data + "_PDF"
 				plt.plot(kde_xs, kde.pdf(kde_xs), label=kdeLabel, color='r')
 				plt.legend()
@@ -263,9 +280,12 @@ def estimate_PDF_with_KDE():
 				plt.title(f'Kernel Density Estimation Plot of the {input_data}')
 				figname = input_data + "_KDE_plot.png"
 				plt.savefig(figname, dpi=600)
+
+				outputList.append(figname)
+
 				print (f" Estimate probability density function for {input_data}...DONE\n"
 						"#=============================================================================#\n")
-			os.
-check_and_import_lib()
+
 make_dir_for_KDE()
 estimate_PDF_with_KDE()				
+organize_out_files()
