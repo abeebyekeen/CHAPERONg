@@ -11,51 +11,65 @@
 
 
 import math
+import os
+import shutil
 import sys
 import time
-missingLib = []
-try:
-	import matplotlib
-except ModuleNotFoundError:
-	print("The matplotlib library has not been installed!\n")
-	missingLib.append("matplotlib")
-else:
-	# Configure the non-interactive backend
-	matplotlib.use('AGG')
-	import matplotlib.pyplot as plt
-try:
-	import numpy as np
-except ModuleNotFoundError:
-	print(" The numpy library has not been installed!\n")
-	missingLib.append("numpy")
-try:
-	import pandas as pd
-except ModuleNotFoundError:
-	print(" The pandas library has not been installed!\n")
-	missingLib.append("pandas")
-try:
-	import scipy.stats as st
-except ModuleNotFoundError:
-	print(" The scipy library has not been installed!\n")
-	missingLib.append("scipy")
 
-if len(missingLib) >= 1 :
-	print('\n\n#================================= CHAPERONg =================================#\n')
-	print(" One or more required libraries have not been installed\n")
-	# if len(missingLib) == 1 : print(" Missing library:\n")
-	# elif len(missingLib) > 1 : print(" Missing libraries:\n")
-	# Ternary Operator
-	# print(" Missing library:\n") if len(missingLib) == 1 else print(" Missing libraries:\n")
-	print(" Missing library:\n" if len(missingLib) == 1 else " Missing libraries:\n")
-	suggestmsg = "pip install "
-	for lib in missingLib:
-		print(f"  {lib}\n")
-		if lib == "numpy" : lib = "numpy==1.23.4"
-		suggestmsg = suggestmsg + f'{lib} '
-	print(f' {suggestmsg}\n\n or\n\n'
-		   ' See https://www.abeebyekeen.com/chaperong-online-documentation/')
-	sys.exit(0)
-			
+def check_and_import_lib ():
+	missingLib = []
+	try:
+		import matplotlib
+	except ModuleNotFoundError:
+		print("The matplotlib library has not been installed!\n")
+		missingLib.append("matplotlib")
+	else:
+		# Configure the non-interactive backend
+		matplotlib.use('AGG')
+		import matplotlib.pyplot as plt
+	try:
+		import numpy as np
+	except ModuleNotFoundError:
+		print(" The numpy library has not been installed!\n")
+		missingLib.append("numpy")
+	try:
+		import pandas as pd
+	except ModuleNotFoundError:
+		print(" The pandas library has not been installed!\n")
+		missingLib.append("pandas")
+	try:
+		import scipy.stats as st
+	except ModuleNotFoundError:
+		print(" The scipy library has not been installed!\n")
+		missingLib.append("scipy")
+
+	if len(missingLib) >= 1 :
+		print('\n\n#================================= CHAPERONg =================================#\n')
+		print(" One or more required libraries have not been installed\n")
+		# if len(missingLib) == 1 : print(" Missing library:\n")
+		# elif len(missingLib) > 1 : print(" Missing libraries:\n")
+		# Ternary Operator
+		# print(" Missing library:\n") if len(missingLib) == 1 else print(" Missing libraries:\n")
+		print(" Missing library:\n" if len(missingLib) == 1 else " Missing libraries:\n")
+		suggestmsg = "pip install "
+		for lib in missingLib:
+			print(f"  {lib}\n")
+			if lib == "numpy" : lib = "numpy==1.23.4"
+			suggestmsg = suggestmsg + f'{lib} '
+		print(f' {suggestmsg}\n\n or\n\n'
+			' See https://www.abeebyekeen.com/chaperong-online-documentation/')
+		sys.exit(0)
+
+def make_dir_for_KDE(motherDir='Kernel_Density_Estimation', backupDir='Kernel_Density_Estimation'):
+	backup_count = 1
+	while os.path.exists(backupDir):
+		backupDir = f'#{backupDir}.backup.{backup_count}'
+		backup_count += 1
+	shutil.move(motherDir, backupDir)
+	
+
+
+
 def estimate_PDF_with_KDE():
 # Read in the data for PDF estimation
 	print (" Reading in parameters for density estimation\n")
@@ -116,26 +130,23 @@ def estimate_PDF_with_KDE():
 				num_of_bins_sqrt = int(np.ceil(math.sqrt(len(dist))))
 				num_of_bins_rice = int(np.ceil( 2 * (len(dist) ** (1 / 3))))
 
+				def write_binning_parameters():
+					bin_summary.write(f"=> {input_data}\n"
+									"----------------------------------\n"					
+									"Binning Method\t  | Number of bins\n"
+									"------------------+---------------\n"
+									f"Freedman-Diaconis | {bin_count}\t(*)\n"
+									f"Square root\t\t  | {num_of_bins_sqrt}\n"
+									f"Rice\t\t\t  | {num_of_bins_rice}\n"
+									f"Scott\t\t\t  | {bin_count_scott}\n\n\n")
+				
 				if int(lineNo) == 1:
 					with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
-						bin_summary.write(f"=> {input_data}\n"
-										"----------------------------------\n"					
-										"Binning Method\t  | Number of bins\n"
-										"------------------+---------------\n"
-										f"Freedman-Diaconis | {bin_count}\t(*)\n"
-										f"Square root\t\t  | {num_of_bins_sqrt}\n"
-										f"Rice\t\t\t  | {num_of_bins_rice}\n"
-										f"Scott\t\t\t  | {bin_count_scott}\n\n\n")
+						write_binning_parameters()
+
 				elif int(lineNo) > 1:
 					with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
-						bin_summary.write(f"=> {input_data}\n"
-										"----------------------------------\n"					
-										"Binning Method\t  | Number of bins\n"
-										"------------------+---------------\n"
-										f"Freedman-Diaconis | {bin_count}\t(*)\n"
-										f"Square root\t\t  | {num_of_bins_sqrt}\n"
-										f"Rice\t\t\t  | {num_of_bins_rice}\n"
-										f"Scott\t\t\t  | {bin_count_scott}\n\n\n")
+						write_binning_parameters()
 
 				print("\n  Optimal binning parameters have been estimated."
 					'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
@@ -254,4 +265,7 @@ def estimate_PDF_with_KDE():
 				plt.savefig(figname, dpi=600)
 				print (f" Estimate probability density function for {input_data}...DONE\n"
 						"#=============================================================================#\n")
+			os.
+check_and_import_lib()
+make_dir_for_KDE()
 estimate_PDF_with_KDE()				
