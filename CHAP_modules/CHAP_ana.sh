@@ -1069,117 +1069,145 @@ analyser10()
 {
 	printf "$demA Preparing to estimate probability density function using KDE...\n\n"
 	sleep 2
-	echo " Select the input data for PDF estimation"
+	echo " Do you want to run single data or multi-data plot?"
 	sleep 1
+
+cat << AnalysisSingleMultiple
+
+   Select your choice(s) from the options listed below:
+   ---------------------------------------
+    Option |  Data
+   --------+------------------------------
+       1   |  Single data plot
+       2   |  Comparative multi-data plot
+  
+AnalysisSingleMultiple
+
+	read -p ' Enter your choice here (1 or 2): ' plot_number
+
+	while [[ "$plot_number" != 0 && "$plot_number" != 1 ]]
+	do
+		printf "\n You entered: ${plot_number}\n\n"
+		printf " Please enter a valid number!!\n\n"
+		read -p ' Enter 1 or 2 here: ' plot_number
+	done
+
+	echo " \nSelect the type of input data for the PDF estimation"
+	sleep 1
+
 cat << AnalysisList
 
    Select your choice(s) from the options listed below:
-   ------------------------------------------------
-   Option |  Data
-   -------+----------------------------------------
-     1    |  Root mean square deviation (RMSD)
-     2    |  Radius of gyration (Rg)
-     3    |  Hydrogen bonds (Hbond)
-     4    |  Solvent accessible surface area (SASA)
+   --------------------------------------------------
+    Option |  Data
+   --------+-----------------------------------------
+       1   |  Root mean square deviation (RMSD)
+       2   |  Radius of gyration (Rg)
+       3   |  Hydrogen bonds (Hbond)
+       4   |  Solvent accessible surface area (SASA)
   
 AnalysisList
 
-read -p ' Enter one or more options here (separated by a space): ' data_kde
+	if [[ "$plot_number" == 1 ]] ; then
+		read -p ' Enter one or more options here (separated by a space): ' data_kde
 
-# create a bash array listing valid numbers
-valid_numbers=(1 2 3 4)
+		# create a bash array listing valid numbers
+		valid_numbers=(1 2 3 4)
 
-while ! [[ "$data_kde" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
-	! [[ "$data_kde" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
-do
-	printf "\n You entered: ${data_kde}\n\n"
-	printf " Please enter a valid number!!\n\n"
-	read -p ' Enter one or more options here (separated by a space): ' data_kde
-done
+		while ! [[ "$data_kde" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
+			! [[ "$data_kde" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+		do
+			printf "\n You entered: ${data_kde}\n\n"
+			printf " Please enter a valid number!!\n\n"
+			read -p ' Enter one or more options here (separated by a space): ' data_kde
+		done
 
-data_kde_ext=("$data_kde")
-count_data_in=0
+		data_kde_ext=("$data_kde")
+		count_data_in=0
 
-printf "$demA Generating the input files for KDE\n"
-sleep 2
-for i in ${data_kde_ext[*]} ; do
-	if (( $count_data_in == 0 )) ; then
-		echo "Data for ${filenm}" > CHAP_kde_dataset_list.dat
-		count_data_in=$(( count_data_in + 1 ))				
-	fi
-	if (( $count_data_in > 0 )) ; then
-		if [[ "$i" == 1 ]] ; then echo "RMSD" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 2 ]] ; then echo "Rg" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
-			echo "Hbond_protein-protein" >> CHAP_kde_dataset_list.dat
-			echo "Hbond_protein-water" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
-			echo "Hbond_intra-protein" >> CHAP_kde_dataset_list.dat
-			echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
-		elif [[ "$i" == 4 ]] ; then	echo "SASA" >> CHAP_kde_dataset_list.dat
-		fi
-		count_data_in=$(( count_data_in + 1 ))
-	fi
-done
-
-# if [[ "${data_kde_ext[@]}" =~ 2 ]] ; then
-# for i in ${data_kde_ext[*]} ; do
-LineCount=0
-while IFS= read -r line; do
-	LineCount=$(( LineCount + 1 ))
-	if (( "$LineCount" == 1 )) ; then continue ; fi
-	printf "\n Preparing data for $line...\n\n"
-	sleep 2
-	if [[ "$line" == "RMSD" ]] ; then
-		dataIN="RMSD"
-		existData="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
-	elif [[ "$line" == "Rg" ]] ; then
-		dataIN="Rg"
-		existData="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
-	elif [[ "$line" == "Hbond_protein-protein" ]] ; then
-		dataIN="$line"
-		existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
-	elif [[ "$line" == "Hbond_protein-water" ]] ; then
-		dataIN="$line"
-		existData="$(pwd)""/hbond/""hbnum_Pro-SOL_${filenm}.xvg"
-	elif [[ "$line" == "Hbond_intra-protein" ]] ; then
-		dataIN="$line"
-		existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
-	elif [[ "$line" == "Hbond_protein-lig" ]] ; then
-		dataIN="$line"
-		existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
-	elif [[ "$line" == "SASA" ]] ; then
-		dataIN="SASA"
-		existData=$(echo "$(pwd)""/SASA/""sasa"*"${filenm}.xvg")
-		if [[ ! -f "$existData" ]] ; then
-			existData=$(echo "$(pwd)""/SASA/""sasa_Pro_${filenm}.xvg")
-		fi
-		if [[ ! -f "$existData" ]] ; then	
-			existData=$(echo "$(pwd)""/SASA/""sasa_${filenm}.xvg")
-		fi
-	fi
-
-	if [[ ! -f "$existData" ]] ; then
-		if [[ "$dataIN" == "RMSD" ]] ; then analyser2
-		elif [[ "$dataIN" == "Rg" ]] ; then analyser4
-		elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
-		elif [[ "$dataIN" == "SASA" ]] ; then analyser6
-		fi
-	elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
-		printf "   Pre-calculated $dataIN data found!\n   File found: $existData \n"
-		sleep 1
-		printf "\n   *CHAPERONg in auto mode\n   Found data will be used for density estimation\n"
+		printf "$demA Generating the input files for KDE\n"
 		sleep 2
-	elif [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
-		printf "   Pre-calculated $dataIN data found!\n   File found: $existData \n"
-		sleep 2
+		for i in ${data_kde_ext[*]} ; do
+			if (( $count_data_in == 0 )) ; then
+				echo "Data for ${filenm}" > CHAP_kde_dataset_list.dat
+				count_data_in=$(( count_data_in + 1 ))				
+			fi
+			if (( $count_data_in > 0 )) ; then
+				if [[ "$i" == 1 ]] ; then echo "RMSD" >> CHAP_kde_dataset_list.dat
+				elif [[ "$i" == 2 ]] ; then echo "Rg" >> CHAP_kde_dataset_list.dat
+				elif [[ "$i" == 3 && "$sysType" == "protein_only" ]] ; then
+					echo "Hbond_protein-protein" >> CHAP_kde_dataset_list.dat
+					echo "Hbond_protein-water" >> CHAP_kde_dataset_list.dat
+				elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
+					echo "Hbond_intra-protein" >> CHAP_kde_dataset_list.dat
+					echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
+				elif [[ "$i" == 4 ]] ; then	echo "SASA" >> CHAP_kde_dataset_list.dat
+				fi
+				count_data_in=$(( count_data_in + 1 ))
+			fi
+		done
+
+		# if [[ "${data_kde_ext[@]}" =~ 2 ]] ; then
+		# for i in ${data_kde_ext[*]} ; do
+		LineCount=0
+		while IFS= read -r line; do
+			LineCount=$(( LineCount + 1 ))
+			if (( "$LineCount" == 1 )) ; then continue ; fi
+			printf "\n Preparing data for $line...\n\n"
+			sleep 2
+			if [[ "$line" == "RMSD" ]] ; then
+				dataIN="RMSD"
+				existData="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
+			elif [[ "$line" == "Rg" ]] ; then
+				dataIN="Rg"
+				existData="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
+			elif [[ "$line" == "Hbond_protein-protein" ]] ; then
+				dataIN="$line"
+				existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
+			elif [[ "$line" == "Hbond_protein-water" ]] ; then
+				dataIN="$line"
+				existData="$(pwd)""/hbond/""hbnum_Pro-SOL_${filenm}.xvg"
+			elif [[ "$line" == "Hbond_intra-protein" ]] ; then
+				dataIN="$line"
+				existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
+			elif [[ "$line" == "Hbond_protein-lig" ]] ; then
+				dataIN="$line"
+				existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
+			elif [[ "$line" == "SASA" ]] ; then
+				dataIN="SASA"
+				existData=$(echo "$(pwd)""/SASA/""sasa"*"${filenm}.xvg")
+				if [[ ! -f "$existData" ]] ; then
+					existData=$(echo "$(pwd)""/SASA/""sasa_Pro_${filenm}.xvg")
+				fi
+				if [[ ! -f "$existData" ]] ; then	
+					existData=$(echo "$(pwd)""/SASA/""sasa_${filenm}.xvg")
+				fi
+			fi
+
+			if [[ ! -f "$existData" ]] ; then
+				if [[ "$dataIN" == "RMSD" ]] ; then analyser2
+				elif [[ "$dataIN" == "Rg" ]] ; then analyser4
+				elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
+				elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+				fi
+			elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
+				printf "   Pre-calculated $dataIN data found!"\
+				"\n   File found: $existData \n"
+				sleep 1
+				printf "\n   *CHAPERONg in auto mode"\
+				"\n   Found data will be used for density estimation\n"
+				sleep 2
+			elif [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
+				printf "   Pre-calculated $dataIN data found!"\
+				"\n   File found: $existData \n"
+				sleep 2
 cat << askDataExist
 
-Do you want to use this file for kernel density estimation?
+ Do you want to use this file for kernel density estimation?
 
-  1) Yes, use the file above
-  2) No, repeat $dataIN calculations and use the new output for density estimation
-  3) No, I want to provide another file to be used
+   1) Yes, use the file above
+   2) No, repeat $dataIN calculations and use the new output
+   3) No, I want to provide another file to be used
 
 askDataExist
 

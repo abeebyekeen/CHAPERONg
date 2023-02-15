@@ -56,23 +56,18 @@ if len(missingLib) >= 1 :
 		print(f"  {lib}\n")
 		if lib == "numpy" : lib = "numpy==1.23.4"
 		suggestmsg = suggestmsg + f'{lib} '
-	print(
-		f' {suggestmsg}\n\n or\n\n'
-		' See https://www.abeebyekeen.com/chaperong-online-documentation/'
-		)
+	print(f' {suggestmsg}\n\n or\n\n'
+		' See https://www.abeebyekeen.com/chaperong-online-documentation/')
 	sys.exit(0)
 
-def make_dir_for_KDE(motherDir='Kernel_Density_Estimation'):
+def make_dir_for_KDE(motherDir='Kernel_Density_Estimation', backupDir='Kernel_Density_Estimation'):
 	if os.path.exists(motherDir):
 		backup_count = 1
-		backupDir=f'#{motherDir}.backup.{backup_count}'
 		while os.path.exists(backupDir):
+			backupDir = f'#{backupDir}.backup.{backup_count}'
 			backup_count += 1
-			backupDir = f'#{motherDir}.backup.{backup_count}'			
 		shutil.move(motherDir, backupDir)
 	os.mkdir(motherDir)
-
-# output_dict = {'files_to_move': [], 'files_to_copy': []}
 
 def estimate_PDF_with_KDE():
 # Read in the data for PDF estimation
@@ -80,7 +75,6 @@ def estimate_PDF_with_KDE():
 	with open("CHAP_kde_dataset_list.dat") as in_par:
 		alldatasets = in_par.readlines()
 		for lineNo, line in enumerate(alldatasets):
-			output_and_para_files = []
 			if int(lineNo) == 0:
 				dataName_raw = str(line).rstrip("\n").split(" ")
 				dataName = str(dataName_raw[2])
@@ -90,8 +84,7 @@ def estimate_PDF_with_KDE():
 				input_data = str(line).rstrip("\n")
 				
 				data_in = []
-				extracted_data = f"{input_data}_Data.dat"
-				with open(extracted_data) as alldata:
+				with open(f"{input_data}_Data.dat") as alldata:
 					alldata_lines = alldata.readlines()
 					for line in alldata_lines:
 						data_point = str(line).split("\n")
@@ -127,11 +120,8 @@ def estimate_PDF_with_KDE():
 				elif int(lineNo) > 1 :
 					with open("CHAP_kde_Par.in", "a") as in_par:
 						writeOut_parameters()
-								
-				with open(f'CHAP_kde_Par_{input_data}.in', "w") as in_par:
-					writeOut_parameters()				
-
-				output_and_para_files.append(f'CHAP_kde_Par_{input_data}.in')
+				outputList = []
+				# outputList.append('CHAP_kde_Par.in')
 
 				# Scott (1979) method
 				stdev = dist.std()
@@ -144,17 +134,14 @@ def estimate_PDF_with_KDE():
 				num_of_bins_rice = int(np.ceil( 2 * (len(dist) ** (1 / 3))))
 
 				def write_binning_parameters():
-					bin_summary.write(
-						f'=> {input_data}\n'
-						"----------------------------------\n"
-						"Binning Method\t  | Number of bins\n"
-						"------------------+---------------\n"
-						f'Freedman-Diaconis | {bin_count}\t(*)\n'
-						f'Square root\t\t  | {num_of_bins_sqrt}\n'
-						f'Rice\t\t\t  | {num_of_bins_rice}\n'
-						f'Scott\t\t\t  | {bin_count_scott}\n'
-						"----------------------------------\n\n\n"
-						)
+					bin_summary.write(f"=> {input_data}\n"
+									"----------------------------------\n"					
+									"Binning Method\t  | Number of bins\n"
+									"------------------+---------------\n"
+									f"Freedman-Diaconis | {bin_count}\t(*)\n"
+									f"Square root\t\t  | {num_of_bins_sqrt}\n"
+									f"Rice\t\t\t  | {num_of_bins_rice}\n"
+									f"Scott\t\t\t  | {bin_count_scott}\n\n\n")
 				
 				if int(lineNo) == 1:
 					with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
@@ -164,27 +151,20 @@ def estimate_PDF_with_KDE():
 					with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 						write_binning_parameters()
 						
-				with open(f"kde_bins_estimated_{input_data}.dat", "w") as bin_summary:
-					write_binning_parameters()
+				outputList.append('kde_bins_estimated_summary.dat')
 
-				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
-
-				print(
-					"\n  Optimal binning parameters have been estimated."
+				print("\n  Optimal binning parameters have been estimated."
 					'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
 					'\n\n  You can modify the parameters if required.'
 					'\n   Enter "Yes" below when you are ready.'
-					"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
-					)
+					"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n")
 
 				prmpt = "  Enter a response here (1 or 2): "
 				response = int(input(prmpt))
 
 				while response != 1 and response != 2:
-					print(
-						"\n ENTRY REJECTED!"
-						"\n **Please enter the appropriate option (1 or 2)\n"
-						)
+					print("\n ENTRY REJECTED!\
+						\n **Please enter the appropriate option (1 or 2)\n")
 					response = int(input(prmpt))
 
 				if response == 2:
@@ -217,7 +197,7 @@ def estimate_PDF_with_KDE():
 				figname = input_data + "_histogram.png"
 				plt.savefig(figname, dpi=600)
 				
-				output_and_para_files.append(figname)
+				outputList.append(figname)
 
 				# Create a new figure for the KDE
 				plt.figure()
@@ -255,27 +235,31 @@ def estimate_PDF_with_KDE():
 					):
 					outfile.write(
 						f'# This file contains the {Keycontent} values of the {input_data}'
-						'\n# data calculated by CHAPERONg from the output of GROMACS\n#\n'
+						'\n#data calculated by CHAPERONg from the output of GROMACS\n#\n'
 						f'@    title "{title} of {input_data}"\n'
 						f'@    xaxis  label "{XaxisLabel}"\n'
 						f'@    yaxis  label "{YaxisLabel}"\n'
 						f'@TYPE {graphType}\n'
 						f'@ s0 legend "{dataName}_{input_data}"\n'
-						'@    s0 symbol size 0.200000\n'
-						'@    s0 line type 0\n'
 						)
 
 				with open (out_hist, 'w') as out_his_file:
 					write_out_plot_files(
 						out_his_file, 'histogram', 'Histogram', XaxisLabelXVG, 'Count', 'bar'
 						)
+					out_his_file.write('# This file contains the  values of '
+								f'the {input_data} data calculated by CHAPERONg'
+								'\n# from the output of GROMACS'
+								'\n#\n'
+								f'@    title "Histogram of {input_data}"\n'
+								f'@    xaxis  label "{XaxisLabelXVG}"\n'
+								'@    yaxis  label "Count"\n'
+								'@TYPE bar\n'
+								f'@ s0 legend "{dataName}_{input_data}"\n')
+				pd.DataFrame({'x_upper':a[1][1:], 'y': a[0]}).to_csv(out_hist,
+								header=False, index=False, sep="\t", mode='a')
 				
-				pd.DataFrame(
-					{'x_upper':a[1][1:], 'y': a[0]}).to_csv(out_hist,
-					header=False, index=False, sep="\t", mode='a'
-					)
-				
-				output_and_para_files.append(out_hist)
+				outputList.append(out_hist)
 
 				print (f" Estimating the probability density function for {input_data}\n")
 				time.sleep(2)
@@ -283,16 +267,23 @@ def estimate_PDF_with_KDE():
 				kde = st.gaussian_kde(data_in, bw_method=bandwidth)
 				kde_ys = kde.pdf(kde_xs)
 				out_kde = input_data+"_KDEdata.xvg"
-				with open (out_kde, 'w') as out_kde_file:
-					write_out_plot_files(
-						out_kde_file, 'KDE-estimated PDF', 'KDE-estimated Probability Density',
-						XaxisLabelXVG, 'Density', 'xy'
-						)					
-					
+				with open (out_kde, 'w') as outdkefile:
+					outdkefile.write(
+						'# This file contains the KDE-estimated PDF values of '
+						f'the {input_data} data calculated by CHAPERONg'
+						'\n# from the output of GROMACS'
+						'\n#\n'
+						'@    title "KDE-estimated Probability Density'
+						f' Function of {input_data}"\n'
+						f'@    xaxis  label "{XaxisLabelXVG}"\n'
+						'@    yaxis  label "Density"\n'
+						'@TYPE xy\n'
+						f'@ s0 legend "{dataName}_{input_data}"\n'
+						)
 				pd.DataFrame({'x':kde_xs, 'y': kde_ys}).to_csv(out_kde,
 								header=False, index=False, sep="\t", mode='a')
 				
-				output_and_para_files.append(out_kde)
+				outputList.append(out_kde)
 
 				kdeLabel = input_data + "_PDF"
 				plt.plot(kde_xs, kde.pdf(kde_xs), label=kdeLabel, color='r')
@@ -303,26 +294,22 @@ def estimate_PDF_with_KDE():
 				figname = input_data + "_KDE_plot.png"
 				plt.savefig(figname, dpi=600)
 
-				output_and_para_files.append(figname)
+				outputList.append(figname)
 
 				print (f" Estimate probability density function for {input_data}...DONE\n"
 						"#=============================================================================#\n")
 			
-			output_and_para_files.append(extracted_data)
 			dataOutPath=f'Kernel_Density_Estimation/{input_data}'
-			# dataOutPath_old=f'{motherDir}/{input_data}'
-			make_dir_for_KDE(dataOutPath)
-			for file in output_and_para_files:
+			dataOutPath_old=f'Kernel_Density_Estimation/{input_data}'
+			make_dir_for_KDE(dataOutPath, dataOutPath_old)
+			for file in outputList:
 				try: shutil.move(file, dataOutPath)
 				except FileNotFoundError: pass
-			# for file in output_dict['files_to_copy']:
-			# 	try: shutil.copy2(file, dataOutPath)
-			# 	except FileNotFoundError: pass				
+			try: shutil.copy2('CHAP_kde_Par.in', dataOutPath)
+			except FileNotFoundError: pass				
 
 make_dir_for_KDE()			
 estimate_PDF_with_KDE()
-para_summary = ['CHAP_kde_Par.in', 'kde_bins_estimated_summary.dat', 'CHAP_kde_dataset_list.dat']
-
-for file in para_summary:
-	try: shutil.move(file, 'Kernel_Density_Estimation')
-	except FileNotFoundError: pass
+try: shutil.move(file, dataOutPath)
+except FileNotFoundError: pass
+'CHAP_kde_Par.in'
