@@ -1085,7 +1085,7 @@ AnalysisSingleMultiple
 
 	read -p ' Enter your choice here (1 or 2): ' plot_number
 
-	while [[ "$plot_number" != 0 && "$plot_number" != 1 ]]
+	while [[ "$plot_number" != 1 && "$plot_number" != 2 ]]
 	do
 		printf "\n You entered: ${plot_number}\n\n"
 		printf " Please enter a valid number!!\n\n"
@@ -1203,55 +1203,62 @@ AnalysisList
 				sleep 2
 cat << askDataExist
 
- Do you want to use this file for kernel density estimation?
+  Do you want to use this file for kernel density estimation?
 
-   1) Yes, use the file above
-   2) No, repeat $dataIN calculations and use the new output
-   3) No, I want to provide another file to be used
+    1) Yes, use the file above
+    2) No, repeat $dataIN calculations and use the new output
+    3) No, I want to provide another file to be used
 
 askDataExist
 
-		read -p ' Enter 1, 2 or 3 here: ' DataFile
-		while [[ "$DataFile" != 1 && "$DataFile" != 2 && "$DataFile" != 3 ]]; do
-			echo $'\nYou entered: '"$DataFile"
-			echo $'Please enter a valid number (1, 2 or 3)!!\n'
-			read -p ' Enter 1, 2 or 3 here: ' DataFile
-		done
-		if [[ "$DataFile" == 1 ]]; then
-			cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat"
-		elif [[ "$DataFile" == 2 ]]; then
-			if [[ "$dataIN" == "RMSD" ]] ; then analyser2
-			elif [[ "$dataIN" == "Rg" ]] ; then analyser4
-			elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
-			elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+			read -p '  Enter 1, 2 or 3 here: ' DataFile
+			while [[ "$DataFile" != 1 && "$DataFile" != 2 && "$DataFile" != 3 ]]; do
+				echo $'\nYou entered: '"$DataFile"
+				echo $'Please enter a valid number (1, 2 or 3)!!\n'
+				read -p ' Enter 1, 2 or 3 here: ' DataFile
+			done
+			if [[ "$DataFile" == 1 ]]; then
+				cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat"
+			elif [[ "$DataFile" == 2 ]]; then
+				if [[ "$dataIN" == "RMSD" ]] ; then analyser2
+				elif [[ "$dataIN" == "Rg" ]] ; then analyser4
+				elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
+				elif [[ "$dataIN" == "SASA" ]] ; then analyser6
+				fi
+			elif [[ "$DataFile" == 3 ]]; then echo ""
+				read -p ' Provide the path to the data to use for density estimation: ' existData
+
+				echo "$demA"$' Preparing density estimation using user-provided data...\n\n'
+				sleep 1
 			fi
-		elif [[ "$DataFile" == 3 ]]; then echo ""
-			read -p ' Provide the path to the data to use for density estimation: ' existData
-
-			echo "$demA"$' Preparing density estimation using user-provided data...\n\n'
-			sleep 1
 		fi
+		cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
+	done < CHAP_kde_dataset_list.dat
+
+	printf "\n Generate input files for KDE...DONE $demB"
+	sleep 2
+	printf " Initializing probability density function calculations\n\n"
+	sleep 2
+
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
+	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
+
+
+
+	elif [[ "$plot_number" == 2 ]] ; then
+		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
+
+	while [[ "$plot_number" != 0 && "$plot_number" != 1 ]]
+	do
+		printf "\n You entered: ${plot_number}\n\n"
+		printf " Please enter a valid number!!\n\n"
+		read -p ' Enter 1, 2, 3 or 4 here: ' plot_number
+	done
+
 	fi
-	cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
-done < CHAP_kde_dataset_list.dat
-
-printf "\n Generate input files for KDE...DONE $demB"
-sleep 2
-printf " Initializing probability density function calculations\n\n"
-sleep 2
-
-python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
-python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
-
-
-
-
-printf " Estimate probability density function using KDE...DONE $demB"
-sleep 2
-exit 0
-
-
-
+	printf " Estimate probability density function using KDE...DONE $demB"
+	# sleep 2
+	exit 0
 }
 
 if [[ "$analysis" == *" 10 "* ]]; then analyser10 ; fi
