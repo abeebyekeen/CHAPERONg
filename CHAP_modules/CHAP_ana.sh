@@ -1240,8 +1240,8 @@ askDataExist
 	printf " Initializing probability density function calculations\n\n"
 	sleep 2
 
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py || \
-	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kernel_density_estimation.py
+	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py || \
+	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py
 
 
 
