@@ -1245,17 +1245,20 @@ askDataExist
 
 
 
+
 	elif [[ "$plot_number" == 2 ]] ; then
 		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
 
-	while [[ "$plot_number" != 0 && "$plot_number" != 1 ]]
-	do
-		printf "\n You entered: ${plot_number}\n\n"
-		printf " Please enter a valid number!!\n\n"
-		read -p ' Enter 1, 2, 3 or 4 here: ' plot_number
-	done
-
+		while ! [[ "$data_kde" =~ ^([1-4])$ ]] ; do
+			echo $'\n You entered: '"$data_kde"
+			echo $' Please enter a valid within !!\n'
+			read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde  
+		done
 	fi
+
+	read -p ' Enter the path to the first : ' data_kde
+
+
 	printf " Estimate probability density function using KDE...DONE $demB"
 	# sleep 2
 	exit 0

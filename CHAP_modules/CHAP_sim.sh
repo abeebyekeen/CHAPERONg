@@ -265,28 +265,63 @@ US_simulate()
 	echo $'\n **ENTER A STAGE NUMBER BELOW\n'
 	read -p ' Initiation stage: ' stage
 
-	checkstage=""
-	for i in {0..18} ; do
-		if [[ "$stage" == "$i" || "$stage" == "0a" || "$stage" == "0b" ]]
-			then checkstage="yes"; break
-		fi
-	done
+	# checkstage=""
+	# for i in {0..18} ; do
+	# 	if [[ "$stage" == "$i" || "$stage" == "0a" || "$stage" == "0b" ]]
+	# 		then checkstage="yes"; break
+	# 	fi
+	# done
 
-	while [[ "$checkstage" != "yes" ]] ; do
+	# while [[ "$checkstage" != "yes" ]] ; do
+	# 	echo $'\nYou entered: '"$stage"
+	# 	echo $'Please enter a valid value!!\n'
+	# 	read -p ' Initiation stage: ' stage
+
+	# 	for i in {0..18} ; do
+	# 		if [[ "$stage" == "$i" || "$stage" == "0a" || "$stage" == "0b" ]]
+	# 			then checkstage="yes"; break
+	# 		fi
+	# 	done
+	# done
+
+	while ! [[ "$stage" =~ ^(0a|0b|[0-9]|1[0-9]{1})$ ]]
+	# Condition:
+		# "0a",
+		# "0b",
+		# any digit between 0 and 9, or
+		# "1" followed by exactly one digit between 0 and 8 ([0-8]{1})
+	do
 		echo $'\nYou entered: '"$stage"
-		echo $'Please enter a valid value!!\n'
-		read -p ' Initiation stage: ' stage
-
-		for i in {0..18} ; do
-			if [[ "$stage" == "$i" || "$stage" == "0a" || "$stage" == "0b" ]]
-				then checkstage="yes"; break
-			fi
-		done
+		echo $'Please provide a valid entry!!\n'
+		read -p 'Initiation stage: ' stage
 	done
+
 	if [[ $sysType == "protein_lig" ]]; then
+		while ! [[ "$stage" =~ ^(0a|0b|[0-9]|1[0-9]{1})$ ]]
+		# Condition:
+			# "0a",
+			# "0b",
+			# any digit between 0 and 9, or
+			# "1" followed by exactly one digit between 0 and 8 ([0-8]{1})
+		do
+			echo $'\nYou entered: '"$stage"
+			echo $'Please provide a valid entry!!\n'
+			read -p 'Initiation stage: ' stage
+		done
+
 		echo "$demA"$'\n*What is the name of your ligand (same as for/in your topol.top file)?\n'
 		read -p '**Ligand name (without any extension): ' ligname
 		echo $'\nYou entered: '"$ligname"$'\n'
+	elif [[ $sysType == "protein_only" ]]; then
+		while ! [[ "$stage" =~ ^([0-9]|1[0-9]{1})$ ]]
+		# Condition:
+			# any digit between 0 and 9, or
+			# "1" followed by exactly one digit between 0 and 8 ([0-8]{1})
+		do
+			echo $'\nYou entered: '"$stage"
+			echo $'Please provide a valid entry!!\n'
+			read -p 'Initiation stage: ' stage
+		done
 	fi
 
 	if [[ $sysType == "protein_only" ]] && [[ "$stage" == 0 ]]; then s0GenTop; s1DefBox; s2Solvat
