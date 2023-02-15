@@ -1243,9 +1243,6 @@ askDataExist
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py || \
 	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py
 
-
-
-
 	elif [[ "$plot_number" == 2 ]] ; then
 		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
 
