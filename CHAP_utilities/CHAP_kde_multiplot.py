@@ -85,13 +85,13 @@ def estimate_PDF_with_KDE():
 		for lineNo, line in enumerate(alldatasets):
 			# output_and_para_files = []
 			if int(lineNo) == 0:
-				# 
+				# Get the type of data from the header
 				dataName = str(line).rstrip("\n")
 				continue
 			elif int(lineNo) >= 0:
 				data_info = str(line).rstrip("\n").split(",")
-				data_label = str(data_info[0])
-				data_path = str(data_info[1])
+				data_label, data_path = str(data_info[0]), str(data_info[1])
+				
 				# Add label and data_name to the dictionary
 				input_data_dict[data_label] = data_path
 				
