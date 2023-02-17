@@ -89,12 +89,14 @@ def store_data_label_name():
 				continue
 			elif int(lineNo) >= 0:
 				data_info = str(line).rstrip("\n").split(",")
-				data_label, data = str(data_info[0]), str(data_info[1])
+				data_label = str(data_info[0])
+				data = str(data_info[1])
 				
 				# Add label and data to the dictionary
 				input_data_dict[data_label] = data
-				return dataName, input_data_dict
+	return dataName, input_data_dict
 
+output_and_para_files = []
 
 # def estimate_PDF_with_KDE():
 def plot_multidata_hist(dataName, input_data_dict):
@@ -110,7 +112,10 @@ def plot_multidata_hist(dataName, input_data_dict):
 				data_in.append(float(data_point))
 
 		# Determine the number of bins automatically
-		print (f" Estimating the optimal number of histogram bins for {dataLabel}\n")
+		print (
+			"#=============================================================================#\n"
+			f"\n Estimating the optimal number of histogram bins for {dataLabel}\n"
+			)
 		time.sleep(2)
 		# Determine the number of bins using the Freedman-Diaconis (1981) method
 		dist = pd.Series(data_in)
@@ -127,13 +132,14 @@ def plot_multidata_hist(dataName, input_data_dict):
 
 		def writeOut_parameters():
 			in_par.write(
+				f'{dataLabel}\n'
 				f'bin_count,{bin_count}\n'
-				"bandwidth_method,silverman\n\n\n"
+				"bandwidth_method,silverman\n\n"
 				)			
 
 		if data_count == 1 :
 			with open("CHAP_kde_Par.in", "w") as in_par:
-				in_par.write(f'{dataName}\n')
+				in_par.write(f'=>{dataName}\n')
 				writeOut_parameters()
 
 		elif data_count > 1 :
@@ -154,7 +160,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 
 		def write_binning_parameters():
 			bin_summary.write(
-				f'=> {dataName}\n'
+				f'{dataLabel}\n'
 				"----------------------------------\n"
 				"Binning Method\t  | Number of bins\n"
 				"------------------+---------------\n"
@@ -162,11 +168,12 @@ def plot_multidata_hist(dataName, input_data_dict):
 				f'Square root\t\t  | {num_of_bins_sqrt}\n'
 				f'Rice\t\t\t  | {num_of_bins_rice}\n'
 				f'Scott\t\t\t  | {bin_count_scott}\n'
-				"----------------------------------\n\n\n"
+				"----------------------------------\n\n"
 				)
 		
 		if data_count == 1:
 			with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
+				bin_summary.write(f'=> {dataName}\n')
 				write_binning_parameters()
 
 		elif data_count > 1:
@@ -263,9 +270,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 	figname = dataName + "_histogram_multi_plot.png"
 	plt.savefig(figname, dpi=600)
 		
-	output_and_para_files.append(
-		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
-		)
+	output_and_para_files.append(figname)
 	return dataName, XaxisLabelXVG, XaxisLabelPNG
 
 def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):		
@@ -275,40 +280,42 @@ def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):
 	bins_number_count = 1
 	print (f" Extracting pre-calculated number of bins for plotting histogram\n")
 	time.sleep(2)	
-	for line in 'CHAP_kde_Par.in':
-		if "bin_count" in line:
-			bin_w = line.rstrip("\n").split(",")
-			bins_number_dict[bins_number_count] = str(bin_w)
-		elif "bandwidth_method" in line:
-			band_w = line.rstrip("\n").split(",")
-			bandwidth_dict[bins_number_count] = str(band_w)
-			bins_number_count += 1
-	
+	with open('CHAP_kde_Par.in', 'r') as in_par:
+		for line in in_par.readlines():
+			if "bin_count" in line:
+				bin_w = line.rstrip("\n").split(",")
+				bins_number_dict[bins_number_count] = bin_w[1]
+			elif "bandwidth_method" in line:
+				band_w = line.rstrip("\n").split(",")
+				bandwidth_dict[bins_number_count] = band_w[1]
+				bins_number_count += 1
+
 	# Reset bin count
 	bins_number_count2 = 1
+
+	plt.figure() # Create a new figure for KDE
+
 	for key, value in input_data_dict.items():
 		dataLabel = key
 		extracted_data = value
 		data_in = []
-		with open(extracted_data) as alldata:
+		with open(extracted_data, 'r') as alldata:
 			alldata_lines = alldata.readlines()
 			for line in alldata_lines:
 				data_point = str(line).rstrip("\n")
 				data_in.append(float(data_point))
 
-		bin_set = int(bins_number_dict[str(bins_number_count2)])
-		bandwidth = int(bandwidth_dict[str(bins_number_count2)])
+		bin_set = int(bins_number_dict[bins_number_count2])
+		bandwidth = bandwidth_dict[bins_number_count2]
 		bins_number_count2 += 1
 		print(f'  Number of bins deduced using the Freedman-Diaconis (1981) rule')
 		time.sleep(2)
 		print(f'\n    bin_count = {bin_set}\n    bandwidth = {bandwidth}')
 
-		plt.figure() # Create a new figure for KDE
-
 		# Generate and plot the histogram of the data
-		histo = plt.hist(data_in, density=True, bins=bin_set, label=dataLabel, alpha=0.5)
+		plt.hist(data_in, density=True, bins=bin_set, label=dataLabel, alpha=0.6)
 
-		print (f" Estimating the probability density function for {dataLabel}\n")
+		print (f"\n Estimating the probability density function for {dataLabel}\n")
 		time.sleep(2)
 		kde_xs = np.linspace(min(data_in), max(data_in), 300)
 		kde = st.gaussian_kde(data_in, bw_method=bandwidth)
@@ -316,8 +323,9 @@ def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):
 		kdeLabel = dataLabel + "_PDF"
 		plt.plot(kde_xs, kde.pdf(kde_xs), label=kdeLabel)
 		plt.legend()
+
+		out_kde = dataLabel + "_KDEdata.xvg"
 		with open (out_kde, 'w') as out_kde_file:
-			out_kde = dataLabel + "_KDEdata.xvg"
 			out_kde_file.write(
 				f'# This file contains the KDE-estimated PDF values of the {dataLabel}'
 				'\n# data calculated by CHAPERONg from the output of GROMACS\n#\n'
@@ -335,33 +343,35 @@ def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):
 		output_and_para_files.append(out_kde)
 		# Increase counter for additional data
 		data_count += 1
+		plt.ylabel("Density")
+		plt.xlabel(XaxisLabelPNG)
 
-	plt.ylabel("Density")
-	plt.xlabel(XaxisLabelPNG)
+		output_and_para_files.append(value)
+
 	plt.title(f'Kernel Density Estimation Plots of {dataName} Data')
 	figname = dataName + "_KDE_multi_plot.png"
 	plt.savefig(figname, dpi=600)
 	
-	output_and_para_files.append(
-		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
-		)
+	output_and_para_files.append(figname)
 
 	print (f" Estimate probability density function for {dataName} data...DONE\n"
 			"#=============================================================================#\n")
 
-	
-	dataOutPath=f'Kernel_Density_Estimation_multi_plot'
-
 	for file in output_and_para_files:
-		try: shutil.move(file, dataOutPath)
+		try: shutil.move(file, './Kernel_Density_Estimation_multi_plot')
+		except: pass
+
+	para_summary = [
+		'CHAP_kde_Par.in', 
+		'kde_bins_estimated_summary.dat', 
+		'CHAP_kde_dataset_list.dat',
+		]
+
+	for file in para_summary:
+		try: shutil.move(file, './Kernel_Density_Estimation_multi_plot')
 		except FileNotFoundError: pass				
 
 make_dir_for_KDE()
 dataName, input_data_dict = store_data_label_name()
-
-output_and_para_files = []
-
-# XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, stored_data)
 dataName, XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, input_data_dict)
-# estimate_PDF_with_KDE(XaxisLabelXVG, XaxisLabelPNG)
 estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG)

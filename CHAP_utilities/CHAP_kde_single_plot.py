@@ -100,7 +100,10 @@ def estimate_PDF_with_KDE():
 				# Create a new figure
 				plt.figure()
 				# Determine the number of bins automatically
-				print (f" Estimating the optimal number of histogram bins for {input_data}\n")
+				print (
+					"#=============================================================================#\n"
+					f"\n Estimating the optimal number of histogram bins for {input_data}\n"
+					)
 				time.sleep(2)
 				# Determine the number of bins using the Freedman-Diaconis (1981) method
 				dist = pd.Series(data_in)

@@ -1333,10 +1333,8 @@ askDataExist
 
 	fi
 
-
-	printf " Estimate probability density function using KDE...DONE $demB"
+	printf "$demA Estimate probability density function using KDE...DONE $demB"
 	# sleep 2
-	exit 0
 }
 
 if [[ "$analysis" == *" 10 "* ]]; then analyser10 ; fi
