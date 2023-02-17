@@ -1316,7 +1316,7 @@ askDataExist
 			data_kde_path=$(echo "$data_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
 			cat "$data_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
-			"${data_kde_path}_Data.dat" || true
+			"${data_kde_label}_Data.dat" || true
 			
 			# Write name and label of the 2nd data to file
 			echo "${data_kde_label},${data_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
@@ -1333,7 +1333,7 @@ askDataExist
 
 
 
-		
+
 	fi
 
 

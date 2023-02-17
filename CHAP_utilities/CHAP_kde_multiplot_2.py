@@ -98,10 +98,10 @@ def store_data_label_name():
 # bandwidth = 'silverman'
 output_and_para_files = []
 
-# def estimate_PDF_with_KDE():
-def plot_multidata_hist():
+def estimate_PDF_with_KDE():
 	data_count = 1
 	for key, value in input_data_dict.items():
+		XaxisLabelPNG = ''
 		def prepare_his_plots(key, value):
 			dataLabel = key
 			extracted_data = value

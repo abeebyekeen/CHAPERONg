@@ -94,7 +94,7 @@ def estimate_PDF_with_KDE():
 				with open(extracted_data) as alldata:
 					alldata_lines = alldata.readlines()
 					for line in alldata_lines:
-						data_point = str(line).split("\n")
+						data_point = str(line).rstrip("\n")
 						data_in.append(float(data_point[0]))
 
 				# Create a new figure
