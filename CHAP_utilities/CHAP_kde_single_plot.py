@@ -95,7 +95,7 @@ def estimate_PDF_with_KDE():
 					alldata_lines = alldata.readlines()
 					for line in alldata_lines:
 						data_point = str(line).rstrip("\n")
-						data_in.append(float(data_point[0]))
+						data_in.append(float(data_point))
 
 				# Create a new figure
 				plt.figure()
@@ -110,6 +110,7 @@ def estimate_PDF_with_KDE():
 				qt3 = dist.quantile(0.75)
 				iqr = qt3 - qt1
 				bin_width = (2 * iqr) / (len(dist) ** (1 / 3))
+				
 				bin_count = int(np.ceil((data_range) / bin_width))
 				print(f'  Number of bins deduced using the Freedman-Diaconis (1981) rule')
 				time.sleep(2)
@@ -210,8 +211,22 @@ def estimate_PDF_with_KDE():
 				time.sleep(2)
 
 				# Generate and plot the histogram of the data
+				out_hist = input_data+"_histogram.xvg"
+				if "RMSD" in input_data: 
+					XaxisLabelXVG = r'RMSD (\cE\C)' 
+					XaxisLabelPNG = 'RMSD' + r' ($\AA$)' # Using Latex in matplotlib
+				elif "Rg" in input_data:
+					XaxisLabelXVG = r'Radius of gyration (\cE\C)'
+					XaxisLabelPNG = 'Radius of gyration' + r' ($\AA$)'
+				elif "Hbond" in input_data:
+					XaxisLabelXVG = "Number of hydrogen bonds"
+					XaxisLabelPNG = XaxisLabelXVG
+				elif "SASA" in input_data:
+					XaxisLabelXVG = r'SASA (nm\S2\N)'
+					XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
+
 				plt.hist(data_in, bins=bin_set, label=input_data, color='#4CE418', alpha=0.9)
-				plt.xlabel(input_data + r' ($\AA$)') # using Latex expression in matplotlib
+				plt.xlabel(XaxisLabelPNG) # using Latex expression in matplotlib
 				plt.ylabel('Count')
 				plt.title("Histogram of the "+input_data)
 				figname = input_data + "_histogram.png"
@@ -236,19 +251,6 @@ def estimate_PDF_with_KDE():
 				# Get the upper bounds and write out the histogram
 				print (f" Writing out the histogram data of the {input_data}\n")
 				time.sleep(2)
-				out_hist = input_data+"_histogram.xvg"
-				if "RMSD" in input_data: 
-					XaxisLabelXVG = r'RMSD (\cE\C)' 
-					XaxisLabelPNG = 'RMSD' + r' ($\AA$)' # Using Latex in matplotlib
-				elif "Rg" in input_data:
-					XaxisLabelXVG = r'Radius of gyration (\cE\C)'
-					XaxisLabelPNG = 'Radius of gyration' + r' ($\AA$)'
-				elif "Hbond" in input_data:
-					XaxisLabelXVG = "Number of hydrogen bonds"
-					XaxisLabelPNG = XaxisLabelXVG
-				elif "SASA" in input_data:
-					XaxisLabelXVG = r'SASA (nm\S2\N)'
-					XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
 
 				def write_out_plot_files(
 					outfile, Keycontent, title, XaxisLabel, YaxisLabel, graphType, lineSetting
@@ -264,7 +266,7 @@ def estimate_PDF_with_KDE():
 						)
 
 				with open (out_hist, 'w') as out_his_file:
-					lineSet = '@    s0 symbol size 0.200000\n''@    s0 line type 0\n'					
+					lineSet = '\n@    s0 symbol size 0.200000\n''@    s0 line type 0'					
 					write_out_plot_files(
 						out_his_file, 'histogram', 'Histogram', XaxisLabelXVG, 'Count', 'bar', lineSet
 						)

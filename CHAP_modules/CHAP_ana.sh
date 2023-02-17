@@ -1076,13 +1076,13 @@ analyser10()
 
 cat << AnalysisSingleMultiple
 
-   Select your choice(s) from the options listed below:
    ---------------------------------------
     Option |  Data
    --------+------------------------------
        1   |  Single data plot
        2   |  Comparative multi-data plot
-  
+   ---------------------------------------
+
 AnalysisSingleMultiple
 
 	read -p ' Enter your choice here (1 or 2): ' plot_number
@@ -1094,21 +1094,23 @@ AnalysisSingleMultiple
 		read -p ' Enter 1 or 2 here: ' plot_number
 	done
 
-	echo " \nSelect the type of input data for the PDF estimation"
-	sleep 1
+	echo -e "\n\n Select the type of input data for the PDF estimation:"
+	sleep 2
 
 cat << AnalysisList
 
-   Select your choice(s) from the options listed below:
    --------------------------------------------------
     Option |  Data
    --------+-----------------------------------------
        1   |  Root mean square deviation (RMSD)
        2   |  Radius of gyration (Rg)
        3   |  Hydrogen bonds (Hbond)
-       4   |  Solvent accessible surface area (SASA)
+       4   |  Solvent accessible surface area (SASA) 
+   --------------------------------------------------
   
 AnalysisList
+
+	sleep 2
 
 	if [[ "$plot_number" == 1 ]] ; then
 		read -p ' Enter one or more options here (separated by a space): ' data_kde
@@ -1127,7 +1129,7 @@ AnalysisList
 		data_kde_ext=("$data_kde")
 		count_data_in=0
 
-		printf "$demA Generating the input files for KDE\n"
+		printf "$demA Generating the input files for KDE"
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
@@ -1155,7 +1157,7 @@ AnalysisList
 		while IFS= read -r line; do
 			LineCount=$(( LineCount + 1 ))
 			if (( "$LineCount" == 1 )) ; then continue ; fi
-			printf "\n Preparing data for $line...\n\n"
+			printf "\n\n Preparing data for $line...\n"
 			sleep 2
 			if [[ "$line" == "RMSD" ]] ; then
 				dataIN="RMSD"
@@ -1237,7 +1239,7 @@ askDataExist
 		cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
 	done < CHAP_kde_dataset_list.dat
 
-		printf "\n Generate input files for KDE...DONE $demB"
+		printf "\n\n Generate input files for KDE...DONE $demB"
 		sleep 2
 		printf " Initializing probability density function calculations\n\n"
 		sleep 2

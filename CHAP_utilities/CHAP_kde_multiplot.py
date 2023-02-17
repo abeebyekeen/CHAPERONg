@@ -107,7 +107,7 @@ def plot_multidata_hist():
 			alldata_lines = alldata.readlines()
 			for line in alldata_lines:
 				data_point = str(line).rstrip("\n")
-				data_in.append(float(data_point[0]))
+				data_in.append(float(data_point))
 
 		# Determine the number of bins automatically
 		print (f" Estimating the optimal number of histogram bins for {dataLabel}\n")
@@ -294,7 +294,7 @@ def estimate_PDF_with_KDE():
 			alldata_lines = alldata.readlines()
 			for line in alldata_lines:
 				data_point = str(line).rstrip("\n")
-				data_in.append(float(data_point[0]))
+				data_in.append(float(data_point))
 
 		bin_set = bins_number_dict[bins_number_count]
 		bandwidth = bandwidth_dict[bins_number_count]
