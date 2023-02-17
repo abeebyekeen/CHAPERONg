@@ -118,7 +118,7 @@ def estimate_PDF_with_KDE():
 				def writeOut_parameters():
 					in_par.write(f'{input_data}\n'
 								f'bin_count,{bin_count}\n'
-								"bandwith_method,silverman\n\n\n")					
+								"bandwidth_method,silverman\n\n\n")					
 
 				if int(lineNo) == 1 :
 					with open("CHAP_kde_Par.in", "w") as in_par:
@@ -197,7 +197,7 @@ def estimate_PDF_with_KDE():
 							if "bin_count" in parameter:
 								para_data = parameter.rstrip('\n').split(",")
 								bin_custom = int(para_data[1].strip())
-							elif "bandwith_method" in parameter:
+							elif "bandwidth_method" in parameter:
 								para_data = parameter.rstrip(' \n').split(",")
 								bandwt = para_data[1].strip()
 								if (bandwt.isalpha()) == True :
