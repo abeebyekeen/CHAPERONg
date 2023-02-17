@@ -97,7 +97,7 @@ def store_data_label_name():
 
 
 # def estimate_PDF_with_KDE():
-def plot_multidata_hist():
+def plot_multidata_hist(dataName, input_data_dict):
 	data_count = 1
 	for key, value in input_data_dict.items():
 		dataLabel = key
@@ -266,26 +266,26 @@ def plot_multidata_hist():
 	output_and_para_files.append(
 		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
 		)
-	return XaxisLabelXVG, XaxisLabelPNG
+	return dataName, XaxisLabelXVG, XaxisLabelPNG
 
-def estimate_PDF_with_KDE():		
+def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):		
 	data_count = 1
 	bins_number_dict = {}
 	bandwidth_dict = {}
 	bins_number_count = 1
-	print (f" Extracting pre-calculated number of bins for {dataLabel} histogram\n")
+	print (f" Extracting pre-calculated number of bins for plotting histogram\n")
 	time.sleep(2)	
 	for line in 'CHAP_kde_Par.in':
 		if "bin_count" in line:
 			bin_w = line.rstrip("\n").split(",")
-			bins_number_dict[bins_number_count] = bin_w
+			bins_number_dict[bins_number_count] = str(bin_w)
 		elif "bandwidth_method" in line:
 			band_w = line.rstrip("\n").split(",")
-			bandwidth_dict[bins_number_count] = band_w
+			bandwidth_dict[bins_number_count] = str(band_w)
 			bins_number_count += 1
-
+	
 	# Reset bin count
-	bins_number_count = 1
+	bins_number_count2 = 1
 	for key, value in input_data_dict.items():
 		dataLabel = key
 		extracted_data = value
@@ -296,9 +296,9 @@ def estimate_PDF_with_KDE():
 				data_point = str(line).rstrip("\n")
 				data_in.append(float(data_point))
 
-		bin_set = bins_number_dict[bins_number_count]
-		bandwidth = bandwidth_dict[bins_number_count]
-		bins_number_count += 1
+		bin_set = int(bins_number_dict[str(bins_number_count2)])
+		bandwidth = int(bandwidth_dict[str(bins_number_count2)])
+		bins_number_count2 += 1
 		print(f'  Number of bins deduced using the Freedman-Diaconis (1981) rule')
 		time.sleep(2)
 		print(f'\n    bin_count = {bin_set}\n    bandwidth = {bandwidth}')
@@ -357,9 +357,11 @@ def estimate_PDF_with_KDE():
 		except FileNotFoundError: pass				
 
 make_dir_for_KDE()
-dataName, stored_data = store_data_label_name()
+dataName, input_data_dict = store_data_label_name()
 
 output_and_para_files = []
 
-XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, stored_data)
-estimate_PDF_with_KDE(XaxisLabelXVG, XaxisLabelPNG)
+# XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, stored_data)
+dataName, XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, input_data_dict)
+# estimate_PDF_with_KDE(XaxisLabelXVG, XaxisLabelPNG)
+estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG)
