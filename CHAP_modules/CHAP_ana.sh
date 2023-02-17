@@ -1326,13 +1326,8 @@ askDataExist
 			$'\n\n Enter a response here (yes/no): ' more_data_prompt
 		done
 
-		python
-
-
-
-
-
-
+		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py || \
+		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py
 
 	fi
 
