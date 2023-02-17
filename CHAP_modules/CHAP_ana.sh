@@ -1252,8 +1252,8 @@ askDataExist
 
 		while ! [[ "$data_kde" =~ ^([1-4])$ ]] ; do
 			echo $'\n You entered: '"$data_kde"
-			echo $' Please enter a valid within !!\n'
-			read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde  
+			echo $' Please enter a valid number!!\n'
+			read -p ' Enter your option here (1, 2, 3, OR 4): ' data_kde  
 		done
 
 		# if [[ "$data_kde" == 1 ]]; then echo "RMSD" > CHAP_kde_dataset_list.dat
@@ -1274,7 +1274,7 @@ askDataExist
 		echo "$data_type" > CHAP_kde_dataset_list.dat
 
 		# Prompt the user to enter the first data label and path
-		read -p ' Provide a label for the first data for the KDE: ' data1_kde_label
+		read -p $'\n Provide a label for the first data for the KDE: ' data1_kde_label
 		read -p $'\n Enter the path to the first .XVG data: ' data1_kde_path
 		
 		# Trim potential leading and trailing whitespaces from the path
@@ -1301,11 +1301,11 @@ askDataExist
 
 		read -p $'\n Do you want to enter additional data?(yes/no): ' more_data_prompt
 
-		# Verify valid input
+		# Verify validity of input
 		while [[ ! " ${valid_YesNo_response[@]} " =~ " ${more_data_prompt} " ]]; do
-			echo $' Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p $'\n Do you want to enter additional data?\n\n   (1) Yes'\
-			$'\n   (2) No\n\n Enter a response here (yes/no): ' more_data_prompt
+			echo $'\n Please enter the appropriate response (a "yes" or a "no")!!\n'
+			echo $' Do you want to enter additional data?'
+			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
 		done
 
 		# count_add_data=3
@@ -1324,8 +1324,8 @@ askDataExist
 			echo "${data_kde_label},${data_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
 			
 			# Prompt the user to enter more data if required
-			read -p $'\n Do you want to enter additional data?\n\n   (1) Yes\n   (2) No'\
-			$'\n\n Enter a response here (yes/no): ' more_data_prompt
+			echo $'\n Do you want to enter additional data?'
+			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
 		done
 
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py || \
