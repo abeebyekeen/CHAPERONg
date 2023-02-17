@@ -251,7 +251,7 @@ def estimate_PDF_with_KDE():
 					XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
 
 				def write_out_plot_files(
-					outfile, Keycontent, title, XaxisLabel, YaxisLabel, graphType
+					outfile, Keycontent, title, XaxisLabel, YaxisLabel, graphType, lineSetting
 					):
 					outfile.write(
 						f'# This file contains the {Keycontent} values of the {input_data}'
@@ -260,14 +260,13 @@ def estimate_PDF_with_KDE():
 						f'@    xaxis  label "{XaxisLabel}"\n'
 						f'@    yaxis  label "{YaxisLabel}"\n'
 						f'@TYPE {graphType}\n'
-						f'@ s0 legend "{dataName}_{input_data}"\n'
-						'@    s0 symbol size 0.200000\n'
-						'@    s0 line type 0\n'
+						f'@ s0 legend "{dataName}_{input_data}"{lineSetting}\n'
 						)
 
 				with open (out_hist, 'w') as out_his_file:
+					lineSet = '@    s0 symbol size 0.200000\n''@    s0 line type 0\n'					
 					write_out_plot_files(
-						out_his_file, 'histogram', 'Histogram', XaxisLabelXVG, 'Count', 'bar'
+						out_his_file, 'histogram', 'Histogram', XaxisLabelXVG, 'Count', 'bar', lineSet
 						)
 				
 				pd.DataFrame(
@@ -286,7 +285,7 @@ def estimate_PDF_with_KDE():
 				with open (out_kde, 'w') as out_kde_file:
 					write_out_plot_files(
 						out_kde_file, 'KDE-estimated PDF', 'KDE-estimated Probability Density',
-						XaxisLabelXVG, 'Density', 'xy'
+						XaxisLabelXVG, 'Density', 'xy', ''
 						)					
 					
 				pd.DataFrame({'x':kde_xs, 'y': kde_ys}).to_csv(out_kde,

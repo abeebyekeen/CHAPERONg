@@ -63,7 +63,7 @@ if len(missingLib) >= 1 :
 		)
 	sys.exit(0)
 
-def make_dir_for_KDE(motherDir='Kernel_Density_Estimation_multiData'):
+def make_dir_for_KDE(motherDir='Kernel_Density_Estimation_multi_plot'):
 	if os.path.exists(motherDir):
 		backup_count = 1
 		backupDir=f'#{motherDir}.backup.{backup_count}'
@@ -72,7 +72,6 @@ def make_dir_for_KDE(motherDir='Kernel_Density_Estimation_multiData'):
 			backupDir = f'#{motherDir}.backup.{backup_count}'			
 		shutil.move(motherDir, backupDir)
 	os.mkdir(motherDir)
-
 
 
 def store_data_label_name():
@@ -96,8 +95,6 @@ def store_data_label_name():
 				input_data_dict[data_label] = data
 				return dataName, input_data_dict
 
-# bandwidth = 'silverman'
-# output_and_para_files = []
 
 # def estimate_PDF_with_KDE():
 def plot_multidata_hist():
@@ -207,7 +204,7 @@ def plot_multidata_hist():
 			bin_set = bin_custom
 
 			plt.figure() # Create a new figure
-			print (f" Generating the histogram of the {dataName}\n")
+			print (f" Generating and plotting the histogram of the {dataLabel}\n")
 			time.sleep(2)
 		
 			if "RMSD" in dataName: 
@@ -224,8 +221,16 @@ def plot_multidata_hist():
 				XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
 
 			# Generate and plot the histogram of the data
-			histo = plt.hist(data_in, bins=bin_set, label=dataName, alpha=0.9)
-			out_hist = dataLabel+"_histogram.xvg"
+			histo = plt.hist(data_in, bins=bin_set, label=dataLabel, alpha=0.9)
+
+			# The first elements are the ys, the second are the xs.
+			# ys = histo[0]; xs = histo[1]
+
+			# The x-axis values are boundaries, starting with the lower bound 
+			# of the first and ending with the upper bound of the last.
+			# So, length of the x-axis > length of the y-axis by 1.
+
+			out_hist = dataLabel + "_histogram.xvg"
 			with open (out_hist, 'w') as out_his_file:
 				out_his_file.write(
 					f'# This file contains the histogram values of the {dataLabel}'
@@ -239,6 +244,7 @@ def plot_multidata_hist():
 					'@    s0 line type 0\n'
 					)
 			
+			# Get the upper bounds and write out the histogram			
 			pd.DataFrame({'x_upper':histo[1][1:], 'y': histo[0]}).to_csv(
 				out_hist, header=False, index=False, sep="\t", mode='a'
 				)
@@ -248,16 +254,19 @@ def plot_multidata_hist():
 			# Increase counter for additional data
 			data_count += 1
 	
+	print (f" Generating the combined histogram plots of the {dataName}\n")
+	time.sleep(2)
+	
 	plt.xlabel(XaxisLabelPNG) # using Latex expression in matplotlib
 	plt.ylabel('Count')
 	plt.title("Histogram of the " + dataName)
-	figname = dataName + "_histogram.png"
+	figname = dataName + "_histogram_multi_plot.png"
 	plt.savefig(figname, dpi=600)
 		
 	output_and_para_files.append(
 		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
 		)
-	return XaxisLabelXVG, XaxisLabelPNG, output_and_para_files
+	return XaxisLabelXVG, XaxisLabelPNG
 
 def estimate_PDF_with_KDE():		
 	data_count = 1
@@ -296,149 +305,61 @@ def estimate_PDF_with_KDE():
 
 		plt.figure() # Create a new figure for KDE
 
-			# Generate and plot the histogram of the data
-			histo = plt.hist(data_in, bins=bin_set, label=dataName, alpha=0.9)
-			out_hist = dataLabel+"_histogram.xvg"
-			with open (out_hist, 'w') as out_his_file:
-				out_his_file.write(
-					f'# This file contains the histogram values of the {dataLabel}'
-					'\n# data calculated by CHAPERONg from the output of GROMACS\n#\n'
-					f'@    title Histogram of {dataName}\n'
-					f'@    xaxis  label "{XaxisLabelXVG}"\n'
-					'@    yaxis  label "Count"\n'
-					'@TYPE bar\n'
-					f'@ s0 legend "{dataLabel}"\n'
-					'@    s0 symbol size 0.200000\n'
-					'@    s0 line type 0\n'
-					)
-			
-			pd.DataFrame({'x_upper':histo[1][1:], 'y': histo[0]}).to_csv(
-				out_hist, header=False, index=False, sep="\t", mode='a'
-				)
-			
-			output_and_para_files.append(out_hist)
+		# Generate and plot the histogram of the data
+		histo = plt.hist(data_in, density=True, bins=bin_set, label=dataLabel, alpha=0.5)
 
-			# Increase counter for additional data
-			data_count += 1
-	
-	plt.xlabel(XaxisLabelPNG) # using Latex expression in matplotlib
-	plt.ylabel('Count')
-	plt.title("Histogram of the " + dataName)
-	figname = dataName + "_histogram.png"
-	plt.savefig(figname, dpi=600)
-		
-	output_and_para_files.append(
-		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
-		)
-
-		# Create a new figure for the KDE
-		# plt.figure()
-
-		# Assign histogram to a value
-		a = plt.hist(data_in, density=True, bins=bin_set,
-					label=input_data, color='#4CE418', alpha=0.9)
-
-		# The first elements are the ys, the second are the xs.
-		# ys = histo[0]; xs = histo[1]
-
-		# The x-axis values are boundaries, starting with the lower bound of the first 
-		# and ending with the upper bound of the last.
-		# So, length of the x-axis > length of the y-axis by 1.
-
-		# Get the upper bounds and write out the histogram
-		print (f" Writing out the histogram data of the {input_data}\n")
-		time.sleep(2)
-		out_hist = input_data+"_histogram.xvg"
-		if "RMSD" in input_data: 
-			XaxisLabelXVG = r'RMSD (\cE\C)' 
-			XaxisLabelPNG = 'RMSD' + r' ($\AA$)' # Using Latex in matplotlib
-		elif "Rg" in input_data:
-			XaxisLabelXVG = r'Radius of gyration (\cE\C)'
-			XaxisLabelPNG = 'Radius of gyration' + r' ($\AA$)'
-		elif "Hbond" in input_data:
-			XaxisLabelXVG = "Number of hydrogen bonds"
-			XaxisLabelPNG = XaxisLabelXVG
-		elif "SASA" in input_data:
-			XaxisLabelXVG = r'SASA (nm\S2\N)'
-			XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
-
-		def write_out_plot_files(
-			outfile, Keycontent, title, XaxisLabel, YaxisLabel, graphType
-			):
-			outfile.write(
-				f'# This file contains the {Keycontent} values of the {input_data}'
-				'\n# data calculated by CHAPERONg from the output of GROMACS\n#\n'
-				f'@    title "{title} of {input_data}"\n'
-				f'@    xaxis  label "{XaxisLabel}"\n'
-				f'@    yaxis  label "{YaxisLabel}"\n'
-				f'@TYPE {graphType}\n'
-				f'@ s0 legend "{dataName}_{input_data}"\n'
-				'@    s0 symbol size 0.200000\n'
-				'@    s0 line type 0\n'
-				)
-
-		with open (out_hist, 'w') as out_his_file:
-			write_out_plot_files(
-				out_his_file, 'histogram', 'Histogram', XaxisLabelXVG, 'Count', 'bar'
-				)
-		
-		pd.DataFrame(
-			{'x_upper':histo[1][1:], 'y': histo[0]}).to_csv(out_hist,
-			header=False, index=False, sep="\t", mode='a'
-			)
-		
-		output_and_para_files.append(out_hist)
-
-		print (f" Estimating the probability density function for {input_data}\n")
+		print (f" Estimating the probability density function for {dataLabel}\n")
 		time.sleep(2)
 		kde_xs = np.linspace(min(data_in), max(data_in), 300)
 		kde = st.gaussian_kde(data_in, bw_method=bandwidth)
 		kde_ys = kde.pdf(kde_xs)
-		out_kde = input_data+"_KDEdata.xvg"
+		kdeLabel = dataLabel + "_PDF"
+		plt.plot(kde_xs, kde.pdf(kde_xs), label=kdeLabel)
+		plt.legend()
 		with open (out_kde, 'w') as out_kde_file:
-			write_out_plot_files(
-				out_kde_file, 'KDE-estimated PDF', 'KDE-estimated Probability Density',
-				XaxisLabelXVG, 'Density', 'xy'
-				)					
+			out_kde = dataLabel + "_KDEdata.xvg"
+			out_kde_file.write(
+				f'# This file contains the KDE-estimated PDF values of the {dataLabel}'
+				'\n# data calculated by CHAPERONg from the output of GROMACS\n#\n'
+				f'@    title "KDE-estimated Probability Density of {dataName}"\n'
+				f'@    xaxis  label "{XaxisLabelXVG}"\n'
+				'@    yaxis  label "Density"\n'
+				'@TYPE xy\n'
+				f'@ s0 legend "{dataLabel}_PDF"\n'
+				)
 			
-		pd.DataFrame({'x':kde_xs, 'y': kde_ys}).to_csv(out_kde,
-						header=False, index=False, sep="\t", mode='a')
+		pd.DataFrame({'x':kde_xs, 'y': kde_ys}).to_csv(
+					out_kde, header=False, index=False, sep="\t", mode='a'
+					)
 		
 		output_and_para_files.append(out_kde)
+		# Increase counter for additional data
+		data_count += 1
 
-		kdeLabel = input_data + "_PDF"
-		plt.plot(kde_xs, kde.pdf(kde_xs), label=kdeLabel, color='r')
-		plt.legend()
-		plt.ylabel("Density")
-		plt.xlabel(XaxisLabelPNG)
-		plt.title(f'Kernel Density Estimation Plot of the {input_data}')
-		figname = input_data + "_KDE_plot.png"
-		plt.savefig(figname, dpi=600)
-
-		output_and_para_files.append(figname)
-
-		print (f" Estimate probability density function for {input_data}...DONE\n"
-				"#=============================================================================#\n")
-		return output_and_para_files
+	plt.ylabel("Density")
+	plt.xlabel(XaxisLabelPNG)
+	plt.title(f'Kernel Density Estimation Plots of {dataName} Data')
+	figname = dataName + "_KDE_multi_plot.png"
+	plt.savefig(figname, dpi=600)
 	
-	output_and_para_files.append(extracted_data)
-	dataOutPath=f'Kernel_Density_Estimation_multiData/{input_data}'
-	# dataOutPath_old=f'{motherDir}/{input_data}'
-	make_dir_for_KDE(dataOutPath)
+	output_and_para_files.append(
+		[figname, "kde_bins_estimated_summary.dat", 'CHAP_kde_Par.in']
+		)
+
+	print (f" Estimate probability density function for {dataName} data...DONE\n"
+			"#=============================================================================#\n")
+
+	
+	dataOutPath=f'Kernel_Density_Estimation_multi_plot'
+
 	for file in output_and_para_files:
 		try: shutil.move(file, dataOutPath)
-		except FileNotFoundError: pass
-	# for file in output_dict['files_to_copy']:
-	# 	try: shutil.copy2(file, dataOutPath)
-	# 	except FileNotFoundError: pass				
+		except FileNotFoundError: pass				
 
 make_dir_for_KDE()
 dataName, stored_data = store_data_label_name()
-XaxisLabelXVG, XaxisLabelPNG, output_and_para_files = plot_multidata_hist(dataName, stored_data)
-estimate_PDF_with_KDE(XaxisLabelXVG, XaxisLabelPNG, output_and_para_files)
 
-para_summary = ['CHAP_kde_Par.in', 'kde_bins_estimated_summary.dat', 'CHAP_kde_dataset_list.dat']
+output_and_para_files = []
 
-for file in para_summary:
-	try: shutil.move(file, 'Kernel_Density_Estimation_multiData')
-	except FileNotFoundError: pass
+XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, stored_data)
+estimate_PDF_with_KDE(XaxisLabelXVG, XaxisLabelPNG)
