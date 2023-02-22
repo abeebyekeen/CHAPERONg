@@ -1133,7 +1133,7 @@ AnalysisList
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
-				echo -e "Data for ${filenm}" > CHAP_kde_dataset_list.dat
+				echo -e "auto mode,$automode\n\nData for ${filenm}" > CHAP_kde_dataset_list.dat
 				count_data_in=$(( count_data_in + 1 ))				
 			fi
 			if (( $count_data_in > 0 )) ; then
@@ -1274,7 +1274,7 @@ askDataExist
 		esac
 
 		# Write data type to file
-		echo -e "$data_type" > CHAP_kde_dataset_list.dat
+		echo -e "auto mode,$automode\n\n$data_type" > CHAP_kde_dataset_list.dat
 
 		# Prompt the user to enter the first data label and path
 		read -p $'\n Provide a label for the first data for the KDE: ' data1_kde_label
@@ -1331,7 +1331,6 @@ askDataExist
 			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
 		done
 
-		echo -e "\nauto mode,$automode" >> CHAP_kde_dataset_list.dat
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py || \
 		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py
 
