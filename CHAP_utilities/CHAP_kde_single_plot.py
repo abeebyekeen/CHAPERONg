@@ -178,23 +178,25 @@ def estimate_PDF_with_KDE():
 
 				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
 
-				print(
-					"\n  Optimal binning parameters have been estimated."
-					'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
-					'\n\n  You can modify the parameters if required.'
-					'\n   Enter "Yes" below when you are ready.'
-					"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
-					)
-
-				prmpt = "  Enter a response here (1 or 2): "
-				response = int(input(prmpt))
-
-				while response != 1 and response != 2:
+				if auto_mode == 'full': response = 1
+				elif auto_mode == 'semi':
 					print(
-						"\n ENTRY REJECTED!"
-						"\n **Please enter the appropriate option (1 or 2)\n"
+						"\n  Optimal binning parameters have been estimated."
+						'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
+						'\n\n  You can modify the parameters if required.'
+						'\n   Enter "Yes" below when you are ready.'
+						"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
 						)
+
+					prmpt = "  Enter a response here (1 or 2): "
 					response = int(input(prmpt))
+
+					while response != 1 and response != 2:
+						print(
+							"\n ENTRY REJECTED!"
+							"\n **Please enter the appropriate option (1 or 2)\n"
+							)
+						response = int(input(prmpt))
 
 				if response == 2:
 					sys.exit(0)
