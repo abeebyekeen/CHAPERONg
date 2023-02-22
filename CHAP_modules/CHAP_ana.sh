@@ -1156,7 +1156,9 @@ AnalysisList
 		LineCount=0
 		while IFS= read -r line; do
 			LineCount=$(( LineCount + 1 ))
-			if (( "$LineCount" == 1 )) ; then continue ; fi
+			if (( "$LineCount" == 1 || "$LineCount" == 2 || "$LineCount" == 3 ))
+				then continue
+			fi
 			printf "\n\n Preparing data for $line...\n"
 			sleep 2
 			if [[ "$line" == "RMSD" ]] ; then
@@ -1195,15 +1197,12 @@ AnalysisList
 				elif [[ "$dataIN" == "SASA" ]] ; then analyser6
 				fi
 			elif [[ -f "$existData" ]] && [[ $automode == "full" ]] ; then
-				printf "   Pre-calculated $dataIN data found!"\
-				"\n   File found: $existData \n"
+				printf "   Pre-calculated $dataIN data found!\n   File found: $existData \n"
 				sleep 1
-				printf "\n   *CHAPERONg in auto mode"\
-				"\n   Found data will be used for density estimation\n"
+				printf "\n   *CHAPERONg in auto mode\n   Found data will be used for density estimation\n"
 				sleep 2
 			elif [[ -f "$existData" ]] && [[ $automode == "semi" ]] ; then
-				printf "   Pre-calculated $dataIN data found!"\
-				"\n   File found: $existData \n"
+				printf "   Pre-calculated $dataIN data found!\n   File found: $existData \n"
 				sleep 2
 cat << askDataExist
 
@@ -1245,7 +1244,7 @@ askDataExist
 		printf " Initializing probability density function calculations\n\n"
 		sleep 2
 
-		echo -e "\nauto mode,$automode" >> CHAP_kde_dataset_list.dat
+		# echo -e "\nauto mode,$automode" >> CHAP_kde_dataset_list.dat
 
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py || \
 		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py

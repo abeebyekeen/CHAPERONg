@@ -86,6 +86,7 @@ def estimate_PDF_with_KDE():
 				auto_mode_raw = str(line).split(",")
 				auto_mode = auto_mode_raw[1]		
 				continue
+			if int(lineNo) == 1: continue
 			if int(lineNo) == 2:
 				dataName_raw = str(line).rstrip("\n").split(" ")
 				dataName = str(dataName_raw[2])

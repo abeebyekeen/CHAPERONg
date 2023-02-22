@@ -73,7 +73,6 @@ def make_dir_for_KDE(motherDir='Kernel_Density_Estimation_multi_plot'):
 		shutil.move(motherDir, backupDir)
 	os.mkdir(motherDir)
 
-
 def store_data_label_name():
 	# Read in the data and label
 	print (" Reading in parameters for density estimation\n")

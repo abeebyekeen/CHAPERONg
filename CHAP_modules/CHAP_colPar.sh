@@ -57,9 +57,9 @@ Optional (int=integer; str=string):
 -T, --nt <int>       Number of threads to use (default is 0: allow gmx to guess)
 -g, --nb gpu         Calculate non-bonded interactions on gpu
 -G, --gpu_id <str>   List ID(s) of unique GPU device(s) available for use
--p, --deffnm <str>   Define filename prefix (default is "md_filename" for outputs)
--a, --auto           Automatic mode (less prompts): Use default parameters &
-                     do common analyses
+-p, --deffnm <str>   Set filename prefix (default for outputs: "md_filename")
+-a, --auto_mode      Automation mode [options: full, semi(default)]. full: Use
+                     default parameters & do common analyses (less prompts)
 --parFile <str>      Name of the CHAPERONg input parameter file
 -H, --Help           Print more, advanced options
 guide_sh
@@ -83,14 +83,12 @@ Optional (int=integer; str=string):
 -g, --nb gpu         Calculate non-bonded interactions on gpu
 -G, --gpu_id <str>   List ID(s) of unique GPU devices available for use
 -p, --deffnm <str>   Set filename prefix (default for outputs: "md_filename")
--a, --auto           Automatic mode (less prompts): Use default parameters &
-                     do common analyses
+-a, --auto_mode      Automation mode [options: full, semi(default)]. full: Use
+                     default parameters & do common analyses (less prompts)
 -H, --Help           Print more, advanced options
 -s, --water <str>    Water model: tip3p, spc, spce, etc. (ff-dependent)
 -f, --ff <str>       Force-field: charmm27, amber94, oplsaa, gromos54a7, etc.
                      (Enter "wd" if forcefield is in working directory)
--R, --ntmpi <int>    Number of thread-MPI ranks [default: 0 (gmx guesses)]
--m, --ntomp <int>    Number of OpenMP threads per MPI rank; default: 0 (guess)
 -P, --posname <str>  Name of the positive ion (default: NA)
 -N, --negname <str>  Name of the negative ion (default: CL)
 -c, --conc <int>     Set salt concentration (mol/L) for the system
@@ -99,8 +97,10 @@ Optional (int=integer; str=string):
 -E, --gmx_exe <str>  Path to gmx to use for all gmx runs except g_mmpbsa
                      (Default is to use the gmx set in the environment)
 -v, --version        Print the installed version of CHAPERONg
+-t, --temp <int>     Simulation temperature in kelvin
+--ntmpi <int>        Number of thread-MPI ranks [default: 0 (gmx guesses)]
+--ntomp <int>        Number of OpenMP threads per MPI rank; default: 0 (guess)
 --parFile <str>      Name of the CHAPERONg input parameter file
---temp <int>         Simulation temperature in kelvin
 --clustr_cut <float> RMSD cut-off (nm) for cluster membership (default: 1.0)
 --clustr_methd <str> Method for cluster determination: gromos (default),
                      linkage, jarvis-patrick, monte-carlo, diagonalization
@@ -168,6 +168,7 @@ read_parFile()
 			elif [[ "$par" == "clustr_methd" ]]; then method_clust="$par_input"
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
 			elif [[ "$par" == "dt" ]]; then dt="$par_input"
+			elif [[ "$par" == "auto_mode" ]]; then auto_mode="$par_input"
 			fi
 		done < "$parfilename"
 	fi
@@ -178,7 +179,7 @@ read_parFile()
 while [ "$1" != "" ]; do	
 	case "$1" in
 	--parFile) shift; parfilename="$1"; read_parFile;;	
-	-a | --auto) automode="full";;
+	-a | --auto_mode) shift; automode="$1";;
 	-b | --bt) shift; btype="$1";;
 	-c | --conc) shift; ion_conc="$1";;
 	--clustr_cut) shift; cut_cl="$1";;
@@ -198,16 +199,16 @@ while [ "$1" != "" ]; do
 	-H | --Help) HHelp; Credit; exit 0;;
 	-i | --input) shift; coordinates_raw="$1";;
 	--inputtraj) shift; PBCcorrectType="$1";;
-	-m | --ntomp) shift; ntomp="$1" ;;
+	--ntomp) shift; ntomp="$1" ;;
 	--movieFrame) shift; customframeNo="$1" ;;
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
 	-N | --negname) shift; nn="$1";;
 	-P | --posname) shift; pn="$1";;
 	--parFile) shift; parfilename="$1";;	
-	-R | --ntmpi) shift; ntmpi="$1";;
+	--ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
 	-T | --nt) shift; nt="$1";;
-	--temp) shift; Temp="$1";;
+	-t | --temp) shift; Temp="$1";;
 	--ter) termini=1;;
 	--trFrac) shift; trajFraction="$1";;	
 	-v | --version) echo "$demA"$' CHAPERON version: '"$CHAPERONg_version"; Credit; echo $''; exit 0 ;;

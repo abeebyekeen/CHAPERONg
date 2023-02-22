@@ -19,6 +19,9 @@
 ; List ID(s) of unique GPU device(s) available for use
 # gpu_id           =      x
 
+; Automation mode: full, semi
+# auto_mode        =      full
+
 ; Define filename prefix
 # deffnm           =      x
    
