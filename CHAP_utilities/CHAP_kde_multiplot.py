@@ -92,7 +92,7 @@ def store_data_label_name():
 				data_label = str(data_info[0])
 				data = str(data_info[1])
 			elif int(lineNo) >= 0 and "auto mode" in line:
-				auto_mode_raw = str(line).split("=")
+				auto_mode_raw = str(line).split(",")
 				auto_mode = auto_mode_raw[1]
 				
 				# Add label and data to the dictionary
@@ -183,23 +183,25 @@ def plot_multidata_hist(dataName, input_data_dict):
 			with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 				write_binning_parameters()
 
-		print(
-			"\n  Optimal binning parameters have been estimated."
-			'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
-			'\n\n  You can modify the parameters if required.'
-			'\n   Enter "Yes" below when you are ready.'
-			"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
-			)
-
-		prmpt = "  Enter a response here (1 or 2): "
-		response = int(input(prmpt))
-
-		while response != 1 and response != 2:
+		if auto_mode == 'full': response
+		elif auto_mode == 'semi':
 			print(
-				"\n ENTRY REJECTED!"
-				"\n **Please enter the appropriate option (1 or 2)\n"
+				"\n  Optimal binning parameters have been estimated."
+				'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
+				'\n\n  You can modify the parameters if required.'
+				'\n   Enter "Yes" below when you are ready.'
+				"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
 				)
+
+			prmpt = "  Enter a response here (1 or 2): "
 			response = int(input(prmpt))
+
+			while response != 1 and response != 2:
+				print(
+					"\n ENTRY REJECTED!"
+					"\n **Please enter the appropriate option (1 or 2)\n"
+					)
+				response = int(input(prmpt))
 
 		if response == 2:
 			sys.exit(0)
