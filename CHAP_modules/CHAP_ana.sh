@@ -1236,6 +1236,7 @@ askDataExist
 				sleep 1
 			fi
 		fi
+		echo "$a" automode
 		cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
 	done < CHAP_kde_dataset_list.dat
 
