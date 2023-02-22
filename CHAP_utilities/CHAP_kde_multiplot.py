@@ -84,7 +84,7 @@ def store_data_label_name():
 		for lineNo, line in enumerate(alldatasets):
 			if int(lineNo) == 0 and "auto mode" in line:
 				global auto_mode
-				auto_mode_raw = str(line).split(",")
+				auto_mode_raw = str(line)..rstrip("\n").split(",")
 				auto_mode = auto_mode_raw[1]
 			elif int(lineNo) == 2:
 				# Get the type of data from the header

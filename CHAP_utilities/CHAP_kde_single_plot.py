@@ -83,8 +83,11 @@ def estimate_PDF_with_KDE():
 			output_and_para_files = []
 			if int(lineNo) == 0 and "auto mode" in line:
 				global auto_mode
-				auto_mode_raw = str(line).split(",")
-				auto_mode = auto_mode_raw[1]		
+				auto_mode_raw = str(line).rstrip("\n").split(",")
+				auto_mode = auto_mode_raw[1]	
+				print(f'auto_mode is {auto_mode}')
+				print(f'auto_mode is {auto_mode}')
+				print(f'auto_mode is {auto_mode}')
 				continue
 			if int(lineNo) == 1: continue
 			if int(lineNo) == 2:
@@ -179,7 +182,13 @@ def estimate_PDF_with_KDE():
 
 				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
 
-				if auto_mode == 'full': response = 1
+				if auto_mode == 'full':
+					response = 1
+					print(f'response is {response}')
+					print(f'response is {response}')
+					print(f'response is {response}')
+					print(f'response is {response}')
+					time.sleep(3)
 				elif auto_mode == 'semi':
 					print(
 						"\n  Optimal binning parameters have been estimated."
