@@ -183,8 +183,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 			with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 				write_binning_parameters()
 
-		if auto_mode == 'full': response = 1
-		elif auto_mode == 'semi':
+		if auto_mode == 'semi':
 			print(
 				"\n  Optimal binning parameters have been estimated."
 				'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
@@ -202,6 +201,17 @@ def plot_multidata_hist(dataName, input_data_dict):
 					"\n **Please enter the appropriate option (1 or 2)\n"
 					)
 				response = int(input(prmpt))
+
+		elif auto_mode == 'full':
+			response = 1
+			print(
+				"\n   CHAPERONg is running in full-auto mode"
+				"\n   The estimated number of bins above will be used"
+				"\n   To use a different number or estimator,"
+				"\n   run CHAPERONg in the semi-auto mode. For details, see"
+				"\n   https://www.abeebyekeen.com/post-sim-analysis-1/"
+			)
+			time.sleep(2)
 
 		if response == 2:
 			sys.exit(0)
