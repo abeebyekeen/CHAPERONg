@@ -295,13 +295,17 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 	threader='' && THREA="-nt ""${nt}" && hbthread="-nthreads ""${nt}"
 fi
 
-echo \
-  $'\n###############################################################################'\
-  $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-  $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-  $'\n#    If you use this program in your work, please cite the relevant paper:    #'\
-  $'\n#                    Yekeen, A.A. et al. To be published...                   #'\
-  $'\n###############################################################################'
+
+echo -e \
+	'\033[92m'\
+	'\n###############################################################################'\
+	'\n#--------------------------------- CHAPERONg ---------------------------------#'\
+	'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
+	'\n#    If you use this program in your work, please cite the relevant paper:    #'\
+	'\n#                   Yekeen, A.A. et al. To be published...                    #'\
+	'\n###############################################################################'\
+	'\033[m'
+
 
 sleep 2
 # cat << usageSt

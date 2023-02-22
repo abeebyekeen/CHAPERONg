@@ -87,10 +87,13 @@ def store_data_label_name():
 				# Get the type of data from the header
 				dataName = str(line).rstrip("\n")
 				continue
-			elif int(lineNo) >= 0:
+			elif int(lineNo) >= 0 and "auto mode" not in line:
 				data_info = str(line).rstrip("\n").split(",")
 				data_label = str(data_info[0])
 				data = str(data_info[1])
+			elif int(lineNo) >= 0 and "auto mode" in line:
+				auto_mode_raw = str(line).split("=")
+				auto_mode = auto_mode_raw[1]
 				
 				# Add label and data to the dictionary
 				input_data_dict[data_label] = data
