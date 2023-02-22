@@ -84,7 +84,7 @@ def store_data_label_name():
 		for lineNo, line in enumerate(alldatasets):
 			if int(lineNo) == 0 and "auto mode" in line:
 				global auto_mode
-				auto_mode_raw = str(line)..rstrip("\n").split(",")
+				auto_mode_raw = str(line).rstrip("\n").split(",")
 				auto_mode = auto_mode_raw[1]
 			elif int(lineNo) == 2:
 				# Get the type of data from the header
@@ -104,6 +104,7 @@ output_and_para_files = []
 # def estimate_PDF_with_KDE():
 def plot_multidata_hist(dataName, input_data_dict):
 	data_count = 1
+	plt.figure() # Create a new figure
 	for key, value in input_data_dict.items():
 		dataLabel = key
 		extracted_data = value
@@ -225,7 +226,6 @@ def plot_multidata_hist(dataName, input_data_dict):
 						bin_custom = int(para_data[1].strip())
 			bin_set = bin_custom
 
-			plt.figure() # Create a new figure
 			print (f" Generating and plotting the histogram of the {dataLabel}\n")
 			time.sleep(2)
 		
@@ -243,7 +243,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 				XaxisLabelPNG = 'SASA' + r' ($nm^{2}$)'
 
 			# Generate and plot the histogram of the data
-			histo = plt.hist(data_in, bins=bin_set, label=dataLabel, alpha=0.9)
+			histo = plt.hist(data_in, density=False, bins=bin_set, label=dataLabel, alpha=0.8)
 
 			# The first elements are the ys, the second are the xs.
 			# ys = histo[0]; xs = histo[1]
@@ -275,12 +275,12 @@ def plot_multidata_hist(dataName, input_data_dict):
 
 			# Increase counter for additional data
 			data_count += 1
-	
+			plt.xlabel(XaxisLabelPNG) # using Latex expression in matplotlib
+			plt.ylabel('Count')
+
 	print (f" Generating the combined histogram plots of the {dataName}\n")
 	time.sleep(2)
 	
-	plt.xlabel(XaxisLabelPNG) # using Latex expression in matplotlib
-	plt.ylabel('Count')
 	plt.title("Histogram of the " + dataName)
 	figname = dataName + "_histogram_multi_plot.png"
 	plt.savefig(figname, dpi=600)
