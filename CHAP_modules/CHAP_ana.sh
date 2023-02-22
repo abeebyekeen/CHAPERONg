@@ -1133,7 +1133,7 @@ AnalysisList
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
-				echo "Data for ${filenm}" > CHAP_kde_dataset_list.dat
+				echo -e "${automode}\n Data for ${filenm}" > CHAP_kde_dataset_list.dat
 				count_data_in=$(( count_data_in + 1 ))				
 			fi
 			if (( $count_data_in > 0 )) ; then
@@ -1272,7 +1272,7 @@ askDataExist
 		esac
 
 		# Write data type to file
-		echo "$data_type" > CHAP_kde_dataset_list.dat
+		echo -e "$automode" "$data_type" > CHAP_kde_dataset_list.dat
 
 		# Prompt the user to enter the first data label and path
 		read -p $'\n Provide a label for the first data for the KDE: ' data1_kde_label
