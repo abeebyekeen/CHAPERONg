@@ -84,16 +84,18 @@ def estimate_PDF_with_KDE():
 			if int(lineNo) == 0 and "auto mode" in line:
 				global auto_mode
 				auto_mode_raw = str(line).rstrip("\n").split(",")
-				auto_mode = auto_mode_raw[1]	
-				print(f'auto_mode is {auto_mode}')
-				print(f'auto_mode is {auto_mode}')
-				print(f'auto_mode is {auto_mode}')
+				auto_mode = auto_mode_raw[1]
 				continue
+			
+			# Skip empty line
 			if int(lineNo) == 1: continue
+			
+			# Save the name of the input data in a variable
 			if int(lineNo) == 2:
 				dataName_raw = str(line).rstrip("\n").split(" ")
 				dataName = str(dataName_raw[2])
 				continue	
+			
 			if int(lineNo) >= 3:
 				# input_data_raw = str(line).rstrip("\n")
 				input_data = str(line).rstrip("\n")
