@@ -81,11 +81,16 @@ def estimate_PDF_with_KDE():
 		alldatasets = in_par.readlines()
 		for lineNo, line in enumerate(alldatasets):
 			output_and_para_files = []
-			if int(lineNo) == 0:
+			if int(lineNo) == 0 and "auto mode" in line:
+				global auto_mode
+				auto_mode_raw = str(line).split(",")
+				auto_mode = auto_mode_raw[1]		
+				continue
+			if int(lineNo) == 2:
 				dataName_raw = str(line).rstrip("\n").split(" ")
 				dataName = str(dataName_raw[2])
-				continue
-			if int(lineNo) > 0:
+				continue	
+			if int(lineNo) >= 3:
 				# input_data_raw = str(line).rstrip("\n")
 				input_data = str(line).rstrip("\n")
 				

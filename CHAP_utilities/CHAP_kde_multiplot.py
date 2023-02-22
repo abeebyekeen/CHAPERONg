@@ -83,18 +83,18 @@ def store_data_label_name():
 		input_data_dict = {}
 		
 		for lineNo, line in enumerate(alldatasets):
-			if int(lineNo) == 0:
-				# Get the type of data from the header
-				dataName = str(line).rstrip("\n")
-				continue
-			elif int(lineNo) >= 0 and "auto mode" not in line:
-				data_info = str(line).rstrip("\n").split(",")
-				data_label = str(data_info[0])
-				data = str(data_info[1])
-			elif int(lineNo) >= 0 and "auto mode" in line:
+			if int(lineNo) == 0 and "auto mode" in line:
 				global auto_mode
 				auto_mode_raw = str(line).split(",")
 				auto_mode = auto_mode_raw[1]
+			elif int(lineNo) == 2:
+				# Get the type of data from the header
+				dataName = str(line).rstrip("\n")
+				continue
+			elif int(lineNo) >= 3:
+				data_info = str(line).rstrip("\n").split(",")
+				data_label = str(data_info[0])
+				data = str(data_info[1])
 				
 				# Add label and data to the dictionary
 				input_data_dict[data_label] = data
