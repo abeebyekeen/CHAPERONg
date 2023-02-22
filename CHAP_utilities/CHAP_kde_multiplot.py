@@ -92,6 +92,7 @@ def store_data_label_name():
 				data_label = str(data_info[0])
 				data = str(data_info[1])
 			elif int(lineNo) >= 0 and "auto mode" in line:
+				global auto_mode
 				auto_mode_raw = str(line).split(",")
 				auto_mode = auto_mode_raw[1]
 				
@@ -183,7 +184,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 			with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 				write_binning_parameters()
 
-		if auto_mode == 'full': response
+		if auto_mode == 'full': response = 1
 		elif auto_mode == 'semi':
 			print(
 				"\n  Optimal binning parameters have been estimated."
