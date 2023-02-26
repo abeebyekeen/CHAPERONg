@@ -397,7 +397,7 @@ analyser1()
 	mv postMD_Temperature.png postMD_KineticEn.png postMD_Potential.png postMD_Density.png ./postMD_thermodynamics || true
 	mv postMD_Pressure.png postMD_TotalEnergy.png postMD_Energies.png ./postMD_thermodynamics || true
 
-	echo "${demA}"$' Calculate post-MD thermodynamics parameters...DONE'"${demB}"
+	echo -e "${demA} \033[92mCalculate post-MD thermodynamics parameters...DONE\033[m${demB}"
 	sleep 2
 
 }
@@ -445,12 +445,12 @@ analyser2()
 		gracebat ${filenm}_rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_rmsd.png \
 		-fixed 7500 4000 -legend load || notifyImgFail
 	fi
-	echo "${demA}"$' Compute RMSD... DONE'"${demB}"
+	echo -e "${demA}\033[92m Compute RMSD... DONE\033[m${demB}"
 	sleep 2
 	AnaName="RMSD"
 	filesuffx="rmsd"
 	createDIR
-	echo "${demA}"$' Generate a finished figure of the RMSD plot... DONE'"${demB}"
+	echo -e "${demA}\033[92m Generate a finished figure of the RMSD plot... DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -461,10 +461,10 @@ analyser3()
 echo "${demA}"$' Now calculating RMSF...\n'
 if [[ $automode == "full" ]]; then
 	echo "Backbone" "Backbone" | eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_BB-rmsf.xvg -res
-	echo "${demA}"$' RMSF with backbone lsq fitting and calculation...DONE'"${demB}"
+	echo -e "${demA}\033[92m RMSF with backbone lsq fitting and calculation...DONE\033[m${demB}"
 	sleep 2
 	echo "C-alpha" "C-alpha" | eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Calpha-rmsf.xvg -res
-	echo "${demA}"$' RMSF with Calpha lsq fitting and calculation...DONE'"${demB}"
+	echo -e "${demA}\033[92m RMSF with Calpha lsq fitting and calculation...DONE\033[m${demB}"
 	sleep 2
 	gracebat ${filenm}_BB-rmsf.xvg -hdevice PNG -autoscale xy -printfile \
 	${filenm}_BB-rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -474,7 +474,7 @@ if [[ $automode == "full" ]]; then
 	${filenm}_BB-Calpha-rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
 else
 	eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_rmsf.xvg -res
-	echo "${demA}"$' Compute RMSF...DONE'"${demB}"
+	echo -e "${demA}\033[92m Compute RMSF...DONE\033[m${demB}"
 	sleep 2
 	gracebat ${filenm}_rmsf.xvg -hdevice PNG -autoscale xy -printfile \
 	${filenm}_rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -484,7 +484,7 @@ AnaName="RMSF"
 filesuffx="rmsf"
 createDIR
 	
-echo "${demA}"$' Generate finished figure(s) of the RMSF plot(s)... DONE'"${demB}"
+echo -e "${demA}\033[92m Generate finished figure(s) of the RMSF plot(s)... DONE\033[m${demB}"
 sleep 2
 }
 if [[ "$analysis" == *" 3 "* ]]; then analyser3 ; fi
@@ -494,7 +494,7 @@ analyser4()
 echo "${demA}"$' Now calculating Rg...\n'
 if [[ $automode == "full" ]]; then
 	echo "Protein" | eval "$gmx_exe_path" gyrate -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Rg.xvg
-	echo "${demA}"$' Compute radius of gyration...DONE'"${demB}"
+	echo -e "${demA}\033[92m Compute radius of gyration...DONE\033[m${demB}"
 	sleep 2
 	echo "${demA}"$' Now converting Rg plot to ns format...\n'
 	sleep 2
