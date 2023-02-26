@@ -17,7 +17,7 @@ demA=$'\n\n'"#================================= CHAPERONg ======================
 demB=$'\n'"#=============================================================================#"$'\n\n'
 
 if [[ $initiator2 != 'avail' ]] ; then
-	echo "$demA"$'Do not run modules independently!\nLaunch CHAPERONg with run_CHAPERONg-<version>!!'"$demB"	
+	echo "${demA}"$'Do not run modules independently!\nLaunch CHAPERONg with run_CHAPERONg-<version>!!'"${demB}"	
 	exit 1
 fi	
 
@@ -142,7 +142,7 @@ fi
 ScanTRAJ()
 {
 if [[ ! -f "trajectDetails.log" ]]; then
-	echo "$demA"$' Checking the trajectory to extract info about the number of\n frames and simulation time'"$demB"
+	echo -e "${demA} Checking the trajectory to extract info about the number of\n frames and simulation time${demB}"
 	sleep 2
 	eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |& tee trajectDetails.log
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
@@ -154,7 +154,7 @@ if [[ ! -f "trajectDetails.log" ]]; then
 	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
 	echo $simDuratnINTns > simulation_duration
 
-	echo "$demA"$' Extract number of frames and simulation duration from trajectory...DONE'"$demB"
+	echo -e "${demA} \033[92mExtract number of frames and simulation duration from trajectory...DONE\033[m${demB}"
 	sleep 2
 else
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
@@ -170,8 +170,8 @@ fi
 
 notifyImgFail()
 {
-echo "$demA"$'CHAPERONg could not generate a finished image file from the .xvg output.'\
-$'\nConfirm that your xmgrace/gracebat is functional!'"$demB"
+echo "${demA}"$'CHAPERONg could not generate a finished image file from the .xvg output.'\
+$'\nConfirm that your xmgrace/gracebat is functional!'"${demB}"
 sleep 2
 }
 
@@ -210,13 +210,13 @@ createDIR()
 		
 DNAwrapAlt()
 {
-echo "$demA""CHAPERONg could not find any index file. Centering on protein instead of Protein_DNA!""$demB"
+echo "${demA}""CHAPERONg could not find any index file. Centering on protein instead of Protein_DNA!""${demB}"
 sleep 2
 echo "Protein" 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_${wraplabel}.xtc -center -pbc mol -ur compact
 }
 analyser0()
 {	
-echo "$demA"$' Now recentering the protein and rewrapping molecules within the unit cell...\n'
+echo "${demA}"$' Now recentering the protein and rewrapping molecules within the unit cell...\n'
 if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
@@ -229,7 +229,7 @@ if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		rm "${filenm}"_"nojump".xtc "${filenm}"_"nojump_fitTrans".xtc
 	else
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
-		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
 		sleep 1
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	fi
@@ -256,7 +256,7 @@ elif [[ $automode != "full" && $sysType == "protein_only" ]]; then
 	else
 		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
-		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
 		sleep 1
 		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
 		sleep 1
@@ -277,9 +277,9 @@ elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 		rm "${filenm}"_"nojump".xtc "${filenm}"_"nojump_fitTrans".xtc
 	else
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
-		echo "$demA"$' Now performing rotational and translational fitting...\n'
+		echo "${demA}"$' Now performing rotational and translational fitting...\n'
 		echo 4 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o "${filenm}"_fit.xtc -fit rot+trans
-		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
 		sleep 1
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
 	fi
@@ -310,7 +310,7 @@ elif [[ $automode != "full" && $sysType == "protein_lig" ]]; then
 	else
 		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
-		echo "$demA"$' Now performing rotational and translational fitting...\n'
+		echo "${demA}"$' Now performing rotational and translational fitting...\n'
 		echo $'**Choose "Backbone" (4) to perform lsq fitting to protein backbone, and "System" (0) for output when prompted\n'
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o "${filenm}"_fit.xtc -fit rot+trans
 	fi
@@ -322,56 +322,56 @@ elif [[ $automode == "full" && $sysType == "protein_dna" ]]; then
 		echo "Protein_DNA" 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 	else
 		echo "Protein_DNA" 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact || DNAwrapAlt
-		echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+		echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
 		sleep 1
 		echo "Protein_DNA" 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 	fi
 elif [[ $automode != "full" ]] && [[ $sysType == "protein_dna" ]]; then
 	echo $'**Choose "Protein_DNA" for centering and "System" (0) for output when prompted\n'
 	eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
-	echo "$demA"$' Now removing possible jumps in the trajectory...\n'
+	echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
 	sleep 1
 	eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 fi
-echo "$demA"$' Recenter the protein and rewrap molecules within the unit cell...DONE'"$demB"
+echo -e "${demA}\033[92m Recenter the protein and rewrap molecules within the unit cell...DONE\033[m${demB}"
 sleep 2
 }
 if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
 analyser1()
 {
-	echo "$demA"$' Now calculating post-MD thermodynamic parameters...\n\n'
+	echo "${demA}"$' Now calculating post-MD thermodynamic parameters...\n\n'
 	sleep 2
 
 	echo "Temperature" | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_Temperature.xvg
 	gracebat postMD_Temperature.xvg -hdevice PNG -autoscale xy -printfile postMD_Temperature.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Temperature progression...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Temperature progression...DONE\n\n' ; sleep 2
 
 	echo "Pressure" | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_Pressure.xvg
 	gracebat postMD_Pressure.xvg -hdevice PNG -autoscale xy -printfile postMD_Pressure.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Pressure progression...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Pressure progression...DONE\n\n' ; sleep 2
 
 	echo "Density" | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_Density.xvg
 	gracebat postMD_Density.xvg -hdevice PNG -autoscale xy -printfile postMD_Density.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Density progression...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Density progression...DONE\n\n' ; sleep 2
 
 	echo "Total-Energy" | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_TotalEnergy.xvg
 	gracebat postMD_TotalEnergy.xvg -hdevice PNG -autoscale xy -printfile postMD_TotalEnergy.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Total energy...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Total energy...DONE\n\n' ; sleep 2
 
 	echo "Potential" | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_Potential.xvg
 	gracebat postMD_Potential.xvg -hdevice PNG -autoscale xy -printfile postMD_Potential.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Potential energy...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Potential energy...DONE\n\n' ; sleep 2
 
 	echo "Kinetic-En." | eval "$gmx_exe_path" energy -f "${filenm}".edr -o postMD_KineticEn.xvg
 	gracebat postMD_KineticEn.xvg -hdevice PNG -autoscale xy -printfile postMD_KineticEn.png \
 	-fixed 7500 4000 -legend load || notifyImgFail
-	echo "$demA"$' Calculate Kinetic energy...DONE\n\n' ; sleep 2
+	echo "${demA}"$' Calculate Kinetic energy...DONE\n\n' ; sleep 2
 
 	currentMDthermodyndir="$(pwd)""/postMD_thermodynamics"
 	nMDtherm=1
@@ -397,7 +397,7 @@ analyser1()
 	mv postMD_Temperature.png postMD_KineticEn.png postMD_Potential.png postMD_Density.png ./postMD_thermodynamics || true
 	mv postMD_Pressure.png postMD_TotalEnergy.png postMD_Energies.png ./postMD_thermodynamics || true
 
-	echo "$demA"$' Calculate post-MD thermodynamics parameters...DONE'"$demB"
+	echo "${demA}"$' Calculate post-MD thermodynamics parameters...DONE'"${demB}"
 	sleep 2
 
 }
@@ -405,11 +405,11 @@ if [[ "$analysis" == *" 1 "* ]]; then analyser1; fi
 
 altRMSD()
 {
-	echo "$demA"$'There are multiple groups identified as '"$ligname"\
-		$'.\nCHAPERONg will try to guess the appropriate group to be used for '"$ligname"" RMSD calculations""$demB"
+	echo "${demA}"$'There are multiple groups identified as '"$ligname"\
+		$'.\nCHAPERONg will try to guess the appropriate group to be used for '"$ligname"" RMSD calculations""${demB}"
 	sleep 2
-	echo "$demA""CHAPERONg: Selecting group 13 for ""$ligname"\
-		$'.\nIf this is wrong, terminate and re-run RMSD analysis without the automation flag!'"$demB"
+	echo "${demA}""CHAPERONg: Selecting group 13 for ""$ligname"\
+		$'.\nIf this is wrong, terminate and re-run RMSD analysis without the automation flag!'"${demB}"
 	sleep 2
 
 	echo 13 13 | eval "$gmx_exe_path" rms -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_"$ligname"-rmsd.xvg -tu ns
@@ -417,7 +417,7 @@ altRMSD()
 
 analyser2()
 {
-	echo "$demA"$' Now calculating RMSD...\n'
+	echo "${demA}"$' Now calculating RMSD...\n'
 	sleep 2
 	if [[ $sysType == "protein_only" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 		echo "Backbone" "Backbone" | eval "$gmx_exe_path" rms -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_BB-rmsd.xvg -tu ns
@@ -430,7 +430,7 @@ analyser2()
 			
 		gracebat ${filenm}_BB-rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_BB-rmsd.png \
 		-fixed 7500 4000 -legend load || notifyImgFail
-		echo "$demA"$'Protein RMSD calculation... DONE\n  Now calculating ligand RMSD...\n'
+		echo "${demA}"$'Protein RMSD calculation... DONE\n  Now calculating ligand RMSD...\n'
 		sleep 2
 			
 		echo "$ligname" "$ligname" | eval "$gmx_exe_path" rms -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o \
@@ -445,12 +445,12 @@ analyser2()
 		gracebat ${filenm}_rmsd.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_rmsd.png \
 		-fixed 7500 4000 -legend load || notifyImgFail
 	fi
-	echo "$demA"$' Compute RMSD... DONE'"$demB"
+	echo "${demA}"$' Compute RMSD... DONE'"${demB}"
 	sleep 2
 	AnaName="RMSD"
 	filesuffx="rmsd"
 	createDIR
-	echo "$demA"$' Generate a finished figure of the RMSD plot... DONE'"$demB"
+	echo "${demA}"$' Generate a finished figure of the RMSD plot... DONE'"${demB}"
 	sleep 2
 }
 
@@ -458,13 +458,13 @@ if [[ "$analysis" == *" 2 "* ]]; then analyser2 ; fi
 
 analyser3()
 {
-echo "$demA"$' Now calculating RMSF...\n'
+echo "${demA}"$' Now calculating RMSF...\n'
 if [[ $automode == "full" ]]; then
 	echo "Backbone" "Backbone" | eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_BB-rmsf.xvg -res
-	echo "$demA"$' RMSF with backbone lsq fitting and calculation...DONE'"$demB"
+	echo "${demA}"$' RMSF with backbone lsq fitting and calculation...DONE'"${demB}"
 	sleep 2
 	echo "C-alpha" "C-alpha" | eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Calpha-rmsf.xvg -res
-	echo "$demA"$' RMSF with Calpha lsq fitting and calculation...DONE'"$demB"
+	echo "${demA}"$' RMSF with Calpha lsq fitting and calculation...DONE'"${demB}"
 	sleep 2
 	gracebat ${filenm}_BB-rmsf.xvg -hdevice PNG -autoscale xy -printfile \
 	${filenm}_BB-rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -474,7 +474,7 @@ if [[ $automode == "full" ]]; then
 	${filenm}_BB-Calpha-rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
 else
 	eval "$gmx_exe_path" rmsf -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_rmsf.xvg -res
-	echo "$demA"$' Compute RMSF...DONE'"$demB"
+	echo "${demA}"$' Compute RMSF...DONE'"${demB}"
 	sleep 2
 	gracebat ${filenm}_rmsf.xvg -hdevice PNG -autoscale xy -printfile \
 	${filenm}_rmsf.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -484,19 +484,19 @@ AnaName="RMSF"
 filesuffx="rmsf"
 createDIR
 	
-echo "$demA"$' Generate finished figure(s) of the RMSF plot(s)... DONE'"$demB"
+echo "${demA}"$' Generate finished figure(s) of the RMSF plot(s)... DONE'"${demB}"
 sleep 2
 }
 if [[ "$analysis" == *" 3 "* ]]; then analyser3 ; fi
 	
 analyser4()
 {
-echo "$demA"$' Now calculating Rg...\n'
+echo "${demA}"$' Now calculating Rg...\n'
 if [[ $automode == "full" ]]; then
 	echo "Protein" | eval "$gmx_exe_path" gyrate -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Rg.xvg
-	echo "$demA"$' Compute radius of gyration...DONE'"$demB"
+	echo "${demA}"$' Compute radius of gyration...DONE'"${demB}"
 	sleep 2
-	echo "$demA"$' Now converting Rg plot to ns format...\n'
+	echo "${demA}"$' Now converting Rg plot to ns format...\n'
 	sleep 2
 	grep "^[@#]" ${filenm}_Rg.xvg | sed "s/ps/ns/g" > ${filenm}_Rg_ns.xvg
 	grep -v "^[@#]" ${filenm}_Rg.xvg | \
@@ -504,22 +504,22 @@ if [[ $automode == "full" ]]; then
 else
 	echo $'**In the following step, CHOOSE Protein (1) for Rg analysis\n\n'
 	eval "$gmx_exe_path" gyrate -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Rg.xvg
-	echo "$demA"$' Compute radius of gyration...DONE'"$demB"
+	echo "${demA}"$' Compute radius of gyration...DONE'"${demB}"
 	sleep 2
-	echo "$demA"$' Now converting Rg plot to ns format...\n'
+	echo "${demA}"$' Now converting Rg plot to ns format...\n'
 	sleep 2
 	grep "^[@#]" ${filenm}_Rg.xvg | sed "s/ps/ns/g" > ${filenm}_Rg_ns.xvg
 	grep -v "^[@#]" ${filenm}_Rg.xvg | \
 	awk '{print $1/1000"      "$2"      "$3"      "$4"     "$5}' >> ${filenm}_Rg_ns.xvg
 fi
-echo "$demA"$' Generate ns and ps Rg plots...DONE'"$demB"
+echo "${demA}"$' Generate ns and ps Rg plots...DONE'"${demB}"
 sleep 2
 gracebat ${filenm}_Rg_ns.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_Rg_ns.png -fixed 7500 4000 -legend load || notifyImgFail
 	
 AnaName="Rg"
 filesuffx="Rg"
 createDIR
-echo "$demA"$' Generate a finished figure of the Rg plot... DONE'"$demB"
+echo "${demA}"$' Generate a finished figure of the Rg plot... DONE'"${demB}"
 sleep 2
 }
 
@@ -527,13 +527,13 @@ if [[ "$analysis" == *" 4 "* ]]; then analyser4 ; fi
 
 altHBOND()
 {
-echo "$demA""There are multiple groups identified as ""$ligname""."\
-$'\nCHAPERONg will try to guess the appropriate group to be used for protein-'"$ligname"" hbond calculations""$demB"
+echo "${demA}""There are multiple groups identified as ""$ligname""."\
+$'\nCHAPERONg will try to guess the appropriate group to be used for protein-'"$ligname"" hbond calculations""${demB}"
 
 sleep 2
 
-echo "$demA""CHAPERONg: Selecting group 13 for ""$ligname""."\
-$'\nIf this is wrong, terminate and re-run hbond analysis without the automation flag!'"$demB"
+echo "${demA}""CHAPERONg: Selecting group 13 for ""$ligname""."\
+$'\nIf this is wrong, terminate and re-run hbond analysis without the automation flag!'"${demB}"
 
 sleep 2
 echo 1 13 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
@@ -542,74 +542,74 @@ echo 1 13 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${fil
 
 hbond_DNA1()
 {
-	echo "$demA"$' Now executing Intra-protein hydrogen bonding analysis...\n'
+	echo "${demA}"$' Now executing Intra-protein hydrogen bonding analysis...\n'
 	sleep 2
 
 	echo "Protein" "Protein" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s ${filenm}.tpr -n index.ndx \
 		-num hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 
-	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 
-	echo "$demA"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
+	echo "${demA}"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
 	sleep 2
 
 	echo "DNA" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx \
 		-num hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 
-	echo "$demA"$' Intra-DNA hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Intra-DNA hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 
-	echo "$demA"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
+	echo "${demA}"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
 	echo "Protein" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -num \
 		hbnum_Pro_DNA_${filenm}.xvg -hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 
-	echo "$demA"$' Protein-DNA hydrogen bonding analysis... DONE'"$demB"
+	echo "${demA}"$' Protein-DNA hydrogen bonding analysis... DONE'"${demB}"
 	sleep 2
 }
 hbond_DNA2()
 {
-echo "$demA"$' Now executing Intra-protein hydrogen bonding analysis...\n'
+echo "${demA}"$' Now executing Intra-protein hydrogen bonding analysis...\n'
 sleep 2
 
 echo "Protein" "Protein" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num \
 	hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
+echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
 sleep 2
 
-echo "$demA"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
+echo "${demA}"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
 sleep 2
 
 echo "DNA" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num \
 	hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "$demA"$' Intra-DNA hydrogen bonding analysis...DONE'"$demB"
+echo "${demA}"$' Intra-DNA hydrogen bonding analysis...DONE'"${demB}"
 sleep 2
 
-echo "$demA"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
+echo "${demA}"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
 echo "Protein" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_Pro_DNA_${filenm}.xvg \
 	-hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "$demA"$' Protein-DNA hydrogen bonding analysis... DONE'"$demB"
+echo "${demA}"$' Protein-DNA hydrogen bonding analysis... DONE'"${demB}"
 sleep 2
 }
 
 analyser5()
 {
-echo "$demA"$' Now executing H-bond analysis...\n'
+echo "${demA}"$' Now executing H-bond analysis...\n'
 if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 1 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
-	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 	echo 1 "SOL" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_Pro-SOL_${filenm}.xvg \
 	-hbm hb_matrix_Pro-SOL_${filenm}.xpm -hbn hb_index_Pro-SOL_${filenm}.ndx -tu ns $hbthread || \
-	echo "$demA"$' There are multiple groups with the name SOL. Skipping...'
-	echo "$demA"$' Protein-SOL hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' There are multiple groups with the name SOL. Skipping...'
+	echo "${demA}"$' Protein-SOL hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -621,12 +621,12 @@ if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	echo 1 "$ligname" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
 	-hbm hb_matrix_ProLig_${filenm}.xpm -hbn hb_index_ProLig_${filenm}.ndx -tu ns $hbthread || altHBOND
-	echo "$demA"$' Protein-ligand hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Protein-ligand hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 
 	echo 1 1 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
-	echo "$demA"$' Intra-protein hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 	gracebat hbnum_ProLig_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_ProLig_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -635,7 +635,7 @@ elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 elif [[ $sysType == "protein_only" && $automode == "semi" ]] ; then
 	eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
-	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
@@ -644,13 +644,13 @@ elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automod
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread || \
 	eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
-	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 elif [[ $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 	hbond_DNA1 || hbond_DNA2
-	echo "$demA"$' Hydrogen bonding analysis...DONE'"$demB"
+	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
 	sleep 2
 fi
 	
@@ -673,14 +673,14 @@ if [[ -d "$currenthbonddir" ]]; then
 elif [[ ! -d "$currenthbonddir" ]]; then
 	mkdir ./hbond; mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 fi
-echo "$demA"$' Generate finished figure(s) of the hbond plot(s)... DONE'"$demB"
+echo "${demA}"$' Generate finished figure(s) of the hbond plot(s)... DONE'"${demB}"
 }
 
 if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
 
 analyser6()
 {
-	echo "$demA"$' Now calculating solvent accessible surface area (SASA)...\n'
+	echo "${demA}"$' Now calculating solvent accessible surface area (SASA)...\n'
 	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 1 | eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
@@ -699,24 +699,24 @@ analyser6()
 		sasa_Pro_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
+		echo "${demA}"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
 		echo "DNA" | eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_DNA_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "$demA"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"$demB"	
-		echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
+		echo "${demA}"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
+		echo "${demA}"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
 		echo "Protein_DNA" | eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_Pro_DNA_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "$demA"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"$demB"	
+		echo "${demA}"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"${demB}"	
 	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 	fi
-	echo "$demA"$' Compute solvent accessible surface area (SASA)...DONE'"$demB"
+	echo "${demA}"$' Compute solvent accessible surface area (SASA)...DONE'"${demB}"
 	sleep 2
 	currentSASAdir="$(pwd)""/SASA"
 	nSASA=1
@@ -736,7 +736,7 @@ analyser6()
 	elif [[ ! -d "$currentSASAdir" ]]; then mkdir ./SASA
 	fi
 	mv sasa*${filenm}.png sasa*${filenm}.xvg ./SASA || true
-	echo "$demA"$' Generate a finished figure of the SASA plot... DONE'"$demB"
+	echo "${demA}"$' Generate a finished figure of the SASA plot... DONE'"${demB}"
 	sleep 2
 }
 
@@ -744,12 +744,12 @@ if [[ "$analysis" == *" 6 "* ]]; then analyser6 ; fi
 
 analyser7()
 {
-	echo "$demA"$' Now running principal component analysis (PCA)...\n'
+	echo "${demA}"$' Now running principal component analysis (PCA)...\n'
 	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 4 4 | eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
 		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
+		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
+		echo "${demA}"$' Now analyzing eigenvectors and calculating overlap between components...\n'
 		echo 4 4 | eval "$gmx_exe_path" anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_${wraplabel}.xtc -eig \
 		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
 			
@@ -758,8 +758,8 @@ analyser7()
 	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		echo $'**Choose "Backbone" (4) twice when prompted\n'
 		eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
+		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
+		echo "${demA}"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
 		$'**Choose "Backbone" (4) twice when prompted\n'
 		eval "$gmx_exe_path" anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_${wraplabel}.xtc -eig "${filenm}"_eigenval.xvg \
 		-s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
@@ -768,8 +768,8 @@ analyser7()
 	elif [[ $sysType == "protein_lig" ]] || [[ $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 		echo "Backbone" "Backbone" | eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx \
 		-o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'
+		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
+		echo "${demA}"$' Now analyzing eigenvectors and calculating overlap between components...\n'
 		echo "Backbone" "Backbone" | eval "$gmx_exe_path" anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_${wraplabel}.xtc -eig \
 		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -n index.ndx -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
@@ -778,13 +778,13 @@ analyser7()
 		echo $'**Choose "Backbone" (4) twice when prompted\n'
 		eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
 		-n index.ndx -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
-		echo "$demA"$' Compute and diagonalize covariance matrix...DONE'"$demB"
-		echo "$demA"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
+		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
+		echo "${demA}"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
 		$'**Choose "Backbone" (4) twice when prompted\n'
 		eval "$gmx_exe_path" anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_${wraplabel}.xtc -eig \
 		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg	
 	fi
-	echo "$demA"$' Principal component analysis (PCA)...DONE'"$demB"
+	echo "${demA}"$' Principal component analysis (PCA)...DONE'"${demB}"
 	sleep 2
 	currentPCAdir="$(pwd)""/PCA"
 	nPCA=1
@@ -803,7 +803,7 @@ analyser7()
 	elif [[ ! -d "$currentPCAdir" ]]; then mkdir ./PCA
 	fi
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb dd?????? ./PCA || true
-	echo "$demA"$' Generate finished figures of the PCA plots... DONE'"$demB"
+	echo "${demA}"$' Generate finished figures of the PCA plots... DONE'"${demB}"
 	sleep 2
 }
 
@@ -812,13 +812,13 @@ if [[ "$analysis" == *" 7 "* ]]; then analyser7 ; fi
 dsspCheck="Avail"
 DSSPfail()
 {
-	echo "$demA"$' DSSP could not be configured for gromacs!\n Skipping secondary structure analysis...\n'
+	echo "${demA}"$' DSSP could not be configured for gromacs!\n Skipping secondary structure analysis...\n'
 	sleep 2
 	dsspCheck="notAvail"
 }
 useCHAPdssp()
 {
-	echo "$demA"$' DSSP not detected on your machine.'\
+	echo "${demA}"$' DSSP not detected on your machine.'\
 	$'\nDo you want use the DSSP executable packaged with CHAPERONg?\n'
 	read -p ' Enter a response here (yes or no): ' configDSSP
 		while [[ "$configDSSP" != "yes" && "$movieLeng" != "y" \
@@ -836,7 +836,7 @@ useCHAPdssp()
 
 useCHAPdsspGMX()
 {
-	echo "$demA"$' DSSP not detected on your machine.'\
+	echo "${demA}"$' DSSP not detected on your machine.'\
 	$'Either it is not installed or the\n environment has not been set (properly).'
 	sleep 2
 	echo $'\n Do you want configure the DSSP executable packaged with'\
@@ -853,7 +853,7 @@ useCHAPdsspGMX()
 		export DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
 		alias DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
 
-		echo "$demA"$' DSSP configured...\n'
+		echo "${demA}"$' DSSP configured...\n'
 		sleep 1
 		echo $' Now attempting to run secondary analysis again...\n\n'
 		sleep 2
@@ -866,7 +866,7 @@ useCHAPdsspGMX()
 
 analyser8()
 {
-	# echo "$demA"$' Checking DSSP availability and configuration...\n'
+	# echo "${demA}"$' Checking DSSP availability and configuration...\n'
 	# sleep 2
 	# catchDSSP1error=''
 	# DSSP -h &> tempdssp.temp1 || true
@@ -898,7 +898,7 @@ analyser8()
 	# 	fi	
 	# fi
 
-	echo "$demA"$' Now computing secondary structure with DSSP...\n'
+	echo "${demA}"$' Now computing secondary structure with DSSP...\n'
 	sleep 2
 	#CollectDSSPdt()
 
@@ -928,9 +928,9 @@ analyser8()
 	echo "MainChain" | eval "$gmx_exe_path" do_dssp -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
 	-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || useCHAPdsspGMX
 	if [[ "$dsspCheck" == "Avail" ]] ; then
-		echo "$demA"$' Compute secondary structure...DONE'"$demB"
+		echo "${demA}"$' Compute secondary structure...DONE'"${demB}"
 		sleep 1
-		echo "$demA"$' Detecting colour codes assigned in the eps file...\n'
+		echo "${demA}"$' Detecting colour codes assigned in the eps file...\n'
 		sleep 2
 		while IFS= read -r line; do
 			scanSSname=$(echo "$line" | awk '{print $6}')
@@ -961,7 +961,7 @@ analyser8()
 		sleep 2
 		#eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype2.eps -rainbow blue || true
 		eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype1.eps || true
-		echo "$demA"$' Converting eps to pdf...\n'
+		echo "${demA}"$' Converting eps to pdf...\n'
 		sleep 1
 		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
 		# ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
@@ -971,9 +971,9 @@ analyser8()
 
 		echo $' Converting ss_eps to png...\n'
 		sleep 1
-		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
+		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor ss_"${filenm}"_colortype1.png || echo "${demA}"$' The program "convert" not found!\n'
 
-		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype1.png || echo "$demA"$' The program "convert" not found!\n'
+		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype1.png || echo "${demA}"$' The program "convert" not found!\n'
 		
 		currentSecStrdir="$(pwd)""/Secondary_structure"
 		nSecStr=1
@@ -994,7 +994,7 @@ analyser8()
 		elif [[ ! -d "$currentSecStrdir" ]]; then
 			mkdir Secondary_structure; mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
 		fi
-		echo "$demA"$' Secondary structure analysis...DONE'"$demB"
+		echo "${demA}"$' Secondary structure analysis...DONE'"${demB}"
 		sleep 2
 	fi
 }
@@ -1009,7 +1009,7 @@ analyser9()
 	elif [[ $frame_b != 0 && $frame_e != 0 ]] ; then clustr_range="-b $frame_b -e $frame_e"
 	fi
 
-	echo "$demA"$' Preparing to cluster frames from the trajectory...\n\n\n'
+	echo "${demA}"$' Preparing to cluster frames from the trajectory...\n\n\n'
 	sleep 2
 	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo "Backbone" "Protein" | eval "$gmx_exe_path" cluster -f "${filenm}"_${wraplabel}.xtc \
@@ -1060,7 +1060,7 @@ analyser9()
 	eval "$gmx_exe_path" xpm2ps -f rmsd-clust.xpm -o rmsd-clust.eps
 	ps2pdf rmsd-clust.eps rmsd-clust.pdf || true
 	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx rmsd-clust.* ./Clustering || true
-	echo "$demA"$' Cluster frames from the trajectory...DONE'"$demB"
+	echo "${demA}"$' Cluster frames from the trajectory...DONE'"${demB}"
 	sleep 2
 }
 
@@ -1069,7 +1069,7 @@ if [[ "$analysis" == *" 9 "* ]]; then analyser9 ; fi
 
 analyser10()
 {
-	printf "$demA Preparing to estimate probability density function using KDE... \n\n"
+	printf "${demA} Preparing to estimate probability density function using KDE... \n\n"
 	sleep 2
 	echo " Do you want to run single data or multi-data plot?"
 	sleep 1
@@ -1129,7 +1129,7 @@ AnalysisList
 		data_kde_ext=("$data_kde")
 		count_data_in=0
 
-		printf "$demA Generating the input files for KDE"
+		printf "${demA} Generating the input files for KDE"
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
@@ -1231,7 +1231,7 @@ askDataExist
 			elif [[ "$DataFile" == 3 ]]; then echo ""
 				read -p ' Provide the path to the data to use for density estimation: ' existData
 
-				echo "$demA"$' Preparing density estimation using user-provided data...\n\n'
+				echo "${demA}"$' Preparing density estimation using user-provided data...\n\n'
 				sleep 1
 			fi
 		fi
@@ -1239,7 +1239,7 @@ askDataExist
 		cat "$existData" | grep -v "^[@#]" | awk '{print $2}' > "${dataIN}_Data.dat" || true
 	done < CHAP_kde_dataset_list.dat
 
-		printf "\n\n Generate input files for KDE...DONE $demB"
+		printf "\033[92m\n\n Generate input files for KDE...DONE\033[m ${demB}"
 		sleep 2
 		printf " Initializing probability density function calculations\n\n"
 		sleep 2
@@ -1335,7 +1335,7 @@ askDataExist
 
 	fi
 
-	printf "$demA Estimate probability density function using KDE...DONE $demB"
+	printf "${demA} Estimate probability density function using KDE...DONE ${demB}"
 	# sleep 2
 }
 
@@ -1384,7 +1384,7 @@ variables_for_regMD_Movie()
 
 # analyser11()
 # {
-# 	echo "$demA $message_Movie"
+# 	echo "${demA} $message_Movie"
 
 # 	if [[ $customframeNo == '' ]]; then
 # cat << askMovielength
@@ -1408,11 +1408,11 @@ variables_for_regMD_Movie()
 # 		cat "$trajectlog" | grep -v "GROMACS reminds"
 # 		sleep 2
 
-# 		echo "$demA Above is a summary of your $simulationcontext trajectory."
+# 		echo "${demA} Above is a summary of your $simulationcontext trajectory."
 # 		sleep 1
 # 		printf ' You may find the info useful to provide a response to the prompt below.\n'
 # 		sleep 2
-# 		printf "$demA How many frames do you want the movie to be composed of?\n\n"
+# 		printf "${demA} How many frames do you want the movie to be composed of?\n\n"
 # 		sleep 1
 # 		read -p ' *Please enter a value here: ' customframeNo
 # 		printf " You entered: $customframeNo \n\n"
@@ -1427,14 +1427,14 @@ variables_for_regMD_Movie()
 # 	skimov=$(echo ${skimov_raw%\.*})
 # elif (( $No_of_frames < "$customframeNo_int" )) ; then 
 # 	skimov=1
-# 	echo "$demA"" Number of frames in the trajectory: ${No_of_frames}"\
+# 	echo "${demA}"" Number of frames in the trajectory: ${No_of_frames}"\
 # 	$'\n'" Total number of frames in the trajectory is less than $customframeNo!"\
-# 	$'\n'" Using ${No_of_frames} frames directly.""$demB"
+# 	$'\n'" Using ${No_of_frames} frames directly.""${demB}"
 # 	customframeNo=$(echo ${No_of_frames})
 # 	customframeNo_int=$(echo ${No_of_frames})
 # fi
 
-# echo "$demA"$' Will now extract frames to be used for the movie...\n\n'
+# echo "${demA}"$' Will now extract frames to be used for the movie...\n\n'
 # sleep 2
 # #if [[ $sysType == 1 ]] || [[ $sysType == 2 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
 # echo 0 | eval "$gmx_exe_path" trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tpr -o ${outXTCmovie}.xtc -skip $skimov
@@ -1442,7 +1442,7 @@ variables_for_regMD_Movie()
 # #gmx trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${outXTCmovie}.xtc" -skip $skimov
 # #fi
 # sleep 2
-# echo "$demA"$' Preparing to extract $customframeNo snapshots...\n'
+# echo "${demA}"$' Preparing to extract $customframeNo snapshots...\n'
 # sleep 2
 # if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 # 	echo 1 | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
@@ -1480,37 +1480,37 @@ variables_for_regMD_Movie()
 # $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
 # $'mclear\n'"cd ${movieDIRECORY}"$'\nsave PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
 	
-# echo "$demA"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"$demB"
+# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
 # sleep 2
 # pyM=0
 # pymol prep_movie_Pyscript.pml || pyM=1
-# echo "$demA"$' Extract frames as images...DONE'"$demB""$demA"$' Now converting images to movie...\n'
+# echo "${demA}"$' Extract frames as images...DONE'"${demB}""${demA}"$' Now converting images to movie...\n'
 # cd ./${movieDIRECORY}
 # mov_make=0
 # convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
 # convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
 
 # if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "$demA"$'The program "Convert/ImageMagick" could not be found.\nCHAPERONg detected'\
+# 	echo "${demA}"$'The program "Convert/ImageMagick" could not be found.\nCHAPERONg detected'\
 # 	$'"PyMOL" and will use it to make a movie which may,\n'\
-# 	$'however, be of lesser quality'"$demB"
+# 	$'however, be of lesser quality'"${demB}"
 		
 # 	makeMoviePy1
 # 	makeMoviePy2
 		
-# 	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
 # fi
 
 # if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "$demA"$'A mp4 movie could not be made. This may be due to the program'\
+# 	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
 # 	$'\n"Convert/ImageMagick" not being found, or some library is missing.'\
 # 	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,\n'\
-# 	$'however, be of lesser quality'"$demB"
+# 	$'however, be of lesser quality'"${demB}"
 		
 # 	makeMoviePy1
 # 	makeMoviePy2
 		
-# 	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
 # fi
 
 # #mkdir ./frames
@@ -1523,14 +1523,14 @@ variables_for_regMD_Movie()
 # #rm prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml
 # #rm ../prep_movie_Pyscript.pml || true; cd ..
 # #rm *movie_Pyscript.pml prep_movie_Pyscript.pml || true
-# echo "$demA"$' Convert images to movie...DONE'"$demB"
+# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
 # cd ..
 # }
 
 # analyser11update()
 # {
 
-# echo "$demA"$'Preparing to make a summary movie from a preset PyMOL session\n'
+# echo "${demA}"$'Preparing to make a summary movie from a preset PyMOL session\n'
 # sleep 2
 
 # currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
@@ -1574,48 +1574,48 @@ variables_for_regMD_Movie()
 	
 # echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
 	
-# echo "$demA"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"$demB"
+# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
 # sleep 2
 # pyM=0
 # pymol prep_movie_Pyscript.pml || pyM=1
-# echo "$demA"$'Extract frames as images...DONE'"$demB""$demA"$'Now converting images to movie...\n'
+# echo "${demA}"$'Extract frames as images...DONE'"${demB}""${demA}"$'Now converting images to movie...\n'
 # cd ./${movieDIRECORY}
 # mov_make=0
 # convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
 # convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
 
 # if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "$demA"$'The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
-# 	$'PyMOL''"'" and will use it to make a movie which may, however, be of lesser quality""$demB"
+# 	echo "${demA}"$'The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
+# 	$'PyMOL''"'" and will use it to make a movie which may, however, be of lesser quality""${demB}"
 		
 # 	makeMoviePyx
 # 	makeMoviePyy
 		
-# 	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
 # fi
 
 # if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "$demA"$'A mp4 movie could not be made. This may be due to the program'\
+# 	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
 # 	$'"Convert/ImageMagick" not being found, or some library is missing.'\
 # 	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
-# 	$'however, be of lesser quality'"$demB"
+# 	$'however, be of lesser quality'"${demB}"
 		
 # 	makeMoviePyx
 # 	makeMoviePyy
 		
-# 	echo "$demA"$'Movie (lesser quality) made with PyMOL...\n'
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
 # fi
 
 # rm frame_*.png || true 
 # # rm ../*movie_Pyscript.pml || true
 # rm ./*movie_Pyscript.pml || true
-# echo "$demA"$' Convert images to movie...DONE'"$demB"
+# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
 # cd ..
 # }
 
 if [[ "$analyse" == "11" ]] && [[ -d "$movieDIRECORY" ]]; then
 cat << MovChoic
-$demA
+${demA}
 Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
 
   a     Make a new movie
@@ -1651,7 +1651,7 @@ if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
 	#if [[ $sysType == 1 ]]; then indexer=''
  	if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then indexer='-n index.ndx' ; fi
-	echo "$demA"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
+	echo "${demA}"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
 
 	if [[ $trajFraction == '' ]]; then trajFraction=3 ; fi
 	trajFraction=$(echo ${trajFraction%\.*})
@@ -1671,60 +1671,60 @@ if [[ $mmGMXpath != '' ]] ; then
 	if (( $No_of_last_third_framesINT >= $mmpbframesNo )) ; then
 		skipframegpsa=$(awk "BEGIN {print $No_of_last_third_frames / $mmpbframesNo }")
 		skipframegpsaINT=$(echo ${skipframegpsa%\.*})
-		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		echo "${demA}"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
 		$'\n'" ${skipframegpsaINT} frames will be skipped at intervals to produce a total of ~100 frames for"\
-		$'\n'" g_mmpbsa calculations.""$demB"
+		$'\n'" g_mmpbsa calculations.""${demB}"
 		
 	elif (( $No_of_last_third_framesINT < $mmpbframesNo )) ; then
 		skipframegpsaINT=1
-		echo "$demA"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
+		echo "${demA}"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
 		$'\n'" Total number of frames in the trajectory is less than 200."\
-		$'\n'" No frames will be skipped for g_mmpbsa calculations.""$demB"
+		$'\n'" No frames will be skipped for g_mmpbsa calculations.""${demB}"
 	fi
 
 	if [[ "$mmGMX" == "1" ]] ; then
-		echo "$demA"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n\n\n'
+		echo "${demA}"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n\n\n'
 		sleep 2
 		eval $mmGMXpath grompp -f md.mdp -c "${filenm}".gro -p topol.top -o \
 		"${filenm}"_TPR_for_g_mmpbsa.tpr $indexer
-		echo "$demA"$' Generate a compatible .tpr for g_MMPBSA...DONE'"$demB"
+		echo "${demA}"$' Generate a compatible .tpr for g_MMPBSA...DONE'"${demB}"
 		sleep 2
-		echo "$demA"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
+		echo "${demA}"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
 		sleep 2
 		if [[ $automode == "full" ]]; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_${wraplabel}.xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$' Generate a compatible trajectory file for g_MMPBSA...DONE'"$demB"
+			echo "${demA}"$' Generate a compatible trajectory file for g_MMPBSA...DONE'"${demB}"
 			sleep 2
 		
-			echo "$demA Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
+			echo "${demA} Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA Extract $mmpbframesNo frames from the trajectory...DONE""$demB"
+			echo "${demA} Extract $mmpbframesNo frames from the trajectory...DONE""${demB}"
 			sleep 2
 		
 		elif [[ $automode != "full" ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_${wraplabel}.xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
-			echo "$demA"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"$demB"
+			echo "${demA}"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"${demB}"
 			sleep 2
 		
-			echo "$demA Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
+			echo "${demA} Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
 		
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "$demA Extract $mmpbframesNo frames from the trajectory...DONE""$demB"
+			echo "${demA} Extract $mmpbframesNo frames from the trajectory...DONE""${demB}"
 			sleep 2
 		fi	
 	
-		echo $' Generate input files for g_MMPBSA free energy calculations...DONE'"$demB"
+		echo $' Generate input files for g_MMPBSA free energy calculations...DONE'"${demB}"
 		sleep 2
 
-		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
+		echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
 		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
@@ -1734,20 +1734,20 @@ if [[ $mmGMXpath != '' ]] ; then
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		fi
-		echo "$demA"$' Run g_MMPBSA calculations...DONE'"$demB"
+		echo "${demA}"$' Run g_MMPBSA calculations...DONE'"${demB}"
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
-		echo "$demA"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
+		echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
 		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s \
 			"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \
-			echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
-			-pbsa -decomp || echo "$demA"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+			-pbsa -decomp || echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
 		fi
 	fi
-	echo "$demA"$' Calculating average binding energy & contribution of residues...\n'
+	echo "${demA}"$' Calculating average binding energy & contribution of residues...\n'
 	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
 	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
@@ -1769,14 +1769,14 @@ if [[ $mmGMXpath != '' ]] ; then
 	elif [[ "$mmGMX" == '' ]] ; then
 		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
-			echo "$demA"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
+			echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
 		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
-			echo "$demA"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
+			echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
 		fi
 	fi
 
-	echo "$demA"$' Calculate average binding energy & contribution of residues...DONE'"$demB"
+	echo "${demA}"$' Calculate average binding energy & contribution of residues...DONE'"${demB}"
 	sleep 2
 
 	AnaName="MMPBSA"
@@ -1803,7 +1803,7 @@ if [[ $mmGMXpath != '' ]] ; then
 	mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
 
 elif [[ $mmGMXpath == '' ]] ; then
-	echo "$demA"$'GMX path for g_mmpbsa not set. Use the parFile option!\n'
+	echo "${demA}"$'GMX path for g_mmpbsa not set. Use the parFile option!\n'
 fi
 
 }
@@ -1812,7 +1812,7 @@ if [[ "$analysis" == *" 12 "* ]]; then ScanTRAJ; analyser12 ; fi
 
 useFoundPCA_sham()
 {
-	echo "$demA"$' Preparing PCA-derived FES with gmx sham...\n'
+	echo "${demA}"$' Preparing PCA-derived FES with gmx sham...\n'
 	sleep 1
 				
 	eval "$gmx_exe_path" sham -f ./PCA/PCA_2dproj_$filenm.xvg -ls ./PCA/FEL_PCA_sham_$filenm.xpm -notime || true
@@ -1849,14 +1849,14 @@ useFoundPCA_sham()
 	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
 	fi
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
-	echo "$demA"$' Prepare Gibbs FES with gmx sham...DONE'"$demB"
+	echo "${demA}"$' Prepare Gibbs FES with gmx sham...DONE'"${demB}"
 	sleep 2
 	ana_folder="PCA_FES_sham"
 }
 
 useFoundRgRMSData_sham()
 {
-	echo "$demA"$' Preparing Rg Vs RMSD FES using gmx sham...\n\n'
+	echo "${demA}"$' Preparing Rg Vs RMSD FES using gmx sham...\n\n'
 	sleep 1
 				
 	eval "$gmx_exe_path" sham -f RgVsRMSD.xvg -ls FEL_sham_RgVsRMSD_$filenm.xpm -notime || true
@@ -1895,7 +1895,7 @@ useFoundRgRMSData_sham()
 	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm \
 	entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 
-	echo "$demA"$' Prepare Rg Vs RMSD FES with gmx sham...DONE'"$demB"
+	echo "${demA}"$' Prepare Rg Vs RMSD FES with gmx sham...DONE'"${demB}"
 	sleep 2
 	ana_folder="RgVsRMSD_FEL_sham"
 }
@@ -1921,7 +1921,7 @@ read -p '  Enter 1, 2 or 3 here: ' orderPair_choice
 	done
 
 if [[ $orderPair_choice == 1 ]] ; then
-	echo "$demA"$' Checking the working directory for pre-calculated PCA_2d projection data...'"$demB"
+	echo "${demA}"$' Checking the working directory for pre-calculated PCA_2d projection data...'"${demB}"
 	sleep 2
 	exist2dPCA="$(pwd)""/PCA/PCA_2dproj_""$filenm"".xvg"
 	if [[ -f "$exist2dPCA" ]] ; then
@@ -1945,7 +1945,7 @@ askFELuseexist
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
 		elif [[ $automode == "full" ]] ; then
-			echo "$demA"$' Pre-calculated PCA_2d projection data found!\n File found:'" $exist2dPCA"\
+			echo "${demA}"$' Pre-calculated PCA_2d projection data found!\n File found:'" $exist2dPCA"\
 			$'\n *CHAPERONg in auto mode\n'" Found data will be used for FES plotting"
 			sleep 2
 		fi
@@ -1957,7 +1957,7 @@ elif [[ $orderPair_choice == 2 ]] ; then
 	existRg="$(pwd)""/Rg/""${filenm}_Rg_ns.xvg"
 	if [[ -f "$existRg" ]] ; then
 		if [[ $automode == "semi" ]] ; then
-			echo "$demA"$' Pre-calculated Rg data found!\n File found:'" $existRg"$'\n'
+			echo "${demA}"$' Pre-calculated Rg data found!\n File found:'" $existRg"$'\n'
 			sleep 2
 cat << askFELuseexist
 
@@ -1976,7 +1976,7 @@ askFELuseexist
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
 		elif [[ $automode == "full" ]] ; then
-			echo "$demA"$' Pre-calculated Rg data found!\nFile found:'" $existRg"\
+			echo "${demA}"$' Pre-calculated Rg data found!\nFile found:'" $existRg"\
 			$'\n *CHAPERONg in auto mode\n'" Found data will be used for FES plotting"
 			sleep 2
 		fi
@@ -1990,7 +1990,7 @@ askFELuseexist
 	existRMSD="$(pwd)""/RMSD/""${filenm}_BB-rmsd.xvg"
 	if [[ -f "$existRMSD" ]] ; then
 		if [[ $automode == "semi" ]] ; then
-			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"$'\n'
+			echo "${demA}"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"$'\n'
 			sleep 2
 cat << askFELuseexist
 
@@ -2009,7 +2009,7 @@ askFELuseexist
 				read -p ' Enter 1, 2 or 3 here: ' PCFile
 			done
 		elif [[ $automode == "full" ]] ; then
-			echo "$demA"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"\
+			echo "${demA}"$' Pre-calculated RMSD data found!\n File found:'" $existRMSD"\
 			$'\n *CHAPERONg in auto mode\n'" Found data will be used for FES plotting"
 			sleep 2
 		fi
@@ -2032,7 +2032,7 @@ fi
 
 analyser13()
 {
-	echo "$demA"$' Constructing free energy surface with gmx sham...\n'
+	echo "${demA}"$' Constructing free energy surface with gmx sham...\n'
 	order_parameters
 	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_sham
@@ -2040,7 +2040,7 @@ analyser13()
 		elif [[ "$PCFile" == 3 ]]; then echo ""
 			read -p ' Provide the path to the pre-calculated 2d_PCA projection file: ' precalcPCfile
 	
-			echo "$demA"$'Preparing PCA-derived FES with user-provided 2d_PCA file...\n\n'
+			echo "${demA}"$'Preparing PCA-derived FES with user-provided 2d_PCA file...\n\n'
 			sleep 1
 
 			felcal=0			
@@ -2074,7 +2074,7 @@ analyser13()
 				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
 					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
 				fi
-				echo "$demA"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"$demB"
+				echo "${demA}"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"${demB}"
 				sleep 2
 				ana_folder="PCA_FES_sham"
 			
@@ -2111,7 +2111,7 @@ inputFormat
 				read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
 				inputRMSD_xvgData="$precalcRMSD"
 
-				echo "$demA"$'Preprocessing user-provided Rg and RMSD data files...\n\n'
+				echo "${demA}"$'Preprocessing user-provided Rg and RMSD data files...\n\n'
 				sleep 1
 				cat "$precalcRg" | grep -v "^[@#]" | awk '{print $2}' > RgData.dat
 				
@@ -2170,7 +2170,7 @@ inputFormat
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm \
 					entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				fi
-				echo "$demA"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"$demB"
+				echo "${demA}"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"${demB}"
 				sleep 2
 				ana_folder="RgVsRMSD_FEL_sham"
 
@@ -2202,7 +2202,7 @@ inputFormat
 			echo ""
 			read -p ' Provide the path to the 2nd order_parameter.xvg data: ' precalcOrderPar2
 				
-			echo "$demA"$'Preprocessing user-provided order parameter data files...\n\n'
+			echo "${demA}"$'Preprocessing user-provided order parameter data files...\n\n'
 			sleep 1
 			cat "$precalcOrderPar1" | grep -v "^[@#]" | awk '{print $2}' > precalcOrderPar1.dat
 			cat "$precalcOrderPar2" | grep -v "^[@#]" | awk '{print $2}' > precalcOrderPar2.dat
@@ -2265,7 +2265,7 @@ inputFormat
 				mv FEL_sham_OrderParameterPair_* precalcOrderPar1.dat precalcOrderPar2.dat OrderParameterPair.xvg \
 				enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./OrderParameterPair_FEL_sham || true
 			fi
-			echo "$demA"$' Prepare 2D energetic landscape with gmx sham...DONE'"$demB"
+			echo "${demA}"$' Prepare 2D energetic landscape with gmx sham...DONE'"${demB}"
 			sleep 2
 			ana_folder="OrderParameterPair_FEL_sham"
 		elif [[ "$felcal" == 1 ]] ; then
@@ -2275,7 +2275,7 @@ inputFormat
 	fi
 
 	# extract lowest free energy structures
-	echo "$demA Identifying the lowest energy bins and frames"$'\n'
+	echo "${demA} Identifying the lowest energy bins and frames"$'\n'
 	sleep 2
 	min0_bin_index=$(grep -F '0.000' ./${ana_folder}/shamlog.log | tail -n 1 | awk '{print $5}')
 	echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
@@ -2295,7 +2295,7 @@ inputFormat
 	min0_struct2_time=$(awk "BEGIN {print $sim_timestep * $min0_struct2_frame}")
 	min0_struct3_time=$(awk "BEGIN {print $sim_timestep * $min0_struct3_frame}")
 
-	echo "$demA"$' Extracting lowest energy structures from the trajectory...\n\n\n'
+	echo "${demA}"$' Extracting lowest energy structures from the trajectory...\n\n\n'
 	sleep 2
 	structure1="${filenm}"_LowestEnergyBin_structure1_frame"$min0_struct1_frame".pdb
 	structure2="${filenm}"_LowestEnergyBin_structure2_frame"$min0_struct2_frame".pdb
@@ -2337,7 +2337,7 @@ inputFormat
 		echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc \
 		-s "${filenm}".tpr -n index.ndx -o "$structure3" -dump "$min0_struct3_time"
 	fi
-	echo "$demA"$' Extract lowest energy structures from the trajectory...DONE\n\n'
+	echo "${demA}"$' Extract lowest energy structures from the trajectory...DONE\n\n'
 	sleep 2
 	mv "$structure1" "$structure2" "$structure3" ./${ana_folder}/ || true
 
@@ -2383,7 +2383,7 @@ extractMoreStructs
 			spec_struct_time=$(awk "BEGIN {print $sim_timestep * $frame_no}")
 			spec_struct="${filenm}"_structure_at_frame"$frame_no".pdb
 
-			echo "$demA"$' Extracting the specified structure from the trajectory...\n\n\n'
+			echo "${demA}"$' Extracting the specified structure from the trajectory...\n\n\n'
 			sleep 2
 
 			if [[ $automode == "full" && $sysType == "protein_only" ]]; then
@@ -2402,13 +2402,13 @@ extractMoreStructs
 				echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc \
 				-s "${filenm}".tpr -n index.ndx -o "$spec_struct" -dump "$spec_struct_time"
 			fi
-			echo "$demA"$' Extract the specified structure from the trajectory...DONE\n\n'
+			echo "${demA}"$' Extract the specified structure from the trajectory...DONE\n\n'
 			sleep 2
 			mv "$spec_struct" ./${ana_folder}/ || true
 		fi
 	done
 
-	echo "$demA"$' Construct free energy landscape with gmx sham...DONE'"$demB"
+	echo "${demA}"$' Construct free energy landscape with gmx sham...DONE'"${demB}"
 	sleep 2
 }
 
@@ -2416,7 +2416,7 @@ if [[ "$analysis" == *" 13 "* ]]; then analyser13 ; fi
 
 useFoundPCA_FESPy()
 {
-	echo "$demA"$' Extracting principal components from 2d_projection data...\n\n'
+	echo "${demA}"$' Extracting principal components from 2d_projection data...\n\n'
 	sleep 2
 	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $1}' > PC1.dat
 	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $2}' > PC2.dat
@@ -2424,10 +2424,10 @@ useFoundPCA_FESPy()
 	cat PC1.dat | sort -n > sorted_PC1.dat
 	cat PC2.dat | sort -n > sorted_PC2.dat
 
-	echo $' Extract principal components from 2d_projection data...DONE'"$demB"
+	echo $' Extract principal components from 2d_projection data...DONE'"${demB}"
 	sleep 2
 
-	echo "$demA"$' Preparing parameters for FES calculations...\n'
+	echo "${demA}"$' Preparing parameters for FES calculations...\n'
 	sleep 2
 
 	echo $' Determining minimal and maximal data points...\n'
@@ -2461,15 +2461,15 @@ useFoundPCA_FESPy()
 		echo ' Skipping FES calculation'
 		sleep 2
 	elif [[ "$para_set" == 1 ]]; then
-		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
+		echo "${demA}"$' Now running construct_free_en_surface.py to construct FES...\n'
 		sleep 2
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py || \
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py
 
 		echo $'\n Run construct_free_en_surface.py...DONE'
 		sleep 2
-		echo $'\n Cleaning up...'"$demB"
-		#echo "$demA"$' Cleaning up...\n'
+		echo $'\n Cleaning up...'"${demB}"
+		#echo "${demA}"$' Cleaning up...\n'
 		sleep 1
 
 		currentFESchapPCAdir="$(pwd)""/PCA_FES_chap"
@@ -2497,7 +2497,7 @@ useFoundPCA_FESPy()
 		# fetch simulation time from the trajectory using the ScanTRAJ fxn
 		checksimtime="SimTime.dat"
 		if [[ ! -f "$checksimtime" ]] ; then
-			echo "$demA"$' Extracting the simulation time-points from the trajectory...\n'
+			echo "${demA}"$' Extracting the simulation time-points from the trajectory...\n'
 			ScanTRAJ
 			increment_factor=$(awk "BEGIN {print $simDuratnINTns / $No_of_frames}")
 			simtimeRecorded=0
@@ -2509,7 +2509,7 @@ useFoundPCA_FESPy()
 					break
 				fi
 			done
-			echo $' Extract simulation time-points from the trajectory...DONE'"$demB"
+			echo $' Extract simulation time-points from the trajectory...DONE'"${demB}"
 			sleep 2
 		fi
 	fi
@@ -2517,7 +2517,7 @@ useFoundPCA_FESPy()
 
 useFoundRgRMSData_FESPy()
 {
-	echo "$demA"$' Preparing parameters for FES calculations...\n'
+	echo "${demA}"$' Preparing parameters for FES calculations...\n'
 	sleep 2
 	
 	# cat RMSData.dat | sort -n > sorted_RMSData.dat
@@ -2539,15 +2539,15 @@ useFoundRgRMSData_FESPy()
 	echo $'XaxisL,RMSD (nm)\nYaxisL,Rg (nm)\n'"Temp,$Temp" >> CHAP_fes_Par.in
 	echo $'outFilename,RgVsRMSD_FES\nplotTitle,Rg Vs RMSD' >> CHAP_fes_Par.in
 
-	echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
+	echo "${demA}"$' Now running construct_free_en_surface.py to construct FES...\n'
 	sleep 2
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py || \
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py
 
-	echo $'\n Run construct_free_en_surface.py...DONE'"$demB"
+	echo $'\n Run construct_free_en_surface.py...DONE'"${demB}"
 	sleep 2
-	echo $'\n Cleaning up...'"$demB"
-	#echo "$demA"$' Cleaning up...\n'
+	echo $'\n Cleaning up...'"${demB}"
+	#echo "${demA}"$' Cleaning up...\n'
 	sleep 1
 	
 	currentFESchapRgVsRMSDdir="$(pwd)""/RgVsRMSD_FES_chap"
@@ -2580,7 +2580,7 @@ useFoundRgRMSData_FESPy()
 
 analyser14()
 {	
-	echo "$demA"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
+	echo "${demA}"$' Constructing FES using CHAPERONg energetic landscape scripts...\n'
 	order_parameters
  	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_FESPy
@@ -2598,7 +2598,7 @@ analyser14()
 			read -p ' Provide the path to the pre-calculated Rg.xvg data: ' precalcRg
 			read -p ' Provide the path to the pre-calculated RMSD.xvg data: ' precalcRMSD
 			
-			echo "$demA"$' Pre-processing user-provided Rg Vs RMSD data files...\n\n'
+			echo "${demA}"$' Pre-processing user-provided Rg Vs RMSD data files...\n\n'
 			sleep 1
 			cat "$precalcRg" | grep -v "^[@#]" | awk '{print $2}' > RgData.dat
 			RgData="$precalcRg"
@@ -2645,7 +2645,7 @@ inputFormat
 			read -p ' Provide the path to the 2nd order_parameter.xvg data: ' precalcOrderPar2
 			inputprecalcOrderPar2="$precalcOrderPar2"
 				
-			echo "$demA"$'Pre-processing user-provided order parameter data files...\n\n'
+			echo "${demA}"$'Pre-processing user-provided order parameter data files...\n\n'
 			sleep 1
 			cat "$precalcOrderPar1" | grep -v "^[@#]" | awk '{print $2}' > precalcOrderPar1.dat
 			cat "$precalcOrderPar2" | grep -v "^[@#]" | awk '{print $2}' > precalcOrderPar2.dat
@@ -2664,7 +2664,7 @@ inputFormat
 			cat "$precalcOrderParPair" | grep -v "^[@#]" | awk '{print $2}' > precalcOrderPar2.dat
 		fi
 
-		echo "$demA"$' Preparing parameters for FES calculations...\n'
+		echo "${demA}"$' Preparing parameters for FES calculations...\n'
 		sleep 2
 		cat precalcOrderPar1.dat | sort -n > sorted_precalcOrderPar1.dat
 		cat precalcOrderPar2.dat | sort -n > sorted_precalcOrderPar2.dat
@@ -2683,15 +2683,15 @@ inputFormat
 		echo "maxPar2,$maxParam2"$'\n'"no_of_frames,$No_of_frames"$'\n'"Temp,$Temp" >> CHAP_fes_Par.in
 		echo $'XaxisL,PC1\nYaxisL,PC2\noutFilename,FES\nplotTitle,' >> CHAP_fes_Par.in
 
-		echo "$demA"$' Now running construct_free_en_surface.py to construct FES...\n'
+		echo "${demA}"$' Now running construct_free_en_surface.py to construct FES...\n'
 		sleep 2
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py || \
 		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_construct_free_en_surface.py
 
 		echo $'\n Run construct_free_en_surface.py...DONE'
 		sleep 2
-		echo $'\n Cleaning up...'"$demB"
-		#echo "$demA"$' Cleaning up...\n'
+		echo $'\n Cleaning up...'"${demB}"
+		#echo "${demA}"$' Cleaning up...\n'
 		sleep 1
 
 		currentFESchapdir="$(pwd)""/FES_chap"
@@ -2732,7 +2732,7 @@ inputFormat
 	raise_bin_problem()
 	{
 		bin_prob=1
-		echo "$demA"$' **NOTE:\n  The choice of the bin size for the 2D histogram is not suitable.'\
+		echo "${demA}"$' **NOTE:\n  The choice of the bin size for the 2D histogram is not suitable.'\
 		$'\n  Lowest energy structures will not be extracted.'\
 		$'\n  Landscape data points will not be mapped to simulation time.'\
 		$'\n  Try experimenting with different bin counts. To do this,'\
@@ -2744,11 +2744,11 @@ inputFormat
 	
 	mv binning_summary.dat ./"$results_folder" || raise_bin_problem
 
-	echo "$demA"$' Construct free energy surface...DONE'"$demB"
+	echo "${demA}"$' Construct free energy surface...DONE'"${demB}"
 	sleep 2
 	
 	if (( "$bin_prob" == 0 )) ; then
-		echo "$demA"$'\n Proceed to identify, extract the lowest energy structure from the landscape?\n'
+		echo "${demA}"$'\n Proceed to identify, extract the lowest energy structure from the landscape?\n'
 		read -p ' Enter a response here (yes or no): ' getEnergyMin
 		
 		while [[ "$getEnergyMin" != "yes" && "$getEnergyMin" != "no" && \
@@ -2768,7 +2768,7 @@ inputFormat
 				mkdir collect_mappings
 			fi
 			paste SimTime.dat $OrderParameter1 $OrderParameter2 > SimTime_OrderParameters1_2.dat
-			echo "$demA"$' Mapping landscape data point to simulation time...\n'
+			echo "${demA}"$' Mapping landscape data point to simulation time...\n'
 			sleep 2
 			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py || \
 			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_fes_parameter_to_simTime.py
@@ -2791,7 +2791,7 @@ inputFormat
 			echo $' Identify the corresponding time for the lowest energy structure...DONE'
 			sleep 1
 			
-			echo "$demA"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
+			echo "${demA}"$' Extracting the lowest energy structure from the trajectory...\n\n\n'
 			sleep 2
 
 			if [[ $automode == "full" && $sysType == "protein_only" ]]; then
@@ -2810,7 +2810,7 @@ inputFormat
 				echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s \
 				"${filenm}".tpr -n index.ndx -o "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb -dump "$lowEn_time_ps"
 			fi
-			echo "$demA"$' Extract lowest energy structure from the trajectory...DONE'"$demB"
+			echo "${demA}"$' Extract lowest energy structure from the trajectory...DONE'"${demB}"
 			sleep 2
 
 			mv "${filenm}"_LowestEnergy_time"$lowEn_time_ps".pdb ./collect_mappings/ || true
@@ -2837,7 +2837,7 @@ extractMoreStructs
 			done
 			
 			if [[ "$getMoreStructs" == 1 ]] ; then
-				echo "$demA"$' Mapping all data points from the Free Energy Surface to simulation time...\n'
+				echo "${demA}"$' Mapping all data points from the Free Energy Surface to simulation time...\n'
 				sleep 2
 				cp ./"$results_folder"/SimTime_OrderParameters1_2.dat . || true
 				cp ./"$results_folder"/OrderParameters1_2_dG_nogap-sorted.dat . || true
@@ -2849,7 +2849,7 @@ extractMoreStructs
 				python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py || \
 				python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_map_all_dataPoint_to_simTime.py
 
-				echo "$demA"$' Collecting approximate simulation entries for mapped data points...\n'
+				echo "${demA}"$' Collecting approximate simulation entries for mapped data points...\n'
 				sleep 2
 				echo $' Sorting and pre-processing FES data points...\n'
 				cd ./collect_mappings_extra
@@ -2887,15 +2887,15 @@ extractMoreStructs
 				mv ./collect_mappings_extra/energy-sorted_mappedFESdataPoints_timed.dat ./"$results_folder"/collect_mappings/
 				rm -r ./collect_mappings_extra SimTime_OrderParameters1_2.dat OrderParameters1_2_dG_nogap-sorted.dat
 
-				echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"$demB"
+				echo $'\n Collect approximate simulation entries for mapped data points...DONE\n'"${demB}"
 				sleep 2
-				echo "$demA"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
+				echo "${demA}"$'\n **NOTE: An output file named mappedFESdataPoints_timed.dat and copies of it'\
 				$'\n (sorted by time or energy) all containing the mapped simulation time, order'\
 				$'\n parameters and the corresponding free energy have been generated and saved'\
 				$'\n into the folder '"$results_folder""/collect_mappings."\
 				$'\n\n **You may use this file to identify the sumulation time(s) of the'\
 				$'\n structure(s) you may want to extract from the 2D representation of the free'\
-				$'\n energy landscape.'"$demB"
+				$'\n energy landscape.'"${demB}"
 				sleep 2
 
 cat << extractMoreStructs
@@ -2922,7 +2922,7 @@ extractMoreStructs
 
 					frameTime_ps=$(awk "BEGIN {print $frameTime * 1000}")
 
-					echo "$demA"$' Extracting structure from the trajectory at the specified time...\n\n'
+					echo "${demA}"$' Extracting structure from the trajectory at the specified time...\n\n'
 					sleep 2
 
 					if [[ $automode == "full" && $sysType == "protein_only" ]]; then
@@ -2941,12 +2941,12 @@ extractMoreStructs
 						echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s \
 						"${filenm}".tpr -n index.ndx -o "${filenm}"_Structure_at_Time"$frameTime_ps".pdb -dump "$frameTime_ps"
 					fi
-					echo "$demA"$' Extract structure from the trajectory at the specified time...DONE'"$demB"
+					echo "${demA}"$' Extract structure from the trajectory at the specified time...DONE'"${demB}"
 					sleep 2
 
 					mv "${filenm}"_Structure_at_Time"$frameTime_ps".pdb ./"$results_folder"/collect_mappings/ || true
 
-					echo "$demA"$'\n The structure has been saved to the folder '"./$results_folder""/collect_mappings"
+					echo "${demA}"$'\n The structure has been saved to the folder '"./$results_folder""/collect_mappings"
 
 cat << extractMoreStructs
 
@@ -2979,16 +2979,16 @@ if [[ "$analysis" == *" 14 "* ]]; then analyser14 ; fi
 
 useFoundPCA_mdDavis()
 {
-	echo "$demA"$' Extracting principal components from 2d_projection data...\n\n'
+	echo "${demA}"$' Extracting principal components from 2d_projection data...\n\n'
 	sleep 2
 	
 	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $1}' > PC1_datapoints.dat
 	cat $exist2dPCA | grep -v "^[@#]" | awk '{print $2}' > PC2_datapoints.dat
 
-	echo $' Extract principal components from 2d_projection data...DONE'"$demB"
+	echo $' Extract principal components from 2d_projection data...DONE'"${demB}"
 	sleep 2
 
-	echo "$demA"$' Preparing parameters for free energy landscape calculations...\n'
+	echo "${demA}"$' Preparing parameters for free energy landscape calculations...\n'
 	sleep 2
 
 	checksimtime="SimTime.dat"
@@ -3006,7 +3006,7 @@ useFoundPCA_mdDavis()
 				break
 			fi
 		done
-		echo $' Extract simulation time-points from the trajectory...DONE'"$demB" ; sleep 2
+		echo $' Extract simulation time-points from the trajectory...DONE'"${demB}" ; sleep 2
 	fi
 
 	currentFELmdDavisPCAdir="$(pwd)""/PCA_3D-FEL_mdDavis"
@@ -3044,7 +3044,7 @@ useFoundPCA_mdDavis()
 
 useFoundRgRMSData_mdDavis()
 {
-	echo "$demA"$' Preparing parameters for 3D free energy landscape calculations...\n'
+	echo "${demA}"$' Preparing parameters for 3D free energy landscape calculations...\n'
 	sleep 2
 
 	currentFELmdDavisRgVsRMSDdir="$(pwd)""/RgVsRMSD_3D-FEL_mdDavis"
@@ -3071,7 +3071,7 @@ useFoundRgRMSData_mdDavis()
 
 analyser15()
 {	
-	echo "$demA"$' Constructing a 3D plot of the FES using md-davis...\n'
+	echo "${demA}"$' Constructing a 3D plot of the FES using md-davis...\n'
 	order_parameters
  	if [[ $orderPair_choice == 1 && $automode == "semi" ]] ; then
 		if [[ "$PCFile" == 1 ]]; then useFoundPCA_mdDavis
@@ -3102,7 +3102,7 @@ analyser15()
 		echo ""
 		read -p ' Provide the path to the 2nd order_parameter.xvg data: ' OrderParameter2
 		
-		echo "$demA"$' Preparing parameters for 3D free energy landscape calculations...\n'
+		echo "${demA}"$' Preparing parameters for 3D free energy landscape calculations...\n'
 		sleep 2
 		
 		results_folder="3D-FEL_mdDavis"
@@ -3126,7 +3126,7 @@ analyser15()
 		fi
 	fi
 
-	echo "$demA"$' Constructing 3D plot of the md-davis free energy surface...\n'
+	echo "${demA}"$' Constructing 3D plot of the md-davis free energy surface...\n'
 	sleep 2
 
 	md-davis landscape_xvg -T $Temp -x ${OrderParameter1} -y ${OrderParameter2} -n \
@@ -3135,7 +3135,7 @@ analyser15()
 	if [[ $orderPair_choice == 2 ]] ; then
 		rm RgVsRMSD.xvg RgData.dat RMSData.dat
 	fi
-	echo $'\n Construct 3D plot of the md-davis free energy surface...DONE'"$demB"
+	echo $'\n Construct 3D plot of the md-davis free energy surface...DONE'"${demB}"
 	sleep 2
 }
 
@@ -3178,7 +3178,7 @@ hbondMatrix_useFoundData()
 	elif [[ ! -d "$currentHBmatrixdir" ]]; then mkdir hbond_matrix
 	fi
 
-	echo "$demA"$' Extracting a reference structure from the trajectory...\n\n\n'
+	echo "${demA}"$' Extracting a reference structure from the trajectory...\n\n\n'
 	sleep 2
 	if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 		echo 1 | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
@@ -3191,7 +3191,7 @@ hbondMatrix_useFoundData()
 	elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 		echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -o hbond_matrix/${filenm}_referenceStructure.pdb -dump 0
 	fi
-	echo "$demA"$' Extract a reference structure from the trajectory...DONE\n'
+	echo "${demA}"$' Extract a reference structure from the trajectory...DONE\n'
 	echo $' Preparing the H-bond matrix...\n'
 	sleep 2
 	echo $' Detecting the list of H-bonds from the gmx index file...\n'
@@ -3233,7 +3233,7 @@ hbcutAsk
 		md-davis plot_hbond --percent --total_frames 101 --cutoff ${HBcutOff} \
 		-o hbond_matrix/hbond_matrix_${filenm}.html hbond_matrix/hb_data.p
 	fi
-	echo $' Preparing the H-bond matrix...DONE'"$demB"
+	echo $' Preparing the H-bond matrix...DONE'"${demB}"
 }
 
 analyser16()
@@ -3242,7 +3242,7 @@ analyser16()
 	if [[ -f "$existXVGin" ]] && [[ -f "$existMATRIXin" ]] && [[ -f "$existINDEXin" ]]
 		then
 		if [[ $automode == "semi" ]] ; then
-			echo "$demA"$' Pre-calculated H-bond data found!\n\nFiles found:'\
+			echo "${demA}"$' Pre-calculated H-bond data found!\n\nFiles found:'\
 			$'\n'"$existXVGin"$'\n'"$existMATRIXin"$'\n'"$existINDEXin"
 			sleep 2
 cat << askFELuseexist
@@ -3293,7 +3293,7 @@ read -p '*Please enter the number of frames to skip at intervals: ' ski
 if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
 fi
 echo "You entered: $ski"$'\n'
-echo "$demA"$' Now extracting chosen frames...\n'
+echo "${demA}"$' Now extracting chosen frames...\n'
 if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 0 | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}""_trjSystem_Every""$ski""skip.xtc" $skp
 	echo 1 | eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}""_trjProtein_Every""$ski""skip.xtc" $skp
@@ -3304,7 +3304,7 @@ elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 else
 	eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}""_trj_Every""$ski""skip.xtc" $skp
 fi
-echo "$demA"$' Extract frames...DONE'"$demB"
+echo "${demA}"$' Extract frames...DONE'"${demB}"
 sleep 2
 }
 
@@ -3312,7 +3312,7 @@ sleep 2
 
 makeNDXGroup2()
 {
-echo "$demA"$' Will now make index group(s)'"$demB"
+echo "${demA}"$' Will now make index group(s)'"${demB}"
 sleep 2
 
 read -p '**Provide a filename for the index group to be made: ' nameForIndex
@@ -3323,7 +3323,7 @@ ndxNAME="$nameForIndex"".ndx"
 
 eval "$gmx_exe_path" make_ndx -f em.gro -o $ndxNAME
 
-echo "$demA"" Make index group ${nameForIndex}... DONE""$demB"
+echo "${demA}"" Make index group ${nameForIndex}... DONE""${demB}"
 sleep 2
 }
 
