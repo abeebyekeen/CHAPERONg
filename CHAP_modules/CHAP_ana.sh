@@ -1069,7 +1069,7 @@ if [[ "$analysis" == *" 9 "* ]]; then analyser9 ; fi
 
 analyser10()
 {
-	printf "$demA Preparing to estimate probability density function using KDE...\n\n"
+	printf "$demA Preparing to estimate probability density function using KDE... \n\n"
 	sleep 2
 	echo " Do you want to run single data or multi-data plot?"
 	sleep 1
