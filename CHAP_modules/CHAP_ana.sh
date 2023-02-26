@@ -504,7 +504,7 @@ if [[ $automode == "full" ]]; then
 else
 	echo $'**In the following step, CHOOSE Protein (1) for Rg analysis\n\n'
 	eval "$gmx_exe_path" gyrate -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_Rg.xvg
-	echo "${demA}"$' Compute radius of gyration...DONE'"${demB}"
+	echo -e "${demA}\033[92m Compute radius of gyration...DONE\033[m${demB}"
 	sleep 2
 	echo "${demA}"$' Now converting Rg plot to ns format...\n'
 	sleep 2
@@ -512,14 +512,14 @@ else
 	grep -v "^[@#]" ${filenm}_Rg.xvg | \
 	awk '{print $1/1000"      "$2"      "$3"      "$4"     "$5}' >> ${filenm}_Rg_ns.xvg
 fi
-echo "${demA}"$' Generate ns and ps Rg plots...DONE'"${demB}"
+echo -e "${demA}\033[92m Generate ns and ps Rg plots...DONE\033[m${demB}"
 sleep 2
 gracebat ${filenm}_Rg_ns.xvg -hdevice PNG -autoscale xy -printfile ${filenm}_Rg_ns.png -fixed 7500 4000 -legend load || notifyImgFail
 	
 AnaName="Rg"
 filesuffx="Rg"
 createDIR
-echo "${demA}"$' Generate a finished figure of the Rg plot... DONE'"${demB}"
+echo -e "${demA}\033[92m Generate a finished figure of the Rg plot... DONE\033[m${demB}"
 sleep 2
 }
 
@@ -548,7 +548,7 @@ hbond_DNA1()
 	echo "Protein" "Protein" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s ${filenm}.tpr -n index.ndx \
 		-num hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 
-	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Intra-protein hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 
 	echo "${demA}"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
@@ -557,14 +557,14 @@ hbond_DNA1()
 	echo "DNA" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx \
 		-num hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 
-	echo "${demA}"$' Intra-DNA hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Intra-DNA hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 
 	echo "${demA}"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
 	echo "Protein" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -num \
 		hbnum_Pro_DNA_${filenm}.xvg -hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 
-	echo "${demA}"$' Protein-DNA hydrogen bonding analysis... DONE'"${demB}"
+	echo -e "${demA}\033[92m Protein-DNA hydrogen bonding analysis... DONE\033[m${demB}"
 	sleep 2
 }
 hbond_DNA2()
