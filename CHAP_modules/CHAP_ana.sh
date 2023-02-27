@@ -576,7 +576,7 @@ echo "Protein" "Protein" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel
 	hbnum_Pro_${filenm}.xvg -hbm hb_matrix_Pro_${filenm}.xpm -hbn hb_index_Pro_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
+echo -e "${demA}\033[92m Intra-protein hydrogen bonding analysis...DONE\033[m${demB}"
 sleep 2
 
 echo "${demA}"$' Now executing Intra-DNA hydrogen bonding analysis...\n'
@@ -586,7 +586,7 @@ echo "DNA" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s
 	hbnum_DNA_${filenm}.xvg -hbm hb_matrix_DNA_${filenm}.xpm -hbn hb_index_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "${demA}"$' Intra-DNA hydrogen bonding analysis...DONE'"${demB}"
+echo -e "${demA}\033[92m Intra-DNA hydrogen bonding analysis...DONE\033[m${demB}"
 sleep 2
 
 echo "${demA}"$' Now executing Protein-DNA hydrogen bonding analysis...\n'
@@ -1335,7 +1335,7 @@ askDataExist
 
 	fi
 
-	printf "${demA} Estimate probability density function using KDE...DONE ${demB}"
+	printf "${demA}\033[92m Estimate probability density function using KDE...DONE\033[m${demB}"
 	# sleep 2
 }
 
