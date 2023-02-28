@@ -1702,7 +1702,7 @@ if [[ $mmGMXpath != '' ]] ; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "${demA} Extract $mmpbframesNo frames from the trajectory...DONE""${demB}"
+			echo -e "${demA}\033[92m Extract $mmpbframesNo frames from the trajectory...DONE\033[m${demB}"
 			sleep 2
 		
 		elif [[ $automode != "full" ]]; then
@@ -1717,7 +1717,7 @@ if [[ $mmGMXpath != '' ]] ; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
 			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
 		
-			echo "${demA} Extract $mmpbframesNo frames from the trajectory...DONE""${demB}"
+			echo -e "${demA}\033[92m Extract $mmpbframesNo frames from the trajectory...DONE\033[m${demB}"
 			sleep 2
 		fi	
 	
@@ -3323,7 +3323,7 @@ ndxNAME="$nameForIndex"".ndx"
 
 eval "$gmx_exe_path" make_ndx -f em.gro -o $ndxNAME
 
-echo "${demA}"" Make index group ${nameForIndex}... DONE""${demB}"
+echo -e "${demA}\033[92m Make index group ${nameForIndex}...DONE\033[m${demB}"
 sleep 2
 }
 
