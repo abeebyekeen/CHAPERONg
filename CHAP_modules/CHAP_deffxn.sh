@@ -108,7 +108,7 @@ makeNDXGroup()
 
 	eval $gmx_exe_path make_ndx -f em.gro -o $ndxNAME
 
-	echo "$demA Make index group ${nameForIndex}... DONE""${demB}"
+	echo -e "${demA}\033[92m Make index group ${nameForIndex}... DONE\033[m${demB}"
 }
 
 
@@ -119,7 +119,7 @@ s0GenTop()
 	echo "${demA}"$' Generating protein topology...'"${demB}"
 	sleep 2
 	if [[ $coordinates_raw == '' ]]; then
-		echo "$demA ERROR! No coordinates filename is given! Use the --input flag!!""${demB}"
+		echo -e "${demA}\033[31m ERROR! ""No coordinates filename is given! ""Use the --input flag!""!""\033[m${demB}"
 		sleep 3
 		Help; sleep 3; Credit; exit 1
 	fi
@@ -2837,7 +2837,7 @@ umbre_s18_WHAM()
 
 	echo "${demA}"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
-	echo "$demA Extract the PMF and plot the umbrella histograms...DONE""${demB}"
+	echo -e "${demA}\033[92m Extract the PMF and plot the umbrella histograms...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -2866,7 +2866,7 @@ umbre_s19_MoreWin()
 
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
-		echo "$demA Run NPT equilibration for configuration $us_frame...DONE""${demB}"
+		echo -e "${demA}\033[92m Run NPT equilibration for configuration $us_frame...DONE\033[m${demB}"
 		sleep 1
 
 		echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
@@ -2876,7 +2876,7 @@ umbre_s19_MoreWin()
 
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
-		echo "$demA Run umbrella sampling for configuration $us_frame...DONE""${demB}"
+		echo -e "${demA}\033[92m Run umbrella sampling for configuration $us_frame...DONE\033[m${demB}"
 		sleep 1
 		echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
 		echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
