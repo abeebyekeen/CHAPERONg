@@ -2722,7 +2722,7 @@ US_fxn()
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt_win"$window"_conf"$us_frame"
 
-	echo "$demA Run NPT equilibration for configuration $us_frame...DONE""${demB}"
+	echo -e "${demA}\033[92m Run NPT equilibration for configuration $us_frame...DONE\033[m${demB}"
 	sleep 1
 
 	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
@@ -2734,7 +2734,7 @@ US_fxn()
 
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm umbrella_win"$window"_conf"$us_frame"
 
-	echo "$demA Run umbrella sampling for configuration $us_frame...DONE""${demB}"
+	echo -e "${demA}\033[92m Run umbrella sampling for configuration $us_frame...DONE\033[m${demB}"
 	sleep 1
 	config_no=$(( config_no + 1 ))
 }
