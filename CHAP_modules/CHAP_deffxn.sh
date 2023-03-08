@@ -2615,7 +2615,7 @@ umbre_s14_xtractFrames()
 	fi
 	# mv coordinate*.gro ./coordinates_SMD || true
 	echo 0 | eval $gmx_exe_path trjconv -s pull.tpr -f pull.xtc -o ./coordinates_SMD/coordinate.gro -sep
-	echo "${demA}"" Extract frames from the steered MDS trajectory...DONE""${demB}"
+	echo -e "${demA}\033[92m Extract frames from the steered MDS trajectory...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -2664,7 +2664,7 @@ umbre_s15_calcCOMdist()
 		StructNo=$(( StructNo + 1 ))
 	done
 	rm -r distances_SMD
-	echo "${demA}"" Calculate COM distances...DONE""${demB}"
+	echo -e "${demA}\033[92m Calculate COM distances...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -2706,7 +2706,7 @@ umbre_s16_findIniConf()
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py || \
 	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py
 
-	echo $'\n'" Identify initial configurations for umbrella sampling...DONE""${demB}"
+	echo -e "\n\033[92m Identify initial configurations for umbrella sampling...DONE\033[m${demB}"
 	sleep 2
 }
 
