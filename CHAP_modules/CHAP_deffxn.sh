@@ -195,12 +195,12 @@ s0CharmmSta()
 	ffcount=0
 	for ffd in charmm*.ff; do
 		if [[ "$ffd" == '' ]]; then
-			echo "$demA Provide below the path/name of the charmm forcefield to be used"$'\n'
+			echo "${demA} Provide below the path/name of the charmm forcefield to be used"$'\n'
 			read -p " Path (or name if in current directory) of forcefield: " forceffd
 		else
 			ffcount=$(( ffcount + 1))
 			if [[ $ffcount == 2 ]] ; then 
-				echo "$demA Multiple forcefield folders found in the working directory! \
+				echo "${demA} Multiple forcefield folders found in the working directory! \
 				Please keep only the one to be used and try again!!"
 				exit 1
 			fi
@@ -214,7 +214,7 @@ s0CharmmSta()
 	charm2gmxCount=0
 	for cgenffscr in cgenff_charmm2gmx*.py; do
 		if [[ "$cgenffscr" == '' ]]; then
-			echo "$demA Please copy a suitable cgenff_charmm2gmx*.py script in the current \
+			echo "${demA} Please copy a suitable cgenff_charmm2gmx*.py script in the current \
 			directory and repeat this step."$'\n'
 			exit 1
 		else
@@ -253,7 +253,7 @@ s0CharmmSta()
 	strcount=0
 	for strLig in *.str; do
 		if [[ "$strLig" == '' ]]; then
-			echo "$demA No CHARMM stream file (.str) found in the current directory."
+			echo "${demA} No CHARMM stream file (.str) found in the current directory."
 			exit 1
 		else
 		strcount=$(( strcount + 1))
@@ -291,7 +291,7 @@ s0CharmmSta()
 		python2 $cgenffscript $ligname $ligandmol2 $strLigand $forceffd
 	}
 
-	echo "$demA Will now convert CHARMM topology to GROMACS format...""${demB}"
+	echo "${demA} Will now convert CHARMM topology to GROMACS format...""${demB}"
 	sleep 2
 
 	cgenff_charmm2gmxTry1 || cgenff_charmm2gmxTry2 || cgenff_charmm2gmxTry3
@@ -2351,7 +2351,7 @@ askMovielength
 		cat "$trajectlog" | grep -v "GROMACS reminds"
 		sleep 2
 
-		echo "$demA Above is a summary of your $simulationcontext trajectory."
+		echo "${demA} Above is a summary of your $simulationcontext trajectory."
 		sleep 1
 		echo $' You may find the info useful to provide a response to the prompt below.'
 		sleep 2
@@ -2725,7 +2725,7 @@ US_fxn()
 	echo -e "${demA}\033[92m Run NPT equilibration for configuration $us_frame...DONE\033[m${demB}"
 	sleep 1
 
-	echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
+	echo "${demA} Now running umbrella sampling for configuration $us_frame"$'\n\n'
 	sleep 1
 
 	eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro \
@@ -2785,7 +2785,7 @@ umbre_s17_USampling()
 
 umbre_s18_WHAM()
 {
-	echo "$demA Extracting the PMF and plotting the umbrella histograms...""${demB}"
+	echo "${demA} Extracting the PMF and plotting the umbrella histograms...""${demB}"
 	sleep 2
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o \
 	PMF_profile.xvg -hist umbrella_sampling_histograms0.xvg -unit kCal
@@ -2848,7 +2848,7 @@ umbre_s19_MoreWin()
 	while [[ "$repeatUSmore" == "yes" || "$repeatUSmore" == "y" || \
 		"$repeatUSmore" == '"yes"' || "$repeatUSmore" == '"y"' ]]
 	do
-		echo "$demA Running umbrella sampling for an additional window...""${demB}"
+		echo "${demA} Running umbrella sampling for an additional window...""${demB}"
 		sleep 2
 		read -p ' Enter the frame number of the SMD configuration to use: ' us_frame
 		echo $'\n You entered: '"$us_frame"
@@ -2859,7 +2859,7 @@ umbre_s19_MoreWin()
 			window=$(( window + 1 ))
 		done
 			
-		echo "$demA Now running NPT equilibration for configuration $us_frame"
+		echo "${demA} Now running NPT equilibration for configuration $us_frame"
 		sleep 1
 		eval $gmx_exe_path grompp -f npt_umbrella.mdp -c ./coordinates_SMD/coordinate"$us_frame".gro -p topol.top -r \
 		./coordinates_SMD/coordinate"$us_frame".gro -n index.ndx -o npt_win"$window"_conf"$us_frame".tpr -maxwarn $WarnMax
@@ -2869,7 +2869,7 @@ umbre_s19_MoreWin()
 		echo -e "${demA}\033[92m Run NPT equilibration for configuration $us_frame...DONE\033[m${demB}"
 		sleep 1
 
-		echo "$demA Now running umbrella sampling for configuration $us_frame"$'\n\n'
+		echo "${demA} Now running umbrella sampling for configuration $us_frame"$'\n\n'
 		sleep 1
 		eval $gmx_exe_path grompp -f md_umbrella.mdp -c npt_win"$window"_conf"$us_frame".gro -t npt_win"$window"_conf"$us_frame".cpt -p \
 		topol.top -r npt_win"$window"_conf"$us_frame".gro -n index.ndx -o umbrella_win"$window"_conf"$us_frame".tpr -maxwarn 1
