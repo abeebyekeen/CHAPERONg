@@ -594,7 +594,7 @@ echo "Protein" "DNA" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xt
 	-hbm hb_matrix_Pro_DNA_${filenm}.xpm -hbn hb_index_Pro_DNA_${filenm}.ndx -tu ns $hbthread
 gracebat hbnum_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 hbnum_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
-echo "${demA}"$' Protein-DNA hydrogen bonding analysis... DONE'"${demB}"
+echo -e "${demA}\033[92m Protein-DNA hydrogen bonding analysis... DONE\033[m${demB}"
 sleep 2
 }
 
@@ -604,12 +604,12 @@ echo "${demA}"$' Now executing H-bond analysis...\n'
 if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 1 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
-	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Intra-protein hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 	echo 1 "SOL" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_Pro-SOL_${filenm}.xvg \
 	-hbm hb_matrix_Pro-SOL_${filenm}.xpm -hbn hb_index_Pro-SOL_${filenm}.ndx -tu ns $hbthread || \
 	echo "${demA}"$' There are multiple groups with the name SOL. Skipping...'
-	echo "${demA}"$' Protein-SOL hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Protein-SOL hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -621,12 +621,12 @@ if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	echo 1 "$ligname" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
 	-hbm hb_matrix_ProLig_${filenm}.xpm -hbn hb_index_ProLig_${filenm}.ndx -tu ns $hbthread || altHBOND
-	echo "${demA}"$' Protein-ligand hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Protein-ligand hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 
 	echo 1 1 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_intraPro_${filenm}.xvg \
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
-	echo "${demA}"$' Intra-protein hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Intra-protein hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 	gracebat hbnum_ProLig_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_ProLig_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
@@ -635,7 +635,7 @@ elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 elif [[ $sysType == "protein_only" && $automode == "semi" ]] ; then
 	eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
-	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
@@ -644,13 +644,13 @@ elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automod
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread || \
 	eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
-	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 	gracebat hbnum_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 elif [[ $sysType == "protein_dna" ]] && [[ $automode == "full" ]] ; then
 	hbond_DNA1 || hbond_DNA2
-	echo "${demA}"$' Hydrogen bonding analysis...DONE'"${demB}"
+	echo -e "${demA}\033[92m Hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
 fi
 	
@@ -673,7 +673,7 @@ if [[ -d "$currenthbonddir" ]]; then
 elif [[ ! -d "$currenthbonddir" ]]; then
 	mkdir ./hbond; mv hbnum_*.png hbnum_*.xvg hbnum*.png hb_matrix_* hb_index_* ./hbond || true
 fi
-echo "${demA}"$' Generate finished figure(s) of the hbond plot(s)... DONE'"${demB}"
+echo -e "${demA}\033[92m Generate finished figure(s) of the hbond plot(s)... DONE\033[m${demB}"
 }
 
 if [[ "$analysis" == *" 5 "* ]]; then analyser5 ; fi
@@ -699,24 +699,24 @@ analyser6()
 		sasa_Pro_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "${demA}"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
+		echo "${demA}"$' Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
 		echo "DNA" | eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_DNA_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "${demA}"$'Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
-		echo "${demA}"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
+		echo "${demA}"$' Compute solvent accessible surface area (SASA) for DNA only...DONE'"${demB}"	
+		echo "${demA}"$' Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...\n'	
 		echo "Protein_DNA" | eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -o \
 		sasa_Pro_DNA_${filenm}.xvg -tu ns
 		gracebat sasa_Pro_DNA_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_Pro_DNA_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail	
-		echo "${demA}"$'Now calculating solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"${demB}"	
+		echo "${demA}"$' Calculate solvent accessible surface area (SASA) for Protein-DNA complex...DONE'"${demB}"	
 	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 		eval "$gmx_exe_path" sasa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o sasa_${filenm}.xvg -tu ns
 		gracebat sasa_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 		sasa_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 	fi
-	echo "${demA}"$' Compute solvent accessible surface area (SASA)...DONE'"${demB}"
+	echo -e "${demA}\033[92m Compute solvent accessible surface area (SASA)...DONE\033[m${demB}"
 	sleep 2
 	currentSASAdir="$(pwd)""/SASA"
 	nSASA=1
@@ -736,7 +736,7 @@ analyser6()
 	elif [[ ! -d "$currentSASAdir" ]]; then mkdir ./SASA
 	fi
 	mv sasa*${filenm}.png sasa*${filenm}.xvg ./SASA || true
-	echo "${demA}"$' Generate a finished figure of the SASA plot... DONE'"${demB}"
+	echo -e "${demA}\033[92m Generate a finished figure of the SASA plot...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -784,7 +784,7 @@ analyser7()
 		eval "$gmx_exe_path" anaeig -v "${filenm}"_eigenvec.trr -f "${filenm}"_${wraplabel}.xtc -eig \
 		"${filenm}"_eigenval.xvg -s "${filenm}".tpr -first 1 -last 2 -2d PCA_2dproj_"${filenm}".xvg	
 	fi
-	echo "${demA}"$' Principal component analysis (PCA)...DONE'"${demB}"
+	echo -e "${demA}\033[92m Principal component analysis (PCA)...DONE\033[m${demB}"
 	sleep 2
 	currentPCAdir="$(pwd)""/PCA"
 	nPCA=1
@@ -803,7 +803,7 @@ analyser7()
 	elif [[ ! -d "$currentPCAdir" ]]; then mkdir ./PCA
 	fi
 	mv PCA_2dproj_*.png *eigenval.xvg PCA_2dproj_*.xvg *_eigenvec.trr covar.log average.pdb dd?????? ./PCA || true
-	echo "${demA}"$' Generate finished figures of the PCA plots... DONE'"${demB}"
+	echo -e "${demA}\033[92m Generate finished figures of the PCA plots... DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -928,7 +928,7 @@ analyser8()
 	echo "MainChain" | eval "$gmx_exe_path" do_dssp -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
 	-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || useCHAPdsspGMX
 	if [[ "$dsspCheck" == "Avail" ]] ; then
-		echo "${demA}"$' Compute secondary structure...DONE'"${demB}"
+		echo -e "${demA}\033[92m Compute secondary structure...DONE\033[m${demB}"
 		sleep 1
 		echo "${demA}"$' Detecting colour codes assigned in the eps file...\n'
 		sleep 2
@@ -994,7 +994,7 @@ analyser8()
 		elif [[ ! -d "$currentSecStrdir" ]]; then
 			mkdir Secondary_structure; mv scount.xvg ss_*.xpm ss_*.eps ss_*.pdf ss_*.png ./Secondary_structure || true
 		fi
-		echo "${demA}"$' Secondary structure analysis...DONE'"${demB}"
+		echo -e "${demA}\033[92m Secondary structure analysis...DONE\033[m${demB}"
 		sleep 2
 	fi
 }
@@ -1060,7 +1060,7 @@ analyser9()
 	eval "$gmx_exe_path" xpm2ps -f rmsd-clust.xpm -o rmsd-clust.eps
 	ps2pdf rmsd-clust.eps rmsd-clust.pdf || true
 	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx rmsd-clust.* ./Clustering || true
-	echo "${demA}"$' Cluster frames from the trajectory...DONE'"${demB}"
+	echo -e "${demA}\033[92m Cluster frames from the trajectory...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -1734,7 +1734,7 @@ if [[ $mmGMXpath != '' ]] ; then
 			"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp
 		fi
-		echo "${demA}"$' Run g_MMPBSA calculations...DONE'"${demB}"
+		echo -e "${demA}\033[92m Run g_MMPBSA calculations...DONE\033[m${demB}"
 		sleep 2
 	elif [[ "$mmGMX" == '' ]] ; then
 		echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
@@ -1776,7 +1776,7 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 	fi
 
-	echo "${demA}"$' Calculate average binding energy & contribution of residues...DONE'"${demB}"
+	echo -e "${demA}\033[92m Calculate average binding energy & contribution of residues...DONE\033[m${demB}"
 	sleep 2
 
 	AnaName="MMPBSA"
@@ -1849,7 +1849,7 @@ useFoundPCA_sham()
 	elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
 	fi
 	mv ./PCA/FEL_PCA_sham_* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
-	echo "${demA}"$' Prepare Gibbs FES with gmx sham...DONE'"${demB}"
+	echo -e "${demA}\033[92m Prepare Gibbs FES with gmx sham...DONE\033[m${demB}"
 	sleep 2
 	ana_folder="PCA_FES_sham"
 }
@@ -1895,7 +1895,7 @@ useFoundRgRMSData_sham()
 	mv FEL_sham_RgVsRMSD_* RMSData.dat RgData.dat RgVsRMSD.xvg enthalpy.xpm \
 	entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 
-	echo "${demA}"$' Prepare Rg Vs RMSD FES with gmx sham...DONE'"${demB}"
+	echo -e "${demA}\033[92m Prepare Rg Vs RMSD FES with gmx sham...DONE\033[m${demB}"
 	sleep 2
 	ana_folder="RgVsRMSD_FEL_sham"
 }
@@ -2074,7 +2074,7 @@ analyser13()
 				elif [[ ! -d "$currentFELPCAdir" ]]; then mkdir PCA_FES_sham
 					mv FEL_PCA_sham* enthalpy.xpm entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./PCA_FES_sham || true
 				fi
-				echo "${demA}"$' Prepare PCA-based 2D energetic landscape using gmx sham...DONE'"${demB}"
+				echo -e "${demA}\033[92m Prepare PCA-based 2D energetic landscape using gmx sham...DONE\033[m${demB}"
 				sleep 2
 				ana_folder="PCA_FES_sham"
 			
@@ -2170,7 +2170,7 @@ inputFormat
 					mv FEL_sham_RgVsRMSD_* RgData.dat RMSData.dat RgVsRMSD.xvg enthalpy.xpm \
 					entropy.xpm prob.xpm shamlog.log bindex.ndx ener.xvg ./RgVsRMSD_FEL_sham || true
 				fi
-				echo "${demA}"$' Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE'"${demB}"
+				echo -e "${demA}\033[92m Prepare Rg Vs RMSD 2D energetic landscape with gmx sham...DONE\033[m${demB}"
 				sleep 2
 				ana_folder="RgVsRMSD_FEL_sham"
 
@@ -2408,7 +2408,7 @@ extractMoreStructs
 		fi
 	done
 
-	echo "${demA}"$' Construct free energy landscape with gmx sham...DONE'"${demB}"
+	echo -e "${demA}\033[92m Construct free energy landscape with gmx sham...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -3135,7 +3135,7 @@ analyser15()
 	if [[ $orderPair_choice == 2 ]] ; then
 		rm RgVsRMSD.xvg RgData.dat RMSData.dat
 	fi
-	echo $'\n Construct 3D plot of the md-davis free energy surface...DONE'"${demB}"
+	echo -e "\n\033[92m Construct 3D plot of the md-davis free energy surface...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -3233,7 +3233,7 @@ hbcutAsk
 		md-davis plot_hbond --percent --total_frames 101 --cutoff ${HBcutOff} \
 		-o hbond_matrix/hbond_matrix_${filenm}.html hbond_matrix/hb_data.p
 	fi
-	echo $' Preparing the H-bond matrix...DONE'"${demB}"
+	echo -e "\033[92m Prepare the H-bond matrix...DONE\033[m${demB}"
 }
 
 analyser16()
@@ -3304,7 +3304,7 @@ elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
 else
 	eval "$gmx_exe_path" trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}""_trj_Every""$ski""skip.xtc" $skp
 fi
-echo "${demA}"$' Extract frames...DONE'"${demB}"
+echo -e "${demA}\033[92m Extract frames...DONE\033[m${demB}"
 sleep 2
 }
 
