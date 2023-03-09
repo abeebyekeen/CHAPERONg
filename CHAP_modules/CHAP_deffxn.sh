@@ -478,7 +478,7 @@ s0CharmmStd()
 
 	echo " Modify topol.top file to include the ligand parameters...DONE"
 
-	echo $'\n\n'" Prepare the topology for the complex...DONE""${demB}"
+	echo -e "\n\033[92m Prepare the topology for the complex...DONE\033[m${demB}"
 	sleep 2
 	echo "${demA}"$'To prepare the topology for the complex, topol.top has been modified as follows:\n\n'\
 	$'    **THE LINES\n\n'\
@@ -1473,7 +1473,7 @@ s4AddIons2()
 {
 	#2. Pass .tpr file to genion to add ions
 	echo 'SOL' | eval $gmx_exe_path genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
-	echo "${demA}"" Add ions...DONE""${demB}"
+	echo -e "${demA}\033[92m Add ions...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -1512,7 +1512,7 @@ s6EnMin2()
 	#2. Invoke mdrun to carry out the EM
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -deffnm em
 	#tail -n 8 em.log
-	echo "${demA}"" Run energy minimization... DONE""${demB}"
+	echo -e "${demA}\033[92m Run energy minimization... DONE\033[m${demB}"
 	sleep 2
 
 	echo "${demA}"$' Now calculating post-EM thermodynamic parameters...\n\n'
@@ -1573,7 +1573,7 @@ $proNDXno | $dnaNDXno
 q
 ProvProDNAMakNdx
 
-	echo "${demA}"" Make a Protein-DNA index group...DONE""${demB}"
+	echo -e "${demA}\033[92m Make a Protein-DNA index group...DONE\033[m${demB}"
 	sleep 2
 
 	if [[ $sysType == "protein_dna" && $automode == "full" ]]; then
@@ -2009,7 +2009,7 @@ s8NVTeq2()
 {
 	if [[ $runNVTeq == "yes" ]] ; then
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm nvt
-		echo "${demA}"" NVT Equilibration... DONE""${demB}"
+		echo -e "${demA}\033[92m NVT Equilibration... DONE\033[m${demB}"
 		sleep 2
 		echo "${demA}"$' Now calculating post-NVT thermodynamic parameters...\n\n'
 		sleep 2
@@ -2046,7 +2046,7 @@ s9NPTeq1()
 s10NPTeq2()
 {
 	eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm npt
-	echo "${demA}"" NPT Equilibration... DONE""${demB}"
+	echo -e "${demA}\033[92m NPT Equilibration... DONE\033[m${demB}"
 	sleep 2
 	echo "${demA}"$' Now calculating post-NPT thermodynamic parameters...\n\n'
 	sleep 2
@@ -2083,7 +2083,7 @@ s10NPTeq2()
 			echo "${demA}"" Will now make an index for the pulling groups...""${demB}"
 			sleep 2
 			eval $gmx_exe_path make_ndx -f npt.gro
-			echo "${demA}"" Make an index for the pulling groups...DONE""${demB}"
+			echo -e "${demA}\033[92m Make an index for the pulling groups...DONE\033[m${demB}"
 			sleep 2
 		fi
 	fi
@@ -2098,7 +2098,7 @@ s11RelPosRe()
 	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then
 		eval $gmx_exe_path grompp -v -f md.mdp -c npt.gro -t npt.cpt -p topol.top -n index.ndx -o ${filenm}.tpr -maxwarn $WarnMax
 	fi
-	echo "${demA}"" Release position restraints... DONE""${demB}"
+	echo -e "${demA}\033[92m Release position restraints... DONE\033[m${demB}"
 	sleep 2
 }
 
