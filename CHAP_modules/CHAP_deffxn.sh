@@ -2185,7 +2185,7 @@ umbre_s12_SMD2()
 
 	echo "${demA}"$'Generate finished figures of key results of the pulling simulation... DONE'
 	sleep 2
-	echo -e "${demA}\033[92m  Steered MD simulation completed...\033[m${demB}"
+	echo -e "${demA}\033[92m Steered MD simulation completed...\033[m${demB}"
 	sleep 2
 }
 
@@ -2203,7 +2203,7 @@ s12MDrun()
 	
 		nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
-		echo $'\n'"${demA}""CHAPERONg: Simulation Completed...""${demB}"
+		echo -e "\n${demA}\033[92m Simulation Completed...\033[m${demB}"
 		sleep 3
 		Credit
 		sleep 2
@@ -2222,7 +2222,7 @@ s12MDrun()
 	
 		eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm}
 	
-		echo $'\n'"${demA}""CHAPERONg: Simulation Completed...""${demB}"
+		echo -e "\n${demA}\033[92m Simulation Completed...\033[m${demB}"
 		sleep 3
 		Credit
 		sleep 2
@@ -2237,7 +2237,7 @@ s12MDrun()
 		if test "$psa" == "yes"; then Analysis; fi
 
 	fi
-	echo $'\n'"${demA}""CHAPERONg: Simulation Completed...""${demB}"
+	echo -e "\n${demA}\033[92m Simulation Completed...\033[m${demB}"
 	sleep 3
 	Credit
 	sleep 2
@@ -2265,7 +2265,7 @@ if [[ $nohp == 1 ]]; then
 	
 	nohup eval $gmx_exe_path mdrun ${threader} ${THREA} $gpidn -v -deffnm ${filenm} -s ${filenm}."tpr" -cpi ${filenm}."cpt" -append
 	
-	echo $'\n'"${demA}"" Simulation extended/appended successfully...""${demB}"
+	echo -e "\n${demA}\033[92m Simulation extended/appended successfully...\033[m${demB}"
 	sleep 2
 	Credit
 	sleep 2
@@ -2296,7 +2296,7 @@ elif [[ $nohp == '' ]]; then
 	#fi
 
 fi
-	echo $'\n'"${demA}""Simulation extended/appended successfully""${demB}"
+	echo -e "\n${demA}\033[92m Simulation extended/appended successfully...\033[m${demB}"
 	sleep 2
 	Credit
 	sleep 2
