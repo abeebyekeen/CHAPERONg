@@ -391,7 +391,7 @@ s0CharmmStc()
 	done < "$coordinates"_processed.gro
 
 	rm tempLigGro
-	echo "$demA Prepare protein-ligand complex...DONE""${demB}"
+	echo -e "${demA}\033[92m Prepare protein-ligand complex...DONE\033[m${demB}"
 	sleep 2
 
 	coordinates="$coordinates""-$ligname"
@@ -618,7 +618,7 @@ s0PrdrgSta()
 	done < "$coordinates"_processed.gro
 
 	rm tempLigGro
-	echo " Prepare protein-ligand complex...DONE""${demB}"
+	echo -e "\033[92m Prepare protein-ligand complex...DONE\033[m${demB}"
 	sleep 2
 
 	coordinates="$coordinates""-$ligname"
@@ -826,7 +826,7 @@ s0AcpypeSta()
 	done < "$coordinates"_processed.gro
 
 	rm tempLigGro
-	echo " Prepare protein-ligand complex...DONE""${demB}"
+	echo "\033[92m Prepare protein-ligand complex...DONE\033[m${demB}"
 	sleep 2
 
 	coordinates="$coordinates""-$ligname"
@@ -1101,7 +1101,7 @@ s0ligpargenSta()
 	done < "$coordinates"_processed.gro
 
 	rm tempLigGro
-	echo " Prepare protein-ligand complex...DONE""${demB}"
+	echo "\033[92m Prepare protein-ligand complex...DONE\033[m${demB}"
 	sleep 2
 
 	coordinates="$coordinates""-$ligname"
@@ -1448,7 +1448,7 @@ s1DefBox()
 			read -p 'ENTER A RESPONSE HERE (1 or 2): ' respDim
 		done
 	fi
-	echo "${demA}"" Define box... DONE""${demB}"
+	echo -e "${demA}\033[92m Define box...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -1457,7 +1457,7 @@ s2Solvat()
 	echo "${demA}"" Solvating the system...""${demB}"
 	sleep 2
 	eval $gmx_exe_path solvate -cp ${coordinates}_newbox.gro -cs spc216.gro -o ${coordinates}_solv.gro -p topol.top
-	echo "${demA}"" Solvate system... DONE""${demB}"
+	echo -e "${demA}\033[92m Solvate system...DONE\033[m${demB}"
 	sleep 2
 }
 
@@ -1473,7 +1473,7 @@ s4AddIons2()
 {
 	#2. Pass .tpr file to genion to add ions
 	echo 'SOL' | eval $gmx_exe_path genion -s ions.tpr -o ${coordinates}_solv_ions.gro -p topol.top -neutral ${pnam_nnam}
-	echo "${demA}"" Add ions... DONE""${demB}"
+	echo "${demA}"" Add ions...DONE""${demB}"
 	sleep 2
 }
 
