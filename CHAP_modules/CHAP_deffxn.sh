@@ -317,19 +317,19 @@ s0CharmmStb()
 				exit 1
 			fi
 		LigINIpdb="$LigINI"
-		echo "$demA Ligand_ini.pdb file found in the current directory: $LigINIpdb""${demB}"
+		echo "${demA} Ligand_ini.pdb file found in the current directory: $LigINIpdb""${demB}"
 		sleep 3
 		fi	
 	done
 
 	ligPDB=$(basename "$LigINIpdb" _ini.pdb)
 
-	echo "$demA Now converting ligand_ini.pdb file to ligand.gro format...""${demB}"
+	echo "${demA} Now converting ligand_ini.pdb file to ligand.gro format...""${demB}"
 	sleep 2
 
 	eval $gmx_exe_path editconf -f $LigINIpdb -o "$ligPDB"".gro"
 
-	echo "$demA Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
+	echo "${demA} Convert ligand_ini.pdb file to ligand.gro format...DONE"$'\n'
 }
 
 s0CharmmStc()
@@ -345,7 +345,7 @@ s0CharmmStc()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "${demA} Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -366,7 +366,7 @@ s0CharmmStc()
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
-	echo "$demA Now preparing protein-ligand complex..."$'\n'
+	echo "${demA} Now preparing protein-ligand complex..."$'\n'
 
 	LineCounterRecept2=0
 	while IFS= read -r coordlineRec2; do
@@ -399,7 +399,7 @@ s0CharmmStc()
 
 s0CharmmStd()
 {
-	echo "$demA Preparing the topology for the complex..."
+	echo "${demA} Preparing the topology for the complex..."
 
 	Ligprmcount=0
 	for ligprm in *.prm; do
@@ -438,7 +438,7 @@ s0CharmmStd()
 		fi	
 	done
 
-	echo "$demA Now modifying topol.top file to include the ligand parameters..."$'\n\n'
+	echo "${demA} Now modifying topol.top file to include the ligand parameters..."$'\n\n'
 
 	catchffpar="; Include forcefield parameters"
 	catchPosRes="; Include Position restraint file"
@@ -571,7 +571,7 @@ s0PrdrgSta()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "${demA} Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -593,7 +593,7 @@ s0PrdrgSta()
 
 	TotalAtomCount=$(( atomCountRecept + atomCountLig ))
 
-	echo "$demA Now preparing protein-ligand complex..."$'\n'
+	echo "${demA} Now preparing protein-ligand complex..."$'\n'
 
 	LineCounterRecept2=0
 	while IFS= read -r coordlineRec2; do
@@ -643,7 +643,7 @@ s0PrdrgStb()
 	sed -i "s|$ligID|$ligname|g" ./DRGGMX.ITP
 	mv ./DRGGMX.ITP ./"$ligname"".itp"
 	
-	echo "$demA Preparing the topology for the complex..."$'\n'
+	echo "${demA} Preparing the topology for the complex..."$'\n'
 
 	Ligtopcount=0
 	for ligtop in *.itp; do
@@ -668,7 +668,7 @@ s0PrdrgStb()
 		fi	
 	done
 
-	echo "$demA Now modifying topol.top file to include the ligand parameters and topology..."$'\n\n'
+	echo "${demA} Now modifying topol.top file to include the ligand parameters and topology..."$'\n\n'
 
 	#catchffpar="; Include forcefield parameters"
 	catchPosRes="; Include Position restraint file"
@@ -779,7 +779,7 @@ s0AcpypeSta()
 		fi
 	done < "$coordinates"_processed.gro
 
-	echo "$demA Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
+	echo "${demA} Your ""$coordinates""_processed.gro file contains $atomCountRecept atoms"$'\n'
 
 	LineCounterLig=0
 	while IFS= read -r coordlineLig; do
@@ -2327,7 +2327,7 @@ variables_for_SMD_Movie()
 
 analyser11()
 {
-	echo "$demA $message_Movie"
+	echo "${demA} $message_Movie"
 
 	if [[ $customframeNo == '' ]]; then
 cat << askMovielength
