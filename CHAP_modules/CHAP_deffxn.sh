@@ -124,21 +124,21 @@ s0GenTop()
 		Help; sleep 3; Credit; exit 1
 	fi
 	if [[ "$ffUse" == "wd" || "$ffUse" == '"wd"' ]] && [[ "$wat" != "" ]]; then
-		echo "$demA GROMACS will use the force-field present in the working directory!""${demB}"
+		echo -e "${demA}\033[92m GROMACS will use the force-field present in the working directory!""\033[m${demB}"
 		sleep 2
 		echo 1 | eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	elif [[ "$ffUse" != "" && "$ffUse" != "wd" && "$ffUse" != '"wd"' ]]; then
-		echo "$demA gmx will use the specified $ffUse force-field""${demB}"
+		echo -e "${demA}\033[92m gmx will use the specified $ffUse force-field\033[m${demB}"
 		sleep 2
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr -ff $ffUse ${wmodel}
 	elif [[ "$ffUse" != "" ]] && [[ "$ffUse" == "wd" || "$ffUse" != '"wd"' ]] && [[ "$wat" == "" ]]; then
-		echo "$demA gmx will use the specified $ffUse force-field""${demB}"
+		echo -e "${demA}\033[92m gmx will use the specified $ffUse force-field\033[m${demB}"
 		sleep 2
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr
 	elif [[ "$ffUse" == "" ]]; then
 		eval $gmx_exe_path pdb2gmx -f $coordinates.pdb -o ${coordinates}_processed.gro $extr ${wmodel}
 	fi
-	echo "$demA Generate protein topology...DONE""${demB}"
+	echo -e "${demA}\033[92m Generate protein topology...DONE\033[m${demB}"
 	sleep 2
 
 	if [[ $mdType == "umbrellaSampl" ]] ; then
@@ -200,7 +200,7 @@ s0CharmmSta()
 		else
 			ffcount=$(( ffcount + 1))
 			if [[ $ffcount == 2 ]] ; then 
-				echo "$demAMultiple forcefield folders found in the working directory! \
+				echo "$demA Multiple forcefield folders found in the working directory! \
 				Please keep only the one to be used and try again!!"
 				exit 1
 			fi
@@ -296,7 +296,7 @@ s0CharmmSta()
 
 	cgenff_charmm2gmxTry1 || cgenff_charmm2gmxTry2 || cgenff_charmm2gmxTry3
 
-	echo "$demA Convert CHARMM topology to GROMACS format... DONE""${demB}"
+	echo -e "${demA}\033[92m Convert CHARMM topology to GROMACS format...DONE\033[m${demB}"
 	sleep 2
 
 }
