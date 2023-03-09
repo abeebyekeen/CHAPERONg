@@ -2185,7 +2185,7 @@ umbre_s12_SMD2()
 
 	echo "${demA}"$'Generate finished figures of key results of the pulling simulation... DONE'
 	sleep 2
-	echo "${demA}"" Steered MD simulation completed...""${demB}"
+	echo -e "${demA}\033[92m  Steered MD simulation completed...\033[m${demB}"
 	sleep 2
 }
 
