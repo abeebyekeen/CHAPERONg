@@ -2105,14 +2105,14 @@ s11RelPosRe()
 ScanTRAJ_SMD()
 {
 if [[ ! -f "SMD_trajectDetails.log" ]]; then
-	echo "${demA}"$' Checking the SMD trajectory to extract info about the number of\n frames and simulation time'"${demB}"
+	echo "${demA}"$' Checking the SMD trajectory to extract info about the number of frames and\n simulation time'"${demB}"
 	sleep 2
 	eval $gmx_exe_path check -f pull.xtc |& tee SMD_trajectDetails.log
 	No_of_frames=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat SMD_trajectDetails.log | grep "Last" | awk '{print $NF}')
 	sim_timestep=$(cat SMD_trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
 	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
-	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratNo_of_framesnps / 1000}")
+	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
 	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
 	echo $simDuratnINTns > simulation_duration
 
@@ -2311,6 +2311,35 @@ fi
 
 	if test "$psa" == "yes"; then Analysis
 	fi
+}
+
+makeMoviePy1()
+{
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
+$'\nquit' > make1_movie_Pyscript.pml
+pymol make1_movie_Pyscript.pml
+}
+	
+makeMoviePy2()
+{
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
+$'\nquit' > make2_movie_Pyscript.pml
+pymol make2_movie_Pyscript.pml
+}
+
+##function specific for movie update
+makeMoviePyx()
+{
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
+pymol make1_movie_Pyscript.pml
+}
+##function specific for movie update	
+makeMoviePyy()
+{
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
+pymol make2_movie_Pyscript.pml
 }
 
 # define function for variables_for_SMD_Movie
