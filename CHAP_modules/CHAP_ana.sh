@@ -1501,10 +1501,10 @@ variables_for_regMD_Movie()
 # fi
 
 # if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
-# 	$'\n"Convert/ImageMagick" not being found, or some library is missing.'\
-# 	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,\n'\
-# 	$'however, be of lesser quality'"${demB}"
+# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+# 	$'\n "Convert/ImageMagick" not being found, or some library is missing.'\
+# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+# 	$'\n however, be of lesser quality'"${demB}"
 		
 # 	makeMoviePy1
 # 	makeMoviePy2
@@ -1594,10 +1594,10 @@ variables_for_regMD_Movie()
 # fi
 
 # if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
-# 	$'"Convert/ImageMagick" not being found, or some library is missing.'\
-# 	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
-# 	$'however, be of lesser quality'"${demB}"
+# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+# 	$' "Convert/ImageMagick" not being found, or some library is missing.'\
+# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+# 	$'\n however, be of lesser quality'"${demB}"
 		
 # 	makeMoviePyx
 # 	makeMoviePyy

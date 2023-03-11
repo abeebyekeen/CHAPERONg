@@ -341,22 +341,23 @@ US_simulate()
 		
 	elif [[ "$stage" == 1 ]]; then s1DefBox; s2Solvat; s3AddIons1; s4AddIons2
 		s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2
-		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 2 ]]; then s2Solvat; s3AddIons1; s4AddIons2; s5EnMin1
 		s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 3 ]]; then s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2
 		s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;	umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 4 ]]; then s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1
-		s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
-		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
+		s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie;
+		umbre_s14_xtractFrames;	umbre_s15_calcCOMdist; umbre_s16_findIniConf;
+		umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 5 ]]; then s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
 		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
@@ -367,24 +368,24 @@ US_simulate()
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 7 ]]; then s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2
-		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 8 ]]; then s8NVTeq2; s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 9 ]]; then s9NPTeq1; s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; 
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 10 ]]; then s10NPTeq2; umbre_s11_SMD1
-		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 11 ]]; then umbre_s11_SMD1; umbre_s12_SMD2
-		umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s14_calcCOMdist
-		umbre_s15_findIniConf; umbre_s16_USampling; umbre_s17_WHAM
+		umbre_s13_SMD_movie; umbre_s14_xtractFrames; umbre_s15_calcCOMdist;
+		umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
 	elif [[ "$stage" == 12 ]]; then umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM

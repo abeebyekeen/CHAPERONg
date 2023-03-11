@@ -2361,7 +2361,7 @@ analyser11()
 	if [[ $customframeNo == '' ]]; then
 cat << askMovielength
 
-  Do you want to proceed to making a movie summarized into 200 frames?
+  Do you want to proceed to making a movie summarized into 200-300 frames?
 
     1) Yes.
     2) No, I want a different number of frames for the movie.
@@ -2475,10 +2475,10 @@ if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
 fi
 
 if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
-	$'\n"Convert/ImageMagick" not being found, or some library is missing.'\
-	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,\n'\
-	$'however, be of lesser quality'"${demB}"
+	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+	$'\n "Convert/ImageMagick" not being found, or some library is missing.'\
+	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+	$'\n however, be of lesser quality'"${demB}"
 		
 	makeMoviePy1
 	makeMoviePy2
@@ -2568,10 +2568,10 @@ if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
 fi
 
 if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-	echo "${demA}"$'A mp4 movie could not be made. This may be due to the program'\
-	$'"Convert/ImageMagick" not being found, or some library is missing.'\
-	$'\nCHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
-	$'however, be of lesser quality'"${demB}"
+	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+	$'\n "Convert/ImageMagick" not being found, or some library is missing.'\
+	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+	$'\n however, be of lesser quality'"${demB}"
 		
 	makeMoviePyx
 	makeMoviePyy
@@ -2774,18 +2774,17 @@ umbre_s17_USampling()
 	sleep 2
 	window=0
 	config_no=0
-	if [[ "$stage" == 16 ]]; then window="$resume_win"
+	if [[ "$stage" == 17 ]]; then window="$resume_win"
 	fi
 	while IFS= read -r line; do
 		if [[ $line == *"#"* ]] ; then continue
-		elif [[ $line != *"#"* && $stage != 16 ]] ; then US_fxn
-		elif [[ $line != *"#"* && $stage == 16 ]] ; then 
-			if (( $config_no < "$resume_win" ))
-			then continue
-			fi
-		elif [[ $line != *"#"* && $stage == 16 ]] ; then
-			if (( $config_no >= "$resume_win" ))
-			then US_fxn
+		elif [[ $line != *"#"* && $stage != 17 ]] ; then US_fxn
+		elif [[ $line != *"#"* && $stage == 17 ]] ; then 
+			if (( $config_no < "$resume_win" )) ; then
+				config_no=$(( config_no + 1 ))
+				continue
+			elif (( $config_no >= "$resume_win" )) ; then
+				US_fxn
 			fi
 		fi
 		if [[ $window == 0 ]] ; then
@@ -2799,6 +2798,11 @@ umbre_s17_USampling()
 		fi
 
 		window=$(( window + 1 ))
+
+		# Remove empty lines
+		sed -i '/^$/d' tpr_files.dat
+		sed -i '/^$/d' pullf_files.dat
+		sed -i '/^$/d' pullx_files.dat		
 
 	done < configuratns_list.txt
 
@@ -2816,8 +2820,10 @@ umbre_s18_WHAM()
 {
 	echo "${demA} Extracting the PMF and plotting the umbrella histograms...""${demB}"
 	sleep 2
+	
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o \
 	PMF_profile.xvg -hist umbrella_sampling_histograms0.xvg -unit kCal
+	rm umbrella_sampling_histograms0.xvg || true
 	sleep 2
 
 	minPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
@@ -2863,6 +2869,7 @@ umbre_s18_WHAM()
 	fi
 	mv umbrella_sampling_histograms.xvg umbrella_sampling_histograms.png PMF_profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
 	mv PMF_profile.xvg PMF_profile.png PMF_profile_YminAdjusted.png ./$AnaName || true
+	
 
 	echo "${demA}"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
@@ -2910,6 +2917,12 @@ umbre_s19_MoreWin()
 		echo "umbrella_win"$window"_conf"$us_frame".tpr" >> tpr_files.dat
 		echo "umbrella_win"$window"_conf"$us_frame"_pullf.xvg" >> pullf_files.dat
 		echo "umbrella_win"$window"_conf"$us_frame"_pullx.xvg" >> pullx_files.dat
+		
+		# Remove empty lines
+		sed -i '/^$/d' tpr_files.dat
+		sed -i '/^$/d' pullf_files.dat
+		sed -i '/^$/d' pullx_files.dat
+		
 		echo "${demA}"$' Umbrella sampling simulation has been completed for the additional window.\n\n'\
 		$' The names of the .tpr, pullf.xvg and pullx.xvg files have been appended to the\n'\
 		$' tpr_files.dat, pullf_files.dat and pullx_files.dat, respectively...'"${demB}"
