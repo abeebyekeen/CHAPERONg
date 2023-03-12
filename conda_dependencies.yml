@@ -6,6 +6,7 @@ dependencies:
   - conda-forge::pymol-open-source=2.5.0
   - conda-forge::imagemagick
   - conda-forge::wxpython
+  - conda-forge::ffmpeg
   - pip
   - pip:
     - scipy
