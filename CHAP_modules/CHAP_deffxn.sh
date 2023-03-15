@@ -2457,7 +2457,8 @@ echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea..
 sleep 2
 pyM=0
 pymol prep_movie_Pyscript.pml || pyM=1
-echo -e "${demA}\033[92m Extract frames as images...DONE\033[m${demB}""${demA}"$' Now converting images to movie...\n'
+echo -e "${demA}\033[92m Extract frames as images...DONE\033[m${demB}"\
+"${demA}"$' Now converting images to movie...\n'
 cd ./${movieDIRECORY}
 mov_make=0
 convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
