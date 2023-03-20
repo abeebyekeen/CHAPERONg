@@ -101,7 +101,7 @@ def store_data_label_name():
 
 output_and_para_files = []
 
-# def estimate_PDF_with_KDE():
+# def estimate_PDF_with_KDE_multiplot():
 def plot_multidata_hist(dataName, input_data_dict):
 	data_count = 1
 	plt.figure() # Create a new figure
@@ -289,7 +289,7 @@ def plot_multidata_hist(dataName, input_data_dict):
 	output_and_para_files.append(figname)
 	return dataName, XaxisLabelXVG, XaxisLabelPNG
 
-def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):		
+def estimate_PDF_with_KDE_multiplot(dataName, XaxisLabelXVG, XaxisLabelPNG):		
 	data_count = 1
 	bins_number_dict = {}
 	bandwidth_dict = {}
@@ -390,4 +390,4 @@ def estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG):
 make_dir_for_KDE()
 dataName, input_data_dict = store_data_label_name()
 dataName, XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, input_data_dict)
-estimate_PDF_with_KDE(dataName, XaxisLabelXVG, XaxisLabelPNG)
+estimate_PDF_with_KDE_multiplot(dataName, XaxisLabelXVG, XaxisLabelPNG)
