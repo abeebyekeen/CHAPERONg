@@ -370,7 +370,7 @@ def estimate_PDF_with_KDE_multiplot(dataName, XaxisLabelXVG, XaxisLabelPNG):
 	
 	output_and_para_files.append(figname)
 
-	print (f" Estimate probability density function for {dataName} data...DONE\n"
+	print (f"\033[92m Estimate probability density function for {dataName}...DONE\033[00m\n"
 			"#=============================================================================#\n")
 
 	for file in output_and_para_files:
