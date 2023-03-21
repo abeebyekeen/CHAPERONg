@@ -1134,12 +1134,23 @@ AnalysisList
 		# create a bash array listing valid numbers
 		valid_numbers=(1 2 3 4)
 
-		while ! [[ "$data_kde" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
-			! [[ "$data_kde" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
-		do
-			printf "\n You entered: ${data_kde}\n\n"
-			printf " Please enter a valid number!!\n\n"
-			read -p ' Enter one or more options here (separated by a space): ' data_kde
+		# while ! [[ "$data_kde" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
+		# 	! [[ "$data_kde" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+		# do
+		# 	printf "\n You entered: ${data_kde}\n\n"
+		# 	printf " Please enter a valid number!!\n\n"
+		# 	read -p ' Enter one or more options here (separated by a space): ' data_kde
+		# done
+
+		analyse_array=("$data_kde")
+
+		# check if all choices are among the available options
+		while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+			echo $'\n You entered: '"$data_kde"$'\n'
+			echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+			read -p ' Enter one or more (combinations of) options here (separated by a space): ' data_kde
+			analyse_array=("$data_kde")
 		done
 
 		data_kde_ext=("$data_kde")
