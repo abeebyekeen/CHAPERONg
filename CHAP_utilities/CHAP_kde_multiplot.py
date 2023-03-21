@@ -186,8 +186,8 @@ def plot_multidata_hist(dataName, input_data_dict):
 
 		if auto_mode == 'semi':
 			print(
-				"\n  Optimal binning parameters have been estimated."
-				'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
+				"\n  Optimal binning and KDE parameters have been estimated."
+				'\n  They have been written to the file "CHAP_kde_Par.in".'
 				'\n\n  You can modify the parameters if required.'
 				'\n   Enter "Yes" below when you are ready.'
 				"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
