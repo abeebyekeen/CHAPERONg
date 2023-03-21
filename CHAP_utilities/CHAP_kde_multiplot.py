@@ -206,9 +206,11 @@ def plot_multidata_hist(dataName, input_data_dict):
 		elif auto_mode == 'full':
 			response = 1
 			print(
-				"\n   Since CHAPERONg is running in full-auto mode, the estimate above will be used."
-				"\n   To use a different number of bins or estimator, run CHAPERONg in the semi-auto"
-				"\n   mode. For details, see https://www.abeebyekeen.com/post-sim-analysis-2/"
+				"\n   Since CHAPERONg is running in the full-auto mode,"
+				"\n   the number of bins estimated above will be used."
+				"\n   To use a different number or estimator, run CHAPERONg in the"
+				"\n   semi-auto mode."
+				"\n   For details, see https://www.abeebyekeen.com/post-sim-analysis-2/"
 			)
 			time.sleep(2)
 
