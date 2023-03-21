@@ -208,8 +208,8 @@ def estimate_PDF_with_KDE():
 				elif auto_mode == 'full':
 					response = 1
 					print(
-						"\n   Since CHAPERONg is running in the full-auto mode,"
-						"\n   the number of bins estimated above will be used."
+						"\n   Since CHAPERONg is running in the full-auto mode, the number of bins"
+						"\n   estimated above will be used."
 						"\n   To use a different number or estimator, run CHAPERONg in the semi-auto mode."
 						"\n   For details, see https://www.abeebyekeen.com/post-sim-analysis-2/"
 					)
