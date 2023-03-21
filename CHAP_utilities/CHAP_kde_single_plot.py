@@ -137,13 +137,13 @@ def estimate_PDF_with_KDE():
 								f'bin_count,{bin_count}\n'
 								"bandwidth_method,silverman\n\n\n")					
 
-				if int(lineNo) == 1 :
-					with open("CHAP_kde_Par.in", "w") as in_par:
-						writeOut_parameters()
+				# if int(lineNo) == 3 :
+				# 	with open("CHAP_kde_Par.in", "w") as in_par:
+				# 		writeOut_parameters()
 
-				elif int(lineNo) > 1 :
-					with open("CHAP_kde_Par.in", "a") as in_par:
-						writeOut_parameters()
+				# elif int(lineNo) > 3 :
+				# 	with open("CHAP_kde_Par.in", "a") as in_par:
+				# 		writeOut_parameters()
 								
 				with open(f'CHAP_kde_Par_{input_data}.in', "w") as in_par:
 					writeOut_parameters()				
@@ -173,23 +173,18 @@ def estimate_PDF_with_KDE():
 						"----------------------------------\n\n\n"
 						)
 				
-				if int(lineNo) == 1:
+				if int(lineNo) == 3:
 					with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
 						write_binning_parameters()
 
-				elif int(lineNo) > 1:
+				elif int(lineNo) > 3:
 					with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 						write_binning_parameters()
 						
-				with open(f"kde_bins_estimated_{input_data}.dat", "w") as bin_summary:
-					write_binning_parameters()
-
-				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
-
 				if auto_mode == 'semi':
 					print(
-						"\n  Optimal binning parameters have been estimated."
-						'\n  Parameters have been written to the file "CHAP_kde_Par.in".'
+						"\n  Optimal binning and KDE parameters have been estimated."
+						f'\n  They have been written to the file "CHAP_kde_Par_{input_data}.in".'
 						'\n\n  You can modify the parameters if required.'
 						'\n   Enter "Yes" below when you are ready.'
 						"\n\n   Do you want to proceed?\n    (1) Yes\n    (2) No\n"
@@ -215,12 +210,17 @@ def estimate_PDF_with_KDE():
 					)
 					time.sleep(2)
 
+				with open(f"kde_bins_estimated_{input_data}.dat", "w") as bin_summary:
+					write_binning_parameters()
+
+				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
+
 				if response == 2:
 					sys.exit(0)
 				elif response == 1:
 					print ("\n Updating input parameters for density estimation\n")
 					time.sleep(2)
-					with open("CHAP_kde_Par.in" , 'r') as in_par:
+					with open(f"CHAP_kde_Par_{input_data}.in" , 'r') as in_par:
 						for parameter in in_par.readlines():
 							if "bin_count" in parameter:
 								para_data = parameter.rstrip('\n').split(",")
@@ -347,9 +347,9 @@ def estimate_PDF_with_KDE():
 			# 	try: shutil.copy2(file, dataOutPath)
 			# 	except FileNotFoundError: pass				
 
-make_dir_for_KDE()			
+make_dir_for_KDE()
 estimate_PDF_with_KDE()
-para_summary = ['CHAP_kde_Par.in', 'kde_bins_estimated_summary.dat', 'CHAP_kde_dataset_list.dat']
+para_summary = ['kde_bins_estimated_summary.dat', 'CHAP_kde_dataset_list.dat']
 
 for file in para_summary:
 	try: shutil.move(file, 'Kernel_Density_Estimation')
