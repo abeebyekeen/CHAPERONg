@@ -110,7 +110,7 @@ AnalysisList
 # 	"$analysis" != *" 15 "* && "$analysis" != *" 16 "* && "$analysis" != *" 17 "* && \
 # 	"$analysis" != *" 18 "* ]] ; do
 # 		echo $'\nYou entered: '"$analyse"$'\n'
-# 		echo $'Please enter a valid number!!\n'
+# 		echo -e "\033[31;107m Please enter a valid number!! \033[m\n"
 # 		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 # 		analysis=" $analyse "
 # done
@@ -120,13 +120,35 @@ read -p '*Enter one or more combinations of the options here (separated by a spa
 # create a bash array listing valid numbers
 valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21)
 
-while ! [[ "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
-	! [[ "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
-do
-	echo $'\n You entered: '"$analyse"$'\n'
-	echo $' Please enter a valid number!!\n'
-	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
-done
+analyse_array=("$analyse")
+echo "listing "${analyse_array}
+# for analysis_option in ${analyse_array[*]} ; do
+# 	echo "${analysis_option}" "count"
+# done
+
+# ${data_kde_ext[*]}
+# check if all choices are among the available options
+# for analysis_option in ${analyse_array[*]} ; do
+	while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+		echo $'\n You entered: '"$analyse"$'\n'
+		echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+		analyse_array=("$analyse")
+	done
+
+# # Check if input choice(s) contains only number within the range
+# while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
+# 	! "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]] || \
+# 	# and if all choices are among the available options
+# 	[[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+# 	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]
+# do
+# 	echo $'\n You entered: '"$analyse"$'\n'
+# 	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+# 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+# 	analyse_array=("$analyse")
+# done
 
 analysis=" $analyse "
 
@@ -137,6 +159,7 @@ fi
 if [[ "$coordinates" == '' ]]; then
 	coordinates="$filenm"
 fi
+
 
 ScanTRAJ()
 {
