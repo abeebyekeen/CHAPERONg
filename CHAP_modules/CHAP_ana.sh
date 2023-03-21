@@ -121,21 +121,15 @@ read -p '*Enter one or more combinations of the options here (separated by a spa
 valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21)
 
 analyse_array=("$analyse")
-echo "listing "${analyse_array}
-# for analysis_option in ${analyse_array[*]} ; do
-# 	echo "${analysis_option}" "count"
-# done
 
-# ${data_kde_ext[*]}
 # check if all choices are among the available options
-# for analysis_option in ${analyse_array[*]} ; do
-	while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
 	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
-		echo $'\n You entered: '"$analyse"$'\n'
-		echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
-		read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
-		analyse_array=("$analyse")
-	done
+	echo $'\n You entered: '"$analyse"$'\n'
+	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+	analyse_array=("$analyse")
+done
 
 # # Check if input choice(s) contains only number within the range
 # while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
