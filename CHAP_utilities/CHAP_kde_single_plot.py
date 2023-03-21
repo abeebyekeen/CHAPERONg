@@ -89,7 +89,8 @@ def estimate_PDF_with_KDE():
 				continue
 			
 			# Skip empty line
-			if int(lineNo) == 1: continue
+			if int(lineNo) == 1 : #or lineNo == "" or str(line).rstrip("\n") == "":
+				continue
 			
 			# Save the name of the input data in a variable
 			if int(lineNo) == 2:
@@ -209,8 +210,7 @@ def estimate_PDF_with_KDE():
 					print(
 						"\n   Since CHAPERONg is running in the full-auto mode,"
 						"\n   the number of bins estimated above will be used."
-						"\n   To use a different number or estimator, run CHAPERONg in the"
-						"\n   semi-auto mode."
+						"\n   To use a different number or estimator, run CHAPERONg in the semi-auto mode."
 						"\n   For details, see https://www.abeebyekeen.com/post-sim-analysis-2/"
 					)
 					time.sleep(2)
