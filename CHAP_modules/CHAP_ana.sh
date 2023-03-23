@@ -92,9 +92,9 @@ Option | Analysis
   16   | Interactive hydrogen bond matrix (using md-davis)
   17   | Extract frames from the trajectory
   18   | Make index groups (make_ndx)
-  19   | All analyses but 16 and 17
-  20   | All analyses but 0, 16 and 17
-  21   | All analyses but 0, 9, 16 and 17
+  19   | All analyses but 17 and 18
+  20   | All analyses but 0, 17 and 18
+  21   | All analyses but 0, 9, 17 and 18
   
 AnalysisList
 
@@ -115,34 +115,69 @@ AnalysisList
 # 		analysis=" $analyse "
 # done
 
-read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+read -p '*Enter one (or a combination) of the options (separated by a space): ' analyse
 
 # create a bash array listing valid numbers
 valid_numbers=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21)
 
 analyse_array=("$analyse")
 
-# check if all choices are among the available options
-while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
-	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
-	echo $'\n You entered: '"$analyse"$'\n'
-	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
-	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
-	analyse_array=("$analyse")
-done
+# # # For debugging purpose
+# for i in ${analyse_array[@]}; do echo "$i" ; done
+# echo "ANALYSE-ARRAY DONE"
 
-# # Check if input choice(s) contains only number within the range
-# while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
-# 	! "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]] || \
-# 	# and if all choices are among the available options
-# 	[[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
-# 	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]
-# do
+# for i in "${valid_numbers[@]}"; do echo "$i"; done
+# echo "VALID NUMBERS DONE"
+
+
+# # # Has bug(s)
+# # check if all choices are among the available options
+# while [[ ! "${valid_numbers[@]}" =~ ${analyse_array[@]} && \
+# 	! "${valid_numbers[@]}" == ${analyse_array[@]} ]]; do
 # 	echo $'\n You entered: '"$analyse"$'\n'
 # 	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
 # 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 # 	analyse_array=("$analyse")
 # done
+
+
+# # # THIS Works
+# # check if all choices are among the available options
+# checkstage="no"
+# for i in ${analyse_array[@]} ; do echo "$i"
+# 	if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
+# 		then checkstage="yes"
+# 	else checkstage="no" ; break
+# 	fi
+# done
+
+# while [[ "$checkstage" != "yes" ]] ; do
+# 	echo $'\n You entered: '"$analyse"$'\n'
+# 	echo " $i is invalid!!"$'\n'
+# 	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+# 	# checkstage="no"
+# 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+# 	analyse_array=("$analyse")
+
+# 	for i in ${analyse_array[@]}; do
+# 		if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
+# 			then checkstage="yes"
+# 		else checkstage="no" ; break
+# 		fi
+# 	done
+# done
+
+
+# # # This compact form also works as intended like the longer forms above
+# Check if input choice(s) is(are) number(s) within the valid range
+while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
+	! "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+do
+	echo $'\n You entered: '"$analyse"$'\n'
+	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+	read -p ' Enter one (or a combination) of the options (separated by a space): ' analyse
+	# analyse_array=("$analyse")
+done
 
 analysis=" $analyse "
 
@@ -154,7 +189,7 @@ if [[ "$coordinates" == '' ]]; then
 	coordinates="$filenm"
 fi
 
-
+# Function to scan the trajectory to extract simulation details
 ScanTRAJ()
 {
 if [[ ! -f "trajectDetails.log" ]]; then
@@ -173,7 +208,13 @@ if [[ ! -f "trajectDetails.log" ]]; then
 	echo -e "${demA} \033[92mExtract number of frames and simulation duration from trajectory...DONE\033[m${demB}"
 	sleep 2
 else
-	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
+	ScanTraj_again_if_err()
+	{
+		echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
+		sleep 2
+		eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |& tee trajectDetails.log		
+	}
+	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}') || ScanTraj_again_if_err
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
 	simDuratnpsINT=$(echo ${simDuratnps%\.*})
 	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
@@ -1106,7 +1147,7 @@ AnalysisSingleMultiple
 	while [[ "$plot_number" != 1 && "$plot_number" != 2 ]]
 	do
 		printf "\n You entered: ${plot_number}\n\n"
-		printf " Please enter a valid number!!\n\n"
+		echo -e " \033[31;107mPlease enter a valid number!!\033[m\n"
 		read -p ' Enter 1 or 2 here: ' plot_number
 	done
 
@@ -1149,7 +1190,7 @@ AnalysisList
 			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
 			echo $'\n You entered: '"$data_kde"$'\n'
 			echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
-			read -p ' Enter one or more (combinations of) options here (separated by a space): ' data_kde
+			read -p ' Enter one (or a combination) of the options (separated by a space): ' data_kde
 			analyse_array=("$data_kde")
 		done
 
@@ -3326,7 +3367,7 @@ askFELuseexist
 
 if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
 
-analyser16()
+analyser17()
 {	
 read -p '*Please enter the number of frames to skip at intervals: ' ski
 if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
@@ -3347,6 +3388,8 @@ echo -e "${demA}\033[92m Extract frames...DONE\033[m${demB}"
 sleep 2
 }
 
+if [[ "$analysis" == *" 17 "* ]]; then analyser17 ; fi
+
 #defining a function for make_ndx
 
 makeNDXGroup2()
@@ -3366,8 +3409,6 @@ echo -e "${demA}\033[92m Make index group ${nameForIndex}...DONE\033[m${demB}"
 sleep 2
 }
 
-if [[ "$analysis" == *" 17 "* ]]; then analyser16 ; fi
-
 if [[ "$analysis" == *" 18 "* ]]; then makeNDXGroup2 ; fi
 
 if [[ "$analysis" == *" 19 "* ]] ; then
@@ -3379,7 +3420,7 @@ elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1
 	analyser8; analyser9; analyser10; variables_for_regMD_Movie
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
 elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2
-	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser9
-	analyser10; analyser12; analyser13; analyser14; analyser15; analyser16
+	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser10
+	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
 fi
 }
