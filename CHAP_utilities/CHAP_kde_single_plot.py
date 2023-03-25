@@ -15,7 +15,6 @@ import os
 import shutil
 import sys
 import time
-from colorama import Fore
 
 # def check_and_import_lib
 missingLib = []
@@ -333,7 +332,7 @@ def estimate_PDF_with_KDE():
 
 				output_and_para_files.append(figname)
 
-				print (f"\033[92m Estimate probability density function for {input_data}...DONE\033[00m\n"
+				print (f"\033[1;92m Estimate probability density function for {input_data}...DONE\033[00m\n"
 						"#=============================================================================#\n")
 			
 			output_and_para_files.append(extracted_data)
