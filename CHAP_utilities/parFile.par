@@ -5,85 +5,85 @@
 ####################################################
 
 ; Input coordinate file (.pdb or .gro)
-# input            =      x
+# input             =      x
 
 ; Simulation box type: cubic, dodecahedron, triclinic, octahedron
-# bt               =      x
+# bt                =      x
 
 ; Number of threads to use
-# nt               =      x
+# nt                =      x
 
 ; Use system GPU for non-bonded interactions
-# nb               =      gpu
+# nb                =      gpu
 
 ; List ID(s) of unique GPU device(s) available for use
-# gpu_id           =      x
+# gpu_id            =      x
 
 ; Automation mode: full, semi
-# auto_mode        =      full
+# auto_mode         =      full
 
 ; Define filename prefix
-# deffnm           =      x
+# deffnm            =      x
    
 ; Water model i.e. tip3p, spc
-# water            =      tip3p
+# water             =      tip3p
 
 ; Force-field (e.g. charmm27, amber94 etc.),
 ; use "wd" if ff in working directory
-# ff               =      wd
+# ff                =      wd
 
 ; Number of thread-MPI ranks      
-# ntmpi            =      x
+# ntmpi             =      x
 
 ; Number of OpenMP threads per MPI rank
-# ntomp            =      x
+# ntomp             =      x
 
 ; Absolute path to gmx binary to be used for mmpbsa
-# mmgpath          =      /home/abeeb/local/gromacs5.1/bin/gmx
+# mmgpath           =      /home/abeeb/local/gromacs5.1/bin/gmx
 
 ; Time (ps) of first frame to read from trajectory
-# frame_beginT     =      0
+# frame_beginT      =      0
 
 ; Time (ps) of last frame to read from trajectory
-# frame_endT       =      0
+# frame_endT        =      0
 
 ; Number of frames to extract and use for movie
-# movieFrame	   =      200
+# movieFrame	    =      200
 
 ; Name of the positive ion
-# posname          =      NA
+# posname           =      NA
 
 ; Name of the negative ion
-# negname          =      CL
+# negname           =      CL
 
 ; Salt concentration (mol/L)
-# conc             =      0.1
+# conc              =      0.1
 
 ; Simulation temperature (in kelvin)
-# temp             =      300 
+# temp              =      300 
 
 ; Number of allowed warnings 
-# maxwarn          =      x
+# maxwarn           =      x
 
 ; Solute-box distance i.e. distance to box edge 
-# dist             =      1.0
+# dist              =      1.0
 
 ; Corrected trajectory to use for analyses (options: 
 ; noPBC, nojump, fit, combo)
-# inputtraj        =      combo
+# inputtraj         =      combo
 
 ; Fraction of trajectory to use for g_mmpbsa calculations
-# trFrac 	       =      x
+# trFrac 	        =      x
 
 ; Parameter for umbrella sampling window spacing
 # us_window_spacing =      0.2
 
 ; Absolute path to the gmx executable to use for 
 ; all gmx runs except those involving mmpbsa
-# gmx_exe          =      x
+# gmx_exe           =      x
 
 ; Method to use for cluster determination
-# clustr_methd     =      gromos
+# clustr_methd      =      gromos
 
 ; Time interval (ps) at which frame is taken from the trajectory
-# dt               =      1
+# dt                =      1
