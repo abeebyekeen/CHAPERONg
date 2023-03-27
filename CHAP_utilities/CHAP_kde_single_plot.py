@@ -88,16 +88,16 @@ def estimate_PDF_with_KDE():
 				continue
 			
 			# Skip empty line
-			if int(lineNo) == 1 : #or lineNo == "" or str(line).rstrip("\n") == "":
+			if int(lineNo) == 2 or lineNo == "" or str(line).rstrip("\n") == "":
 				continue
 			
 			# Save the name of the input data in a variable
-			if int(lineNo) == 2:
+			if int(lineNo) == 3 and "Data for" in line:
 				dataName_raw = str(line).rstrip("\n").split(" ")
 				dataName = str(dataName_raw[2])
 				continue	
 			
-			if int(lineNo) >= 3:
+			if int(lineNo) >= 4:
 				# input_data_raw = str(line).rstrip("\n")
 				input_data = str(line).rstrip("\n")
 				
@@ -108,6 +108,7 @@ def estimate_PDF_with_KDE():
 					for line in alldata_lines:
 						data_point = str(line).rstrip("\n")
 						data_in.append(float(data_point))
+					output_and_para_files.append(extracted_data)
 
 				# Create a new figure
 				plt.figure()
@@ -172,14 +173,17 @@ def estimate_PDF_with_KDE():
 						"----------------------------------\n\n\n"
 						)
 				
-				if int(lineNo) == 3:
+				if int(lineNo) == 4:
 					with open("kde_bins_estimated_summary.dat", "w") as bin_summary:
 						write_binning_parameters()
 
-				elif int(lineNo) > 3:
+				elif int(lineNo) > 4:
 					with open("kde_bins_estimated_summary.dat", "a") as bin_summary:
 						write_binning_parameters()
-						
+
+				# Set response
+				response = 3
+
 				if auto_mode == 'semi':
 					print(
 						"\n  Optimal binning and KDE parameters have been estimated."
@@ -214,7 +218,17 @@ def estimate_PDF_with_KDE():
 
 				output_and_para_files.append(f"kde_bins_estimated_{input_data}.dat")
 
+				if response != 1 and response != 2:
+					print("\n \033[31;107m There is a problem with the input parameter file(s)! \033[00m"
+	   					"\n \033[31;107m Please check these files for errors!! \033[00m\n"
+					)
+					sys.exit(1)
 				if response == 2:
+					output_and_para_files.append('kde_bins_estimated_summary.dat')
+					output_and_para_files.append('CHAP_kde_dataset_list.dat')
+					for file in output_and_para_files:
+						if os.path.isfile(file):
+							os.remove(file)
 					sys.exit(0)
 				elif response == 1:
 					print ("\n Updating input parameters for density estimation\n")
@@ -335,7 +349,7 @@ def estimate_PDF_with_KDE():
 				print (f"\033[1;92m Estimate probability density function for {input_data}...DONE\033[00m\n"
 						"#=============================================================================#\n")
 			
-			output_and_para_files.append(extracted_data)
+			# output_and_para_files.append(extracted_data)
 			dataOutPath=f'Kernel_Density_Estimation/{input_data}'
 			# dataOutPath_old=f'{motherDir}/{input_data}'
 			make_dir_for_KDE(dataOutPath)
