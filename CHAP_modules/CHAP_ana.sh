@@ -141,43 +141,43 @@ analyse_array=("$analyse")
 # done
 
 
-# # # THIS Works
-# # check if all choices are among the available options
-# checkstage="no"
-# for i in ${analyse_array[@]} ; do echo "$i"
-# 	if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
-# 		then checkstage="yes"
-# 	else checkstage="no" ; break
-# 	fi
-# done
-
-# while [[ "$checkstage" != "yes" ]] ; do
-# 	echo $'\n You entered: '"$analyse"$'\n'
-# 	echo " $i is invalid!!"$'\n'
-# 	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
-# 	# checkstage="no"
-# 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
-# 	analyse_array=("$analyse")
-
-# 	for i in ${analyse_array[@]}; do
-# 		if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
-# 			then checkstage="yes"
-# 		else checkstage="no" ; break
-# 		fi
-# 	done
-# done
-
-
-# # # This compact form also works as intended like the longer forms above
-# Check if input choice(s) is(are) number(s) within the valid range
-while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
-	! "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
-do
-	echo $'\n You entered: '"$analyse"$'\n'
-	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
-	read -p ' Enter one (or a combination) of the options (separated by a space): ' analyse
-	# analyse_array=("$analyse")
+# # THIS Works
+# check if all choices are among the available options
+checkstage="no"
+for i in ${analyse_array[@]} ; do echo "$i"
+	if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
+		then checkstage="yes"
+	else checkstage="no" ; break
+	fi
 done
+
+while [[ "$checkstage" != "yes" ]] ; do
+	echo $'\n You entered: '"$analyse"$'\n'
+	echo -e "\033[31;107m $i is invalid!! \033[m\n"
+	echo -e "\033[31;107m Please enter a valid (set of) number(s)!! \033[m\n"
+	# checkstage="no"
+	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+	analyse_array=("$analyse")
+
+	for i in ${analyse_array[@]}; do
+		if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
+			then checkstage="yes"
+		else checkstage="no" ; break
+		fi
+	done
+done
+
+
+# # # # This compact form also works as intended like the longer forms above
+# # Check if input choice(s) is(are) number(s) within the valid range
+# while [[ ! "$analyse" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ && \
+# 	! "$analyse" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
+# do
+# 	echo $'\n You entered: '"$analyse"$'\n'
+# 	echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+# 	read -p ' Enter one (or a combination) of the options (separated by a space): ' analyse
+# 	# analyse_array=("$analyse")
+# done
 
 analysis=" $analyse "
 
@@ -1201,7 +1201,11 @@ AnalysisList
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
-				echo -e "auto mode,$automode\n\nData for ${filenm}" > CHAP_kde_dataset_list.dat
+				if [[ $plot_number == 1 ]] ; then plot_type="single-data plot"
+				elif [[ $plot_number == 2 ]] ; then plot_type="multi-data plot"
+				fi
+				echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
+				echo -e "\nData for ${filenm}" >> CHAP_kde_dataset_list.dat
 				count_data_in=$(( count_data_in + 1 ))				
 			fi
 			if (( $count_data_in > 0 )) ; then
