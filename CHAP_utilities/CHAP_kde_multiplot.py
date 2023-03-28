@@ -86,11 +86,11 @@ def store_data_label_name():
 				global auto_mode
 				auto_mode_raw = str(line).rstrip("\n").split(",")
 				auto_mode = auto_mode_raw[1]
-			elif int(lineNo) == 2:
+			elif int(lineNo) == 3:
 				# Get the type of data from the header
 				dataName = str(line).rstrip("\n")
 				continue
-			elif int(lineNo) >= 3:
+			elif int(lineNo) >= 4:
 				data_info = str(line).rstrip("\n").split(",")
 				data_label = str(data_info[0])
 				data = str(data_info[1])
@@ -369,18 +369,15 @@ def estimate_PDF_with_KDE_multiplot(dataName, XaxisLabelXVG, XaxisLabelPNG):
 	
 	output_and_para_files.append(figname)
 
-	print (f"\033[1;92m Estimate probability density function for {dataName}...DONE\033[00m\n"
+	print (f"\033[1;92m Estimate probability density function for {dataName}...DONE \033[00m\n"
 			"#=============================================================================#\n")
 
+	output_and_para_files.append('CHAP_kde_Par.in')
 	for file in output_and_para_files:
 		try: shutil.move(file, './Kernel_Density_Estimation_multi_plot')
 		except: pass
 
-	para_summary = [
-		'CHAP_kde_Par.in', 
-		'kde_bins_estimated_summary.dat', 
-		'CHAP_kde_dataset_list.dat',
-		]
+	para_summary = ['kde_bins_estimated_summary.dat', 'CHAP_kde_dataset_list.dat']
 
 	for file in para_summary:
 		try: shutil.move(file, './Kernel_Density_Estimation_multi_plot')
