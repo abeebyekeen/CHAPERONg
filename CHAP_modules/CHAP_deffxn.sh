@@ -26,7 +26,9 @@ fi
 # import module with collected parameters
 #. ./CHAP_colPar-4.00.sh
 
-valid_YesNo_response=("yes" "no" '"yes"' '"no"')
+valid_YesNo_response=("yes" "no" '"yes"' '"no"' "y" "n")
+acceptable_Yes_response=("yes" '"yes"' '"y"' "y")
+acceptable_No_response=("no" '"n"' '"no"' "n")
 
 ##Defining primary functions
 
@@ -154,11 +156,14 @@ s0GenTop()
 		# while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" && \
 		# 	"$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]]
 		# do
-			echo $' Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p ' Do you want to proceed? (yes/no): ' procd2boxdef
+			echo $' Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+			read -p ' Do you want to proceed? (y/n): ' procd2boxdef
 		done
-		if [[ "$procd2boxdef" == "yes" || "$procd2boxdef" == '"yes"' ]] ; then echo ""
-		elif [[ "$procd2boxdef" == "no" || "$procd2boxdef" == '"no"' ]] ; then exit 0
+		
+		if [[ "${acceptable_Yes_response[@]}" =~ "$procd2boxdef" ]] ; then echo ""
+		elif [[ "${acceptable_No_response[@]}" =~ "$procd2boxdef" ]] ; then exit 0
+		# if [[ "$procd2boxdef" == "yes" || "$procd2boxdef" == '"yes"' ]] ; then echo ""
+		# elif [[ "$procd2boxdef" == "no" || "$procd2boxdef" == '"no"' ]] ; then exit 0
 		fi
 	fi
 }
@@ -533,11 +538,13 @@ s0CharmmStd()
 	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
 	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
 	done
-	if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
-	elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
+	if [[ " ${acceptable_Yes_response[@]} " =~ "$procds" ]] ; then echo ""
+	elif [[ " ${acceptable_No_response[@]} " =~ "$procds" ]] ; then exit 0
+	# if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
+	# elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
 	fi
 }
 
@@ -749,11 +756,13 @@ s0PrdrgStb()
 	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
 	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
 	done
-	if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
-	elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procds" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procds" ]] ; then exit 0
+	# if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
+	# elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
 	fi
 
 }
@@ -1007,11 +1016,13 @@ s0AcpypeStb()
 	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
 	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
 		read -p 'Do you want to proceed? (yes/no): ' procds
 	done
-	if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
-	elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procds" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procds" ]] ; then exit 0
+	# if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
+	# elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
 	fi
 
 }
@@ -1291,11 +1302,13 @@ s0ligpargenStb()
 	while [[ ! "${valid_YesNo_response[@]}" =~ "${procds}" ]]
 	# while [[ "$procds" != "yes" && "$procds" != "no" && "$procds" != '"yes"' && "$procds" != '"no"' ]]
 	do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-		read -p 'Do you want to proceed? (yes/no): ' procds
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+		read -p 'Do you want to proceed? (y/n): ' procds
 	done
-	if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
-	elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procds" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procds" ]] ; then exit 0
+	# if [[ "$procds" == "yes" || "$procds" == '"yes"' ]] ; then echo ""
+	# elif [[ "$procds" == "no" || "$procds" == '"no"' ]] ; then exit 0
 	fi
 
 }	
@@ -1370,13 +1383,15 @@ iniGenLigTop
 		while [[ ! "${valid_YesNo_response[@]}" =~ "${procd2boxdef}" ]] ; do
 		# while [[ "$procd2boxdef" != "yes" && "$procd2boxdef" != "no" ]] && \
 		# 	[[ "$procd2boxdef" != '"yes"' && "$procd2boxdef" != '"no"' ]] ; do
-			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p 'Do you want to proceed? (yes/no): ' procd2boxdef
+			echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+			read -p 'Do you want to proceed? (y/n): ' procd2boxdef
 		done
-		if [[ "$procd2boxdef" == "yes" || "$procd2boxdef" == '"yes"' ]] 
-			then echo ""
-		elif [[ "$procd2boxdef" == "no" || "$procd2boxdef" == '"no"' ]] 
-			then exit 0
+	
+		if [[ "${acceptable_Yes_response[@]}" =~ "$procd2boxdef" ]] ; then echo ""
+		elif [[ "${acceptable_No_response[@]}" =~ "$procd2boxdef" ]] ; then exit 0
+
+		# if [[ "$procd2boxdef" == "yes" || "$procd2boxdef" == '"yes"' ]]; then echo ""
+		# elif [[ "$procd2boxdef" == "no" || "$procd2boxdef" == '"no"' ]]; then exit 0
 		fi
 	fi	
 }
@@ -2214,11 +2229,11 @@ s12MDrun()
 
 		while [[ ! "${valid_YesNo_response[@]}" =~ "${psa}" ]] ; do
 		# while [[ "$psa" != "yes" && "$psa" != "no" && "$psa" != '"yes"' && "$psa" != '"no"' ]] ; do
-			echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p '*Do you want to run any post-simulation processing/analyses?(yes/no): ' psa 
+			echo $' Please enter the appropriate response ("yes"/"y" or a "no"/"n")!!\n'
+			read -p '*Do you want to run any post-simulation processing/analyses?(y/n): ' psa 
 		done
 
-		if test "$psa" == "yes"; then Analysis ; fi
+		if test "${acceptable_Yes_response[@]}" =~ "$psa" ; then Analysis ; fi
 
 	elif [[ $nohp == '' ]]; then
 	
@@ -2941,18 +2956,22 @@ umbre_s19_MoreWin()
 		# done
 
 		while [[ ! " ${valid_YesNo_response[@]} " =~ " ${repeatUSmore} " ]]; do
-			echo $' Please enter the appropriate response (a "yes" or a "no")!!\n'
-			read -p ' Do you want to run umbrella sampling for more windows? (yes/no): ' repeatUSmore
+			echo $' Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+			read -p ' Do you want to run umbrella sampling for more windows? (y/n): ' repeatUSmore
 		done
 	done
 
 	read -p ' Do you want to proceed to PMF calculation? (yes/no): ' procd2pmf
 
 	while [[ ! " ${valid_YesNo_response[@]} " =~ " ${procd2pmf} " ]] ; do
-		echo $'Please enter the appropriate response (a "yes" or a "no")!!\n'
-		read -p ' Do you want to proceed to PMF calculation? (yes/no): ' procd2pmf
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+		read -p ' Do you want to proceed to PMF calculation? (y/n): ' procd2pmf
 	done
-	if [[ "$procd2pmf" == "yes" || "$procd2pmf" == '"yes"' ]] ; then echo ""
-	elif [[ "$procd2pmf" == "no" || "$procd2pmf" == '"no"' ]] ; then exit 0
+
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procd2pmf" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procd2pmf" ]] ; then exit 0
+
+	# if [[ "$procd2pmf" == "yes" || "$procd2pmf" == '"yes"' ]] ; then echo ""
+	# elif [[ "$procd2pmf" == "no" || "$procd2pmf" == '"no"' ]] ; then exit 0
 	fi
 }
