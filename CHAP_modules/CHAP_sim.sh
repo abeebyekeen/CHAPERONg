@@ -1,10 +1,12 @@
 #! /bin/bash
 
-#CHAP_sim - The simulation module of CHAPERONg
-#CHAPERONg - An automation program for GROMACS md simulation
-#Author: Abeeb A. Yekeen
-#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date: 2022.02.11
+######################################################################
+#  CHAP_sim -- The simulation module of CHAPERONg                    #
+#  CHAPERONg -- An automation program for GROMACS md simulation and  #
+#    trajectory analysis                                             #
+#  Author -- Abeeb A. Yekeen (abeeb.yekeen@hotmail.com)              #
+#  Date: 2022.02.11                                                  #
+######################################################################
 
 
 set -e
@@ -172,8 +174,8 @@ RegMDsimulate()
 	done
 
 	while [[ "$checkstage" != "yes" ]] ; do
-		echo $'\nYou entered: '"$stage"
-		echo $'Please enter a valid value!!\n'
+		echo $'\n You entered: '"$stage"
+		echo $' Please enter a valid value!!\n'
 		read -p ' Initiation stage: ' stage
 
 		for i in {0..15} ; do
@@ -291,8 +293,8 @@ US_simulate()
 		# any digit between 0 and 9, or
 		# "1" followed by exactly one digit between 0 and 8 ([0-8]{1})
 	do
-		echo $'\nYou entered: '"$stage"
-		echo $'Please provide a valid entry!!\n'
+		echo $'\n You entered: '"$stage"
+		echo $' Please provide a valid entry!!\n'
 		read -p 'Initiation stage: ' stage
 	done
 
