@@ -32,8 +32,11 @@ Credit()
   '\n###############################################################################'\
   '\n#--------------------------------- CHAPERONg ---------------------------------#'\
   '\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-  '\n#    If you use this program in your work, please cite the relevant paper:    #'\
-  '\n#                   Yekeen, A.A. et al. To be published...                    #'\
+  '\n#  \033[32;40m'\
+  'If you use this program in your work, please cite the relevant paper: \033[m  '\
+  '\033[92m #'\
+  '\n#                 \033[32;40m Yekeen, A.A. et al. To be published... \033[m '\
+  '\033[92m                 #'\
   '\n###############################################################################'\
   '\033[m'
 }
@@ -297,16 +300,26 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 fi
 
 
+	# '\033[92m'\
+	# '\n###############################################################################'\
+	# '\n#--------------------------------- CHAPERONg ---------------------------------#'\
+	# '\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
+	# '\n#    If you use this program in your work, please cite the relevant paper:    #'\
+	# '\n#                   Yekeen, A.A. et al. To be published...                    #'\
+	# '\n###############################################################################'\
+	# '\033[m'
 echo -e \
-	'\033[92m'\
-	'\n###############################################################################'\
-	'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-	'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-	'\n#    If you use this program in your work, please cite the relevant paper:    #'\
-	'\n#                   Yekeen, A.A. et al. To be published...                    #'\
-	'\n###############################################################################'\
-	'\033[m'
-
+'\033[92m'\
+'\n###############################################################################'\
+'\n#--------------------------------- CHAPERONg ---------------------------------#'\
+'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
+'\n#   \033[32;40m'\
+' If you use this program in your work, please cite the relevant paper: \033[m  '\
+'\033[92m #'\
+'\n#                  \033[32;40m Yekeen, A.A. et al. To be published... \033[m '\
+'\033[92m                  #'\
+'\n###############################################################################'\
+'\033[m'
 
 sleep 2
 # cat << usageSt
