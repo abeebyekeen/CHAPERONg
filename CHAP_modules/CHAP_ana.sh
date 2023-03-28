@@ -144,17 +144,19 @@ analyse_array=("$analyse")
 # # THIS Works
 # check if all choices are among the available options
 checkstage="no"
-for i in ${analyse_array[@]} ; do echo "$i"
+for i in ${analyse_array[@]}
+do # echo "$i"
 	if [[ ${valid_numbers[@]} =~ "$i" || ${valid_numbers[@]} == "$i" ]]
 		then checkstage="yes"
 	else checkstage="no" ; break
 	fi
 done
 
-while [[ "$checkstage" != "yes" ]] ; do
+while [[ "$checkstage" != "yes" ]]
+do
 	echo $'\n You entered: '"$analyse"$'\n'
-	echo -e "\033[31;107m $i is invalid!! \033[m\n"
-	echo -e "\033[31;107m Please enter a valid (set of) number(s)!! \033[m\n"
+	echo -e "\033[31;40m $i is invalid!! \033[m\n"
+	echo -e "\033[31;40m Please enter a valid (set of) number(s)!! \033[m\n"
 	# checkstage="no"
 	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
 	analyse_array=("$analyse")
@@ -1147,7 +1149,7 @@ AnalysisSingleMultiple
 	while [[ "$plot_number" != 1 && "$plot_number" != 2 ]]
 	do
 		printf "\n You entered: ${plot_number}\n\n"
-		echo -e " \033[31;107mPlease enter a valid number!!\033[m\n"
+		echo -e " \033[31;40m Please enter a valid number!! \033[m\n"
 		read -p ' Enter 1 or 2 here: ' plot_number
 	done
 
@@ -1168,8 +1170,8 @@ cat << AnalysisList
 AnalysisList
 
 	sleep 2
-
-	if [[ "$plot_number" == 1 ]] ; then
+			
+	if [[ "$plot_number" == 1 ]] ; then plot_type="single-data plot"
 		read -p ' Enter one or more options here (separated by a space): ' data_kde
 
 		# create a bash array listing valid numbers
@@ -1189,7 +1191,7 @@ AnalysisList
 		while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
 			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
 			echo $'\n You entered: '"$data_kde"$'\n'
-			echo -e " \033[31;107mPlease enter a valid (set of) number(s)!!\033[m\n"
+			echo -e " \033[31;40mPlease enter a valid (set of) number(s)!!\033[m\n"
 			read -p ' Enter one (or a combination) of the options (separated by a space): ' data_kde
 			analyse_array=("$data_kde")
 		done
@@ -1201,9 +1203,6 @@ AnalysisList
 		sleep 2
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
-				if [[ $plot_number == 1 ]] ; then plot_type="single-data plot"
-				elif [[ $plot_number == 2 ]] ; then plot_type="multi-data plot"
-				fi
 				echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
 				echo -e "\nData for ${filenm}" >> CHAP_kde_dataset_list.dat
 				count_data_in=$(( count_data_in + 1 ))				
@@ -1301,7 +1300,7 @@ askDataExist
 				read -p '  Enter 1, 2 or 3 here: ' DataFile
 				while [[ "$DataFile" != 1 && "$DataFile" != 2 && "$DataFile" != 3 ]]; do
 					echo $'\n You entered: '"$DataFile"
-					echo -e "\n\033[31;107m Please enter a valid number (1, 2 or 3)!! \033[m\n"
+					echo -e "\n\033[31;40m Please enter a valid number (1, 2 or 3)!! \033[m\n"
 					read -p '  Enter 1, 2 or 3 here: ' DataFile
 				done
 				if [[ "$DataFile" == 1 ]]; then
@@ -1330,10 +1329,10 @@ askDataExist
 
 		# echo -e "\nauto mode,$automode" >> CHAP_kde_dataset_list.dat
 
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_single_plot.py
+		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
+		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
 
-	elif [[ "$plot_number" == 2 ]] ; then
+	elif [[ "$plot_number" == 2 ]] ; then plot_type="multi-data plot"
 		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
 
 		while ! [[ "$data_kde" =~ ^([1-4])$ ]] ; do
@@ -1357,7 +1356,10 @@ askDataExist
 		esac
 
 		# Write data type to file
-		echo -e "auto mode,$automode\n\n$data_type" > CHAP_kde_dataset_list.dat
+		echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
+		echo -e "\n$data_type" >> CHAP_kde_dataset_list.dat
+
+		# echo -e "auto mode,$automode\n\n$data_type" > CHAP_kde_dataset_list.dat
 
 		# Prompt the user to enter the first data label and path
 		read -p $'\n Provide a label for the first data for the KDE: ' data1_kde_label
@@ -1414,8 +1416,8 @@ askDataExist
 			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
 		done
 
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_kde_multiplot.py
+		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
+		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
 
 	fi
 
