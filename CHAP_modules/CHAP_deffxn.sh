@@ -2431,7 +2431,7 @@ echo 0 | eval $gmx_exe_path trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tp
 #gmx trjconv -f "${filenm}"_"${wraplabel}".xtc -s "${filenm}".tpr -o "${outXTCmovie}.xtc" -skip $skimov
 #fi
 sleep 2
-echo "${demA}"$' Preparing to extract $customframeNo snapshots...\n'
+echo "${demA} Preparing to extract $customframeNo snapshots..."'$\n'
 sleep 2
 if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 	echo 1 | eval $gmx_exe_path trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
