@@ -1727,6 +1727,7 @@ elif [[ "$analyse" == "11" ]] && [[ ! -d "MOVIE" ]]; then
 	ScanTRAJ; variables_for_regMD_Movie; analyser11
 fi
 
+
 if [[ "$analysis" == *" 11 "* ]]; then
 	ScanTRAJ; variables_for_regMD_Movie; analyser11
 fi
