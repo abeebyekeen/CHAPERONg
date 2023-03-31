@@ -1699,7 +1699,7 @@ variables_for_regMD_Movie()
 # cd ..
 # }
 
-if [[ "$analyse" == "11" ]] && [[ -d "$movieDIRECORY" ]]; then
+if [[ "$analyse" == "11" ]] && [[ -d "MOVIE" ]]; then
 cat << MovChoic
 ${demA}
 Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
@@ -1723,7 +1723,7 @@ MovChoic
 		variables_for_regMD_Movie; analyser11update
 	fi
 
-elif [[ "$analyse" == "11" ]] && [[ ! -d "$movieDIRECORY" ]]; then
+elif [[ "$analyse" == "11" ]] && [[ ! -d "MOVIE" ]]; then
 	ScanTRAJ; variables_for_regMD_Movie; analyser11
 fi
 
