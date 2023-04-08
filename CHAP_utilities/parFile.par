@@ -28,8 +28,9 @@
 ; Water model i.e. tip3p, spc
 # water             =      tip3p
 
-; Force-field (e.g. charmm27, amber94 etc.),
-; use "wd" if ff in working directory
+; Force-field (e.g., charmm27, amber94, amber99sb, gromos54a7, oplsaa, etc.),
+; full list at https://manual.gromacs.org/current/user-guide/force-fields.html
+; use "wd" if force-field is in working directory
 # ff                =      wd
 
 ; Number of thread-MPI ranks      
