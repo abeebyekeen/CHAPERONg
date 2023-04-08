@@ -2467,8 +2467,13 @@ $'preset.pretty(selection='"'all'"$')\n'\
 $'spectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
 $'set movie_loop, 0\nsmooth\norient\nviewport 760, 540\nzoom all, -10\n'\
 $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
-$'mclear\n'"cd ${movieDIRECORY}"$'\nshow cell\nsave PyMOLsession_allSet.pse\n'\
-$'mpng frame_.png\nquit' > prep_movie_Pyscript.pml
+$'mclear\n'"cd ${movieDIRECORY}" > prep_movie_Pyscript.pml
+
+if [[ "$mdType" == "umbrellaSampl" ]]; then
+	echo "show cell" >> prep_movie_Pyscript.pml
+fi
+
+echo $'save PyMOLsession_allSet.pse\nmpng frame_.png\nquit' >> prep_movie_Pyscript.pml
 	
 echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
 sleep 2
