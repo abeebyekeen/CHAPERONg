@@ -63,7 +63,7 @@ Optional (int=integer; str=string):
 -p, --deffnm <str>   Set filename prefix (default for outputs: "md_filename")
 -a, --auto_mode      Automation mode [options: full, semi(default)]. full: Use
                      default parameters & do common analyses (less prompts)
---parFile <str>      Name of the CHAPERONg input parameter file
+--paraFile <str>     Name of the CHAPERONg input parameter file
 -H, --Help           Print more, advanced options
 guide_sh
 }
@@ -103,7 +103,7 @@ Optional (int=integer; str=string):
 -t, --temp <int>     Simulation temperature in kelvin
 --ntmpi <int>        Number of thread-MPI ranks [default: 0 (gmx guesses)]
 --ntomp <int>        Number of OpenMP threads per MPI rank; default: 0 (guess)
---parFile <str>      Name of the CHAPERONg input parameter file
+--paraFile <str>     Name of the CHAPERONg input parameter file
 --clustr_cut <float> RMSD cut-off (nm) for cluster membership (default: 1.0)
 --clustr_methd <str> Method for cluster determination: gromos (default),
                      linkage, jarvis-patrick, monte-carlo, diagonalization
@@ -138,8 +138,8 @@ parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
 #gmxV=''
 
-# check if the parFile flag is used and then read the provided parameter file
-read_parFile()
+# check if the paraFile flag is used and then read the provided parameter file
+read_paraFile()
 {
 	if [[ "$parfilename" != '' ]] ; then 
 		while IFS= read -r line; do
@@ -171,17 +171,17 @@ read_parFile()
 			elif [[ "$par" == "clustr_methd" ]]; then method_clust="$par_input"
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
 			elif [[ "$par" == "dt" ]]; then dt="$par_input"
-			elif [[ "$par" == "auto_mode" ]]; then auto_mode="$par_input"
+			elif [[ "$par" == "auto_mode" ]]; then automode="$par_input"
 			fi
 		done < "$parfilename"
 	fi
 }
 
 # then check other flags
-# flags provided on the terminal overwrite parameters in parFile in case of conflicts
+# flags provided on the terminal overwrite parameters in paraFile in case of conflicts
 while [ "$1" != "" ]; do	
 	case "$1" in
-	--parFile) shift; parfilename="$1"; read_parFile;;	
+	--paraFile) shift; parfilename="$1"; read_paraFile;;	
 	-a | --auto_mode) shift; automode="$1";;
 	-b | --bt) shift; btype="$1";;
 	-c | --conc) shift; ion_conc="$1";;
@@ -207,7 +207,7 @@ while [ "$1" != "" ]; do
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
 	-N | --negname) shift; nn="$1";;
 	-P | --posname) shift; pn="$1";;
-	--parFile) shift; parfilename="$1";;	
+	--paraFile) shift; parfilename="$1";;	
 	--ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
 	-T | --nt) shift; nt="$1";;
