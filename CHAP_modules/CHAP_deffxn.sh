@@ -2330,6 +2330,46 @@ fi
 	fi
 }
 
+ScanTRAJ()
+{
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
+	sleep 2
+	analyser0
+fi
+if [[ ! -f "trajectDetails.log" ]]; then
+	echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
+	sleep 2
+	eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |& tee trajectDetails.log
+	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
+	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
+	simDuratnpsINT=$(echo ${simDuratnps%\.*})
+	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
+	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
+	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
+	echo $simDuratnINTns > simulation_duration
+
+	echo -e "${demA} \033[92mExtract number of frames and simulation duration from trajectory...DONE\033[m${demB}"
+	sleep 2
+else
+	ScanTraj_again_if_err()
+	{
+		echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
+		sleep 2
+		eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |& tee trajectDetails.log		
+	}
+	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}') || ScanTraj_again_if_err
+	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
+	simDuratnpsINT=$(echo ${simDuratnps%\.*})
+	sim_timestep=$(cat trajectDetails.log | grep -A1 "Item" | awk '{print $NF}' | tail -n 1)
+	#simDuratn_nsFloat=$(echo "${simDuratnps%\.*} / 1000" | bc -l)
+	simDuratn_nsFloat=$(awk "BEGIN {print $simDuratnps / 1000}")
+	simDuratnINTns=$(echo ${simDuratn_nsFloat%\.*})
+	echo $simDuratnINTns > simulation_duration
+fi
+}
+
 makeMoviePy1()
 {
 echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
@@ -2373,6 +2413,7 @@ variables_for_SMD_Movie()
 
 analyser10()
 {
+	ScanTRAJ
 	echo "${demA} $message_Movie"
 
 	if [[ $customframeNo == '' ]]; then
