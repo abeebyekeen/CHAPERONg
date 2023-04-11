@@ -300,30 +300,30 @@ if [[ $automode == "full" && $sysType == "protein_only" ]]; then
 				
 elif [[ $automode != "full" && $sysType == "protein_only" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'noPBC' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 1
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 1
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
-		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose (4) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -pbc mol -center
 	else
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"noPBC".xtc -pbc mol -center
 		echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
-		sleep 1
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 1
+		sleep 3
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	fi
 		
@@ -350,32 +350,35 @@ elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 
 elif [[ $automode != "full" && $sysType == "protein_lig" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 1
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'nojump' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 1
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'fit' ]] ; then	
-		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose (4) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"fit".xtc -fit rot+trans
 	elif [[ "$PBCcorrectType" != '' && "$wraplabel" == 'combo' ]] ; then
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
-		echo $'**Choose (4) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose (4) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump".xtc -o "${filenm}"_"nojump_fitTrans".xtc -fit translation
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
-		sleep 2
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_"nojump_fitTrans".xtc -o "${filenm}"_"combo".xtc -center -pbc mol -ur compact
 	else
-		echo $'**Choose "Protein" (1) for centering and "System" (0) for output when prompted\n'
+		echo -e '\033[92m **Choose "Protein" (1) for centering and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
 		echo "${demA}"$' Now performing rotational and translational fitting...\n'
-		echo $'**Choose "Backbone" (4) to perform lsq fitting to protein backbone, and "System" (0) for output when prompted\n'
+		sleep 3
+		echo -e '\033[92m **Choose "Backbone" (4) to perform lsq fitting to protein backbone, and "System" (0) for output when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o "${filenm}"_fit.xtc -fit rot+trans
 	fi
 
@@ -391,10 +394,11 @@ elif [[ $automode == "full" && $sysType == "protein_dna" ]]; then
 		echo "Protein_DNA" 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 	fi
 elif [[ $automode != "full" ]] && [[ $sysType == "protein_dna" ]]; then
-	echo $'**Choose "Protein_DNA" for centering and "System" (0) for output when prompted\n'
+	echo -e '\033[92m **Choose "Protein_DNA" for centering and "System" (0) for output when prompted\n\033[m'
+	sleep 4
 	eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
 	echo "${demA}"$' Now removing possible jumps in the trajectory...\n'
-	sleep 1
+	sleep 3
 	eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -n index.ndx -o "${filenm}"_"nojump".xtc -center -pbc nojump -ur compact || DNAwrapAlt
 fi
 echo -e "${demA}\033[92m Recenter the protein and rewrap molecules within the unit cell...DONE\033[m${demB}"
@@ -826,7 +830,8 @@ analyser7()
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
 		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
 	elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
-		echo $'**Choose "Backbone" (4) twice when prompted\n'
+		echo -e '\033[92m **Choose "Backbone" (4) twice when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
 		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
 		echo "${demA}"$' Now analyzing eigenvectors and calculating overlap between components...\n'\
@@ -845,7 +850,8 @@ analyser7()
 		gracebat PCA_2dproj_"${filenm}".xvg -hdevice PNG -autoscale xy -printfile \
 		PCA_2dproj_"${filenm}".png -fixed 7500 4000 -legend load || notifyImgFail
 	elif [[ $sysType == "protein_lig" ]] || [[ $sysType == "protein_dna" ]] && [[ $automode == "semi" ]] ; then
-		echo $'**Choose "Backbone" (4) twice when prompted\n'
+		echo -e '\033[92m **Choose "Backbone" (4) twice when prompted\n\033[m'
+		sleep 4
 		eval "$gmx_exe_path" covar -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
 		-n index.ndx -o "${filenm}"_eigenval.xvg -v "${filenm}"_eigenvec.trr
 		echo "${demA}"$' Compute and diagonalize covariance matrix...DONE'"${demB}"
@@ -3439,7 +3445,7 @@ elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
 elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1
 	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
-	analyser8; analyser9; variables_for_regMD_Movie; analyser10
+	analyser8; variables_for_regMD_Movie; analyser10
 	analyser11; analyser13; analyser14; analyser15; analyser16
 fi
 }
