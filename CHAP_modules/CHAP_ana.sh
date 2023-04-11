@@ -83,8 +83,8 @@ Option | Analysis
   7    | Principal component analysis (PCA)
   8    | Secondary structure analysis
   9    | Clustering analysis
-  10   | Kernel density estimation
-  11   | Make a movie of the simulation
+  10   | Make a movie of the simulation
+  11   | Kernel density estimation
   12   | Free energy calculations using the MMPBSA method (g_mmpbsa)
   13   | Free energy surface (FES) with gmx sham
   14   | Free energy surface using the CHAPERONg FES scripts
@@ -92,9 +92,9 @@ Option | Analysis
   16   | Interactive hydrogen bond matrix (using md-davis)
   17   | Extract frames from the trajectory
   18   | Make index groups (make_ndx)
-  19   | All analyses but 17 and 18
-  20   | All analyses but 0, 17 and 18
-  21   | All analyses but 0, 9, 17 and 18
+  19   | All analyses but (0,) 17 and 18
+  20   | All analyses but (0,) 9, 17 and 18
+  21   | All analyses but (0,) 9, 12, 17 and 18
   
 AnalysisList
 
@@ -183,7 +183,7 @@ done
 
 analysis=" $analyse "
 
-if [[ "$analyse" == "11" ]]; then
+if [[ "$analyse" == "10" ]]; then
 	analysis="$analyse"
 fi
 
@@ -194,6 +194,11 @@ fi
 # Function to scan the trajectory to extract simulation details
 ScanTRAJ()
 {
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
+	sleep 2
+	analyser0
+fi
 if [[ ! -f "trajectDetails.log" ]]; then
 	echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
 	sleep 2
@@ -397,6 +402,12 @@ sleep 2
 }
 if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
+	sleep 2
+	analyser0
+fi
+
 analyser1()
 {
 	echo "${demA}"$' Now calculating post-MD thermodynamic parameters...\n\n'
@@ -460,7 +471,7 @@ analyser1()
 	sleep 2
 
 }
-if [[ "$analysis" == *" 1 "* ]]; then analyser1; fi
+if [[ "$analysis" == *" 1 "* ]]; then analyser1 ; fi
 
 altRMSD()
 {
@@ -513,7 +524,7 @@ analyser2()
 	sleep 2
 }
 
-if [[ "$analysis" == *" 2 "* ]]; then analyser2 ; fi
+if [[ "$analysis" == *" 2 "* ]]; then ScanTRAJ ; analyser2 ; fi
 
 analyser3()
 {
@@ -1125,8 +1136,313 @@ analyser9()
 
 if [[ "$analysis" == *" 9 "* ]]; then analyser9 ; fi
 
+makeMoviePy1()
+{
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
+$'\nquit' > make1_movie_Pyscript.pml
+pymol make1_movie_Pyscript.pml
+}
+	
+makeMoviePy2()
+{
+echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
+$'\nquit' > make2_movie_Pyscript.pml
+pymol make2_movie_Pyscript.pml
+}
 
-analyser10()
+##function specific for movie update
+makeMoviePyx()
+{
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
+pymol make1_movie_Pyscript.pml
+}
+##function specific for movie update	
+makeMoviePyy()
+{
+echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
+$'\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
+pymol make2_movie_Pyscript.pml
+}
+
+# define function for variables_for_regMD_Movie
+variables_for_regMD_Movie()
+{
+	message_Movie="Preparing to make a summary movie of the trajectory"
+	trajectlog="trajectDetails.log"
+	simulationcontext="simulation"
+	xtcFileMovie="$filenm""_${wraplabel}"
+	tprFileMovie="${filenm}"
+	outXTCmovie="${filenm}""_trjEvery""$skimov""skipForMovie"
+	movieDIRECORY="MOVIE"
+}
+
+# analyser10()
+# {
+# 	echo "${demA} $message_Movie"
+
+# 	if [[ $customframeNo == '' ]]; then
+# cat << askMovielength
+
+# Do you want to proceed to making a movie summarized into 200 frames?
+
+#   1) Yes.
+#   2) No, I want a different number of frames for the movie.
+
+# askMovielength
+
+# 	read -p ' Enter 1 or 2 here: ' movieLeng
+# 		while [[ "$movieLeng" != 1 && "$movieLeng" != 2 ]]; do
+# 			printf "\n You entered: $movieLeng \n"
+# 			printf ' Please enter a valid number (1 or 2)!!\n\n'
+# 			read -p ' Enter 1 or 2 here: ' movieLeng
+# 		done
+# 	if [[ $movieLeng == 1 ]] ; then
+# 		customframeNo_int=200
+# 	elif [[ $movieLeng == 2 ]] ; then
+# 		cat "$trajectlog" | grep -v "GROMACS reminds"
+# 		sleep 2
+
+# 		echo "${demA} Above is a summary of your $simulationcontext trajectory."
+# 		sleep 1
+# 		printf ' You may find the info useful to provide a response to the prompt below.\n'
+# 		sleep 2
+# 		printf "${demA} How many frames do you want the movie to be composed of?\n\n"
+# 		sleep 1
+# 		read -p ' *Please enter a value here: ' customframeNo
+# 		printf " You entered: $customframeNo \n\n"
+# 		customframeNo_int=$(echo ${customframeNo%\.*})
+# 	fi 
+# elif [[ "$customframeNo" != '' ]]; then
+# 	customframeNo_int=$(echo ${customframeNo%\.*})
+# fi
+
+# if (( $No_of_frames >= "$customframeNo_int" )) ; then
+# 	skimov_raw=$(awk "BEGIN {print $No_of_frames / $customframeNo_int}")
+# 	skimov=$(echo ${skimov_raw%\.*})
+# elif (( $No_of_frames < "$customframeNo_int" )) ; then 
+# 	skimov=1
+# 	echo "${demA}"" Number of frames in the trajectory: ${No_of_frames}"\
+# 	$'\n'" Total number of frames in the trajectory is less than $customframeNo!"\
+# 	$'\n'" Using ${No_of_frames} frames directly.""${demB}"
+# 	customframeNo=$(echo ${No_of_frames})
+# 	customframeNo_int=$(echo ${No_of_frames})
+# fi
+
+# echo "${demA}"$' Will now extract frames to be used for the movie...\n\n'
+# sleep 2
+# #if [[ $sysType == 1 ]] || [[ $sysType == 2 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
+# echo 0 | eval "$gmx_exe_path" trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tpr -o ${outXTCmovie}.xtc -skip $skimov
+# #elif [[ $sysType == 1 ]] || [[ $sysType == 2 ]] && [[ $flw == 0 ]] ; then
+# #gmx trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${outXTCmovie}.xtc" -skip $skimov
+# #fi
+# sleep 2
+# echo "${demA}"$' Preparing to extract $customframeNo snapshots...\n'
+# sleep 2
+# if [[ $automode == "full" && $sysType == "protein_only" ]]; then
+# 	echo 1 | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
+# elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
+# 	eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
+# elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
+# 	echo "Protein_DNA" | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
+# elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
+# 	eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
+# elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
+# 	echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
+# fi
+# currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
+# nMOVIE=1
+# bkupMOVIEdir="$(pwd)""/#${movieDIRECORY}"".""backup.""$nMOVIE"
+# base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
+# if [[ -d "$currentMOVIEdir" ]]; then
+# 	echo $'\n'"$currentMOVIEdir"$' folder exists,\n'"backing it up as $base_bkupMOVIEdir"
+# 	sleep 1
+# 	while [[ -d "$bkupMOVIEdir" ]]; do
+# 		nMOVIE=$(( nMOVIE + 1 ))
+# 		bkupMOVIEdir="$(pwd)""/#${movieDIRECORY}"".""backup.""$nMOVIE"
+# 		base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
+# 	done
+# 	mv "$currentMOVIEdir" "$bkupMOVIEdir" && mkdir "${movieDIRECORY}" || true
+# 	echo $'\n'"Backing up the last MOVIE folder and its contents as $base_bkupMOVIEdir"
+# 	sleep 1
+# elif [[ ! -d "$currentMOVIEdir" ]]; then mkdir "${movieDIRECORY}"
+# fi	
+	
+# echo $'load summaryForMovie.pdb\nsave PyMOLsession.pse\nintra_fit name ca+c+n+o\n'\
+# $'preset.pretty(selection='"'all'"$')\n'\
+# $'spectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
+# $'set movie_loop, 0\nsmooth\norient\nviewport 760, 540\nzoom all, -10\n'\
+# $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
+# $'mclear\n'"cd ${movieDIRECORY}"$'\nsave PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
+	
+# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
+# sleep 2
+# pyM=0
+# pymol prep_movie_Pyscript.pml || pyM=1
+# echo "${demA}"$' Extract frames as images...DONE'"${demB}""${demA}"$' Now converting images to movie...\n'
+# cd ./${movieDIRECORY}
+# mov_make=0
+# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
+# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
+
+# if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
+# 	echo "${demA}"$'The program "Convert/ImageMagick" could not be found.\nCHAPERONg detected'\
+# 	$'"PyMOL" and will use it to make a movie which may,\n'\
+# 	$'however, be of lesser quality'"${demB}"
+		
+# 	makeMoviePy1
+# 	makeMoviePy2
+		
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
+# fi
+
+# if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
+# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+# 	$'\n "Convert/ImageMagick" not being found, or some library is missing.'\
+# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+# 	$'\n however, be of lesser quality'"${demB}"
+		
+# 	makeMoviePy1
+# 	makeMoviePy2
+		
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
+# fi
+
+# #mkdir ./frames
+# #mv frame_*.png ./frames || true ; mv ../summaryForMovie.pdb ./ || true; mv ../"${outXTCmovie}.xtc" ./ || true ; mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
+# rm frame_*.png || true ; rm ../summaryForMovie.pdb || true
+# rm ../"${outXTCmovie}.xtc" || true 
+# mv ../*.pse ./ || true ; rm ../*_movie_Pyscript.pml || true
+# rm ./*_movie_Pyscript.pml || true
+# rm ./PyMOLsession.pse || true
+# #rm prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml
+# #rm ../prep_movie_Pyscript.pml || true; cd ..
+# #rm *movie_Pyscript.pml prep_movie_Pyscript.pml || true
+# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
+# cd ..
+# }
+
+# analyser10update()
+# {
+
+# echo "${demA}"$'Preparing to make a summary movie from a preset PyMOL session\n'
+# sleep 2
+
+# currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
+# if [[ ! -d "$currentMOVIEdir" ]]; then
+# 	echo "No MOVIE directory from a previous run exists... Exiting"
+# 	exit 1
+# fi
+# nMOVIE=1
+# currentMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie.gif"
+# bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
+# if [[ -f "$currentMOVIEgif" ]]; then
+# 	base_currentMOVIEgif=$(basename "$currentMOVIEgif")
+# 	base_bkupMOVIEgif=$(basename "$bkupMOVIEgif")
+# 	echo $'\n'"$base_currentMOVIEgif" "exists, backing it up as $base_bkupMOVIEgif"$'\n'
+# 	sleep 1
+# 	while [[ -f "$bkupMOVIEgif" ]]; do
+# 	nMOVIE=$(( nMOVIE + 1 ))
+# 	bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
+# 	done
+# 	mv "$currentMOVIEgif" "$bkupMOVIEgif" || true
+# 	echo $'\n'"Backing up the last .gif MOVIE as $base_bkupMOVIEgif"
+# 	sleep 1
+# fi	
+
+# nMOVIE=1
+# currentMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie.mp4"
+# bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
+# if [[ -f "$currentMOVIEmp4" ]]; then
+# 	base_currentMOVIEmp4=$(basename "$currentMOVIEmp4")
+# 	base_bkupMOVIEmp4=$(basename "$bkupMOVIEmp4")
+# 	echo $'\n'"$base_currentMOVIEmp4"" exists, backing it up as $base_bkupMOVIEmp4"$'\n'
+# 	sleep 1
+# 	while [[ -f "$bkupMOVIEmp4" ]]; do
+# 	nMOVIE=$(( nMOVIE + 1 ))
+# 	bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
+# 	done
+# 	mv "$currentMOVIEmp4" "$bkupMOVIEmp4" || true
+# 	echo $'\n'"Backing up the last .mp4 MOVIE as $base_bkupMOVIEmp4"
+# 	sleep 1
+# fi	
+	
+# echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
+	
+# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
+# sleep 2
+# pyM=0
+# pymol prep_movie_Pyscript.pml || pyM=1
+# echo "${demA}"$'Extract frames as images...DONE'"${demB}""${demA}"$'Now converting images to movie...\n'
+# cd ./${movieDIRECORY}
+# mov_make=0
+# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
+# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
+
+# if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
+# 	echo "${demA}"$'The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
+# 	$'PyMOL''"'" and will use it to make a movie which may, however, be of lesser quality""${demB}"
+		
+# 	makeMoviePyx
+# 	makeMoviePyy
+		
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
+# fi
+
+# if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
+# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
+# 	$' "Convert/ImageMagick" not being found, or some library is missing.'\
+# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
+# 	$'\n however, be of lesser quality'"${demB}"
+		
+# 	makeMoviePyx
+# 	makeMoviePyy
+		
+# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
+# fi
+
+# rm frame_*.png || true 
+# # rm ../*movie_Pyscript.pml || true
+# rm ./*movie_Pyscript.pml || true
+# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
+# cd ..
+# }
+
+if [[ "$analyse" == "10" ]] && [[ -d "MOVIE" ]]; then
+cat << MovChoic
+${demA}
+Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
+
+  a     Make a new movie
+  b     Adjust a previous one
+
+MovChoic
+
+	read -p '*Enter your choice here (a or b): ' moviechoic
+
+	while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
+		echo $'\nYou entered: '"$moviechoic"$'\n'
+		echo $'Please enter a valid letter!!\n'
+		read -p '*Enter your choice here (a or b): ' moviechoic
+	done
+ 
+	if [[ "$moviechoic" == "a" ]]; then
+		ScanTRAJ; variables_for_regMD_Movie; analyser10
+	elif [[ "$moviechoic" == "b" ]]; then
+		variables_for_regMD_Movie; analyser10update
+	fi
+
+elif [[ "$analyse" == "10" ]] && [[ ! -d "MOVIE" ]]; then
+	ScanTRAJ; variables_for_regMD_Movie; analyser10
+fi
+
+
+if [[ "$analysis" == *" 10 "* ]]; then
+	ScanTRAJ; variables_for_regMD_Movie; analyser10
+fi
+
+
+analyser11()
 {
 	printf "${demA} Preparing to estimate probability density function using KDE... \n\n"
 	sleep 2
@@ -1425,312 +1741,8 @@ askDataExist
 	# sleep 2
 }
 
-if [[ "$analysis" == *" 10 "* ]]; then analyser10 ; fi
+if [[ "$analysis" == *" 11 "* ]]; then analyser11 ; fi
 
-makeMoviePy1()
-{
-echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, quality 100'\
-$'\nquit' > make1_movie_Pyscript.pml
-pymol make1_movie_Pyscript.pml
-}
-	
-makeMoviePy2()
-{
-echo $'load PyMOLsession_allSet.pse\nmovie.produce dynamics_moviePy.mpg, ray, quality=100'\
-$'\nquit' > make2_movie_Pyscript.pml
-pymol make2_movie_Pyscript.pml
-}
-
-##function specific for movie update
-makeMoviePyx()
-{
-echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
-$'\nmovie.produce dynamics_moviePy.mpg, quality 100\nquit' > make1_movie_Pyscript.pml
-pymol make1_movie_Pyscript.pml
-}
-##function specific for movie update	
-makeMoviePyy()
-{
-echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse'\
-$'\nmovie.produce dynamics_moviePy.mpg, ray, quality=100\nquit' > make2_movie_Pyscript.pml
-pymol make2_movie_Pyscript.pml
-}
-
-# define function for variables_for_regMD_Movie
-variables_for_regMD_Movie()
-{
-	message_Movie="Preparing to make a summary movie of the trajectory"
-	trajectlog="trajectDetails.log"
-	simulationcontext="simulation"
-	xtcFileMovie="$filenm""_${wraplabel}"
-	tprFileMovie="${filenm}"
-	outXTCmovie="${filenm}""_trjEvery""$skimov""skipForMovie"
-	movieDIRECORY="MOVIE"
-}
-
-# analyser11()
-# {
-# 	echo "${demA} $message_Movie"
-
-# 	if [[ $customframeNo == '' ]]; then
-# cat << askMovielength
-
-# Do you want to proceed to making a movie summarized into 200 frames?
-
-#   1) Yes.
-#   2) No, I want a different number of frames for the movie.
-
-# askMovielength
-
-# 	read -p ' Enter 1 or 2 here: ' movieLeng
-# 		while [[ "$movieLeng" != 1 && "$movieLeng" != 2 ]]; do
-# 			printf "\n You entered: $movieLeng \n"
-# 			printf ' Please enter a valid number (1 or 2)!!\n\n'
-# 			read -p ' Enter 1 or 2 here: ' movieLeng
-# 		done
-# 	if [[ $movieLeng == 1 ]] ; then
-# 		customframeNo_int=200
-# 	elif [[ $movieLeng == 2 ]] ; then
-# 		cat "$trajectlog" | grep -v "GROMACS reminds"
-# 		sleep 2
-
-# 		echo "${demA} Above is a summary of your $simulationcontext trajectory."
-# 		sleep 1
-# 		printf ' You may find the info useful to provide a response to the prompt below.\n'
-# 		sleep 2
-# 		printf "${demA} How many frames do you want the movie to be composed of?\n\n"
-# 		sleep 1
-# 		read -p ' *Please enter a value here: ' customframeNo
-# 		printf " You entered: $customframeNo \n\n"
-# 		customframeNo_int=$(echo ${customframeNo%\.*})
-# 	fi 
-# elif [[ "$customframeNo" != '' ]]; then
-# 	customframeNo_int=$(echo ${customframeNo%\.*})
-# fi
-
-# if (( $No_of_frames >= "$customframeNo_int" )) ; then
-# 	skimov_raw=$(awk "BEGIN {print $No_of_frames / $customframeNo_int}")
-# 	skimov=$(echo ${skimov_raw%\.*})
-# elif (( $No_of_frames < "$customframeNo_int" )) ; then 
-# 	skimov=1
-# 	echo "${demA}"" Number of frames in the trajectory: ${No_of_frames}"\
-# 	$'\n'" Total number of frames in the trajectory is less than $customframeNo!"\
-# 	$'\n'" Using ${No_of_frames} frames directly.""${demB}"
-# 	customframeNo=$(echo ${No_of_frames})
-# 	customframeNo_int=$(echo ${No_of_frames})
-# fi
-
-# echo "${demA}"$' Will now extract frames to be used for the movie...\n\n'
-# sleep 2
-# #if [[ $sysType == 1 ]] || [[ $sysType == 2 ]] || [[ $sysType == 3 ]] && [[ $flw == 1 ]] ; then
-# echo 0 | eval "$gmx_exe_path" trjconv -f "$xtcFileMovie".xtc -s ${tprFileMovie}.tpr -o ${outXTCmovie}.xtc -skip $skimov
-# #elif [[ $sysType == 1 ]] || [[ $sysType == 2 ]] && [[ $flw == 0 ]] ; then
-# #gmx trjconv -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -o "${outXTCmovie}.xtc" -skip $skimov
-# #fi
-# sleep 2
-# echo "${demA}"$' Preparing to extract $customframeNo snapshots...\n'
-# sleep 2
-# if [[ $automode == "full" && $sysType == "protein_only" ]]; then
-# 	echo 1 | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-# elif [[ $automode == "semi" && $sysType == "protein_only" ]]; then
-# 	eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -o summaryForMovie.pdb
-# elif [[ $automode == "semi" || $automode == "full" ]] && [[ $sysType == "protein_dna" ]]; then
-# 	echo "Protein_DNA" | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-# elif [[ $automode == "semi" && $sysType == "protein_lig" ]]; then
-# 	eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-# elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
-# 	echo "Protein_$ligname" | eval "$gmx_exe_path" trjconv -f ${outXTCmovie}.xtc -s ${tprFileMovie}.tpr -n index.ndx -o summaryForMovie.pdb
-# fi
-# currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
-# nMOVIE=1
-# bkupMOVIEdir="$(pwd)""/#${movieDIRECORY}"".""backup.""$nMOVIE"
-# base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
-# if [[ -d "$currentMOVIEdir" ]]; then
-# 	echo $'\n'"$currentMOVIEdir"$' folder exists,\n'"backing it up as $base_bkupMOVIEdir"
-# 	sleep 1
-# 	while [[ -d "$bkupMOVIEdir" ]]; do
-# 		nMOVIE=$(( nMOVIE + 1 ))
-# 		bkupMOVIEdir="$(pwd)""/#${movieDIRECORY}"".""backup.""$nMOVIE"
-# 		base_bkupMOVIEdir=$(basename "$bkupMOVIEdir")
-# 	done
-# 	mv "$currentMOVIEdir" "$bkupMOVIEdir" && mkdir "${movieDIRECORY}" || true
-# 	echo $'\n'"Backing up the last MOVIE folder and its contents as $base_bkupMOVIEdir"
-# 	sleep 1
-# elif [[ ! -d "$currentMOVIEdir" ]]; then mkdir "${movieDIRECORY}"
-# fi	
-	
-# echo $'load summaryForMovie.pdb\nsave PyMOLsession.pse\nintra_fit name ca+c+n+o\n'\
-# $'preset.pretty(selection='"'all'"$')\n'\
-# $'spectrum chain, green cyan orange magenta\ncolor atomic, (not elem C)\nbg white\n'\
-# $'set movie_loop, 0\nsmooth\norient\nviewport 760, 540\nzoom all, -10\n'\
-# $'set ray_trace_frames=1\nset ray_opaque_background, 0\nset cache_frames=0\n'\
-# $'mclear\n'"cd ${movieDIRECORY}"$'\nsave PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
-	
-# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
-# sleep 2
-# pyM=0
-# pymol prep_movie_Pyscript.pml || pyM=1
-# echo "${demA}"$' Extract frames as images...DONE'"${demB}""${demA}"$' Now converting images to movie...\n'
-# cd ./${movieDIRECORY}
-# mov_make=0
-# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
-# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
-
-# if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$'The program "Convert/ImageMagick" could not be found.\nCHAPERONg detected'\
-# 	$'"PyMOL" and will use it to make a movie which may,\n'\
-# 	$'however, be of lesser quality'"${demB}"
-		
-# 	makeMoviePy1
-# 	makeMoviePy2
-		
-# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
-# fi
-
-# if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
-# 	$'\n "Convert/ImageMagick" not being found, or some library is missing.'\
-# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
-# 	$'\n however, be of lesser quality'"${demB}"
-		
-# 	makeMoviePy1
-# 	makeMoviePy2
-		
-# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
-# fi
-
-# #mkdir ./frames
-# #mv frame_*.png ./frames || true ; mv ../summaryForMovie.pdb ./ || true; mv ../"${outXTCmovie}.xtc" ./ || true ; mv ../*.pse ./ || true ; rm ../*movie_Pyscript.pml || true
-# rm frame_*.png || true ; rm ../summaryForMovie.pdb || true
-# rm ../"${outXTCmovie}.xtc" || true 
-# mv ../*.pse ./ || true ; rm ../*_movie_Pyscript.pml || true
-# rm ./*_movie_Pyscript.pml || true
-# rm ./PyMOLsession.pse || true
-# #rm prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml
-# #rm ../prep_movie_Pyscript.pml || true; cd ..
-# #rm *movie_Pyscript.pml prep_movie_Pyscript.pml || true
-# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
-# cd ..
-# }
-
-# analyser11update()
-# {
-
-# echo "${demA}"$'Preparing to make a summary movie from a preset PyMOL session\n'
-# sleep 2
-
-# currentMOVIEdir="$(pwd)""/${movieDIRECORY}"
-# if [[ ! -d "$currentMOVIEdir" ]]; then
-# 	echo "No MOVIE directory from a previous run exists... Exiting"
-# 	exit 1
-# fi
-# nMOVIE=1
-# currentMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie.gif"
-# bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
-# if [[ -f "$currentMOVIEgif" ]]; then
-# 	base_currentMOVIEgif=$(basename "$currentMOVIEgif")
-# 	base_bkupMOVIEgif=$(basename "$bkupMOVIEgif")
-# 	echo $'\n'"$base_currentMOVIEgif" "exists, backing it up as $base_bkupMOVIEgif"$'\n'
-# 	sleep 1
-# 	while [[ -f "$bkupMOVIEgif" ]]; do
-# 	nMOVIE=$(( nMOVIE + 1 ))
-# 	bkupMOVIEgif="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".gif"
-# 	done
-# 	mv "$currentMOVIEgif" "$bkupMOVIEgif" || true
-# 	echo $'\n'"Backing up the last .gif MOVIE as $base_bkupMOVIEgif"
-# 	sleep 1
-# fi	
-
-# nMOVIE=1
-# currentMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie.mp4"
-# bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
-# if [[ -f "$currentMOVIEmp4" ]]; then
-# 	base_currentMOVIEmp4=$(basename "$currentMOVIEmp4")
-# 	base_bkupMOVIEmp4=$(basename "$bkupMOVIEmp4")
-# 	echo $'\n'"$base_currentMOVIEmp4"" exists, backing it up as $base_bkupMOVIEmp4"$'\n'
-# 	sleep 1
-# 	while [[ -f "$bkupMOVIEmp4" ]]; do
-# 	nMOVIE=$(( nMOVIE + 1 ))
-# 	bkupMOVIEmp4="$(pwd)""/${movieDIRECORY}/dynamics_movie_""backup""$nMOVIE"".mp4"
-# 	done
-# 	mv "$currentMOVIEmp4" "$bkupMOVIEmp4" || true
-# 	echo $'\n'"Backing up the last .mp4 MOVIE as $base_bkupMOVIEmp4"
-# 	sleep 1
-# fi	
-	
-# echo "cd ${movieDIRECORY}"$'\nload PyMOLsession_allSet.pse\nmpng frame_.png\nquit' > prep_movie_Pyscript.pml
-	
-# echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
-# sleep 2
-# pyM=0
-# pymol prep_movie_Pyscript.pml || pyM=1
-# echo "${demA}"$'Extract frames as images...DONE'"${demB}""${demA}"$'Now converting images to movie...\n'
-# cd ./${movieDIRECORY}
-# mov_make=0
-# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.gif || mov_make=1
-# convert -delay 5 -loop 0 -dispose Background frame_*.png dynamics_movie.mp4 || mov_make=2
-
-# if [[ "$mov_make" == 1 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$'The program ''"'"Convert/ImageMagick "'"'"could not be found. CHAPERONg detected "'"'\
-# 	$'PyMOL''"'" and will use it to make a movie which may, however, be of lesser quality""${demB}"
-		
-# 	makeMoviePyx
-# 	makeMoviePyy
-		
-# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
-# fi
-
-# if [[ "$mov_make" == 2 ]] && [[ "$pyM" == 0 ]]; then
-# 	echo "${demA}"$' A mp4 movie could not be made. This may be due to the program'\
-# 	$' "Convert/ImageMagick" not being found, or some library is missing.'\
-# 	$'\n CHAPERONg detected "PyMOL" and will use it to make a mp4 movie which may,'\
-# 	$'\n however, be of lesser quality'"${demB}"
-		
-# 	makeMoviePyx
-# 	makeMoviePyy
-		
-# 	echo "${demA}"$'Movie (lesser quality) made with PyMOL...\n'
-# fi
-
-# rm frame_*.png || true 
-# # rm ../*movie_Pyscript.pml || true
-# rm ./*movie_Pyscript.pml || true
-# echo "${demA}"$' Convert images to movie...DONE'"${demB}"
-# cd ..
-# }
-
-if [[ "$analyse" == "11" ]] && [[ -d "MOVIE" ]]; then
-cat << MovChoic
-${demA}
-Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
-
-  a     Make a new movie
-  b     Adjust a previous one
-
-MovChoic
-
-	read -p '*Enter your choice here (a or b): ' moviechoic
-
-	while [[ "$moviechoic" != "a" ]] && [[ "$moviechoic" != "b" ]] ; do
-		echo $'\nYou entered: '"$moviechoic"$'\n'
-		echo $'Please enter a valid letter!!\n'
-		read -p '*Enter your choice here (a or b): ' moviechoic
-	done
- 
-	if [[ "$moviechoic" == "a" ]]; then
-		ScanTRAJ; variables_for_regMD_Movie; analyser11
-	elif [[ "$moviechoic" == "b" ]]; then
-		variables_for_regMD_Movie; analyser11update
-	fi
-
-elif [[ "$analyse" == "11" ]] && [[ ! -d "MOVIE" ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser11
-fi
-
-
-if [[ "$analysis" == *" 11 "* ]]; then
-	ScanTRAJ; variables_for_regMD_Movie; analyser11
-fi
 	
 analyser12()
 {
@@ -1890,7 +1902,7 @@ if [[ $mmGMXpath != '' ]] ; then
 	mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
 
 elif [[ $mmGMXpath == '' ]] ; then
-	echo "${demA}"$'GMX path for g_mmpbsa not set. Use the parFile option!\n'
+	echo "${demA}"$'GMX path for g_mmpbsa not set. Use the paraFile option!\n'
 fi
 
 }
@@ -3419,15 +3431,15 @@ sleep 2
 if [[ "$analysis" == *" 18 "* ]]; then makeNDXGroup2 ; fi
 
 if [[ "$analysis" == *" 19 "* ]] ; then
-	analyser0; ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5
-	analyser6; analyser7; analyser8; analyser9; analyser10; variables_for_regMD_Movie
+	ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5; analyser6
+	analyser7; analyser8; analyser9; variables_for_regMD_Movie; analyser10
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1
-	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
-	analyser8; analyser9; analyser10; variables_for_regMD_Movie
-	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2
+elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2
 	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser10
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
+elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1
+	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
+	analyser8; analyser9; variables_for_regMD_Movie; analyser10
+	analyser11; analyser13; analyser14; analyser15; analyser16
 fi
 }
