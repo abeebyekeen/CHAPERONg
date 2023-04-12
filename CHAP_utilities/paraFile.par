@@ -1,8 +1,8 @@
 ; this is an input parameter file for CHAPERONg
 ; lines beginning with ";" are comments
-; lines beginning with "#" are disabled parameters
+; lines beginning with "#" are disabled/unset parameters
 ; delete the "#" to activate and set a parameter
-####################################################
+#################################################################
 
 ; GENERAL PARAMETERS
 ; Input coordinate file (.pdb or .gro)
@@ -40,9 +40,6 @@
 ; Number of OpenMP threads per MPI rank
 # ntomp             =      x
 
-; Absolute path to gmx binary to be used for mmpbsa
-# mmgpath           =      /home/abeeb/local/gromacs5.1/bin/gmx
-
 ; Number of frames to extract and use for movie
 # movieFrame	    =      200
 
@@ -68,29 +65,32 @@
 ; nojump, fit, combo)
 # inputtraj         =      combo
 
-; Parameter for umbrella sampling window spacing
-# us_window_spacing =      0.2
-
 ; Absolute path to the gmx executable to use for 
 ; all gmx runs except those involving mmpbsa
 # gmx_exe           =      x
 
+; Parameter for umbrella sampling window spacing
+# us_window_spacing =      0.2
+
 ; PARAMETERS FOR g_mmpbsa CALCULATIONS
+; Absolute path to gmx binary to be used for mmpbsa
+# mmgpath           =      /home/abeeb/local/gromacs5.1/bin/gmx
+
 ; Fraction of trajectory to use for g_mmpbsa calculations
 # trFrac 	        =      x
 
 ; PARAMETERS FOR CLUSTERING
-; Time (ps) of first frame to read from trajectory for clustering
-# frame_beginT      =      0
-
-; Time (ps) of last frame to read from trajectory for clustering
-# frame_endT        =      0
-
 ; RMSD cut-off (nm) for two structures to be neighbors
 # clustr_cut        =      0.15
 
 ; Method to use for cluster determination
 # clustr_methd      =      gromos
+
+; Time (ps) of first frame to read from trajectory for clustering
+# frame_beginT      =      0
+
+; Time (ps) of last frame to read from trajectory for clustering
+# frame_endT        =      0
 
 ; Time interval (ps) at which frame is taken from the trajectory
 # dt                =      1
