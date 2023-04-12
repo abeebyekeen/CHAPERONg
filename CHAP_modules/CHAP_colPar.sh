@@ -33,10 +33,10 @@ Credit()
   '\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
   '\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
   '\n#   \033[92;7m'\
-  ' If you use this program in your work, please cite the relevant paper: \033[m  '\
+  'If you use this program in your work, please cite the relevant paper: \033[m '\
   '\033[92m #'\
   '\n#                  \033[92;7m Yekeen, A.A. et al. To be published... \033[m '\
-  '\033[92m                  #'\
+  '\033[92m                 #'\
   '\n###############################################################################'\
   '\033[m'
 }
