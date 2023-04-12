@@ -180,13 +180,21 @@ def estimate_PDF_with_KDE_single():
 				def write_binning_parameters():
 					bin_summary.write(
 						f'=> {input_data}\n'
+						# "----------------------------------\n"
+						# "Binning Method\t  | Number of bins\n"
+						# "------------------+---------------\n"
+						# f'Freedman-Diaconis | {bin_count}\t(*)\n'
+						# f'Square root\t\t  | {num_of_bins_sqrt}\n'
+						# f'Rice\t\t\t  | {num_of_bins_rice}\n'
+						# f'Scott\t\t\t  | {bin_count_scott}\n'
+						# "----------------------------------\n\n\n"
 						"----------------------------------\n"
-						"Binning Method\t  | Number of bins\n"
-						"------------------+---------------\n"
-						f'Freedman-Diaconis | {bin_count}\t(*)\n'
-						f'Square root\t\t  | {num_of_bins_sqrt}\n'
-						f'Rice\t\t\t  | {num_of_bins_rice}\n'
-						f'Scott\t\t\t  | {bin_count_scott}\n'
+						"Binning Method     | Number of bins\n"
+						"-------------------+---------------\n"
+						f'Freedman-Diaconis | {bin_count}  (*)\n'
+						f'Square root       | {num_of_bins_sqrt}\n'
+						f'Rice              | {num_of_bins_rice}\n'
+						f'Scott             | {bin_count_scott}\n'
 						"----------------------------------\n\n\n"
 						)
 				
