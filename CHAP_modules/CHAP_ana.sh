@@ -2837,13 +2837,14 @@ inputFormat
 	raise_bin_problem()
 	{
 		bin_prob=1
-		echo "${demA}"$' **NOTE:\n  The choice of the bin size for the 2D histogram is not suitable.'\
+		echo "${demA}"$' **NOTE:'\
+		$'\n  The automatically estimated bin size for the 2D histogram is not suitable.'\
 		$'\n  Lowest energy structures will not be extracted.'\
 		$'\n  Landscape data points will not be mapped to simulation time.'\
-		$'\n  Try experimenting with different bin counts. To do this,'\
-		$'\n  you can alter the FES input parameter file "CHAP_fes_Par.in".'\
-		$'\n  Please know that the problem could also be that'\
-		$'\n  the number of frames in the trajectory is small.'
+		$'\n  Try experimenting with different bin counts. To do this, you can alter'\
+		$'\n  the FES input parameter file "CHAP_fes_Par.in".'\
+		$'\n  Please know that the problem could also be that the number of frames in'\
+		$'\n  the trajectory is small.'
 	}
 	
 	
