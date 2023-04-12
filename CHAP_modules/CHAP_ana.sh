@@ -93,7 +93,7 @@ Option | Analysis
   17   | Extract frames from the trajectory
   18   | Make index groups (make_ndx)
   19   | All analyses but (0,) 17 and 18
-  20   | All analyses but (0,) 9, 17 and 18
+  20   | All analyses but (0,) 12, 17 and 18
   21   | All analyses but (0,) 9, 12, 17 and 18
   
 AnalysisList
@@ -2382,7 +2382,9 @@ inputFormat
 	# extract lowest free energy structures
 	echo "${demA} Identifying the lowest energy bins and frames"$'\n'
 	sleep 2
-	min0_bin_index=$(grep -F '0.000' ./${ana_folder}/shamlog.log | tail -n 1 | awk '{print $5}')
+	# min0_bin_index=$(grep -F '0.000' ./${ana_folder}/shamlog.log | tail -n 1 | awk '{print $5}')
+	min0_bin_index=$(grep -A1 'Minima sorted after energy' ./${ana_folder}/shamlog.log  | tail -n 1 | awk '{print $5}')
+	
 	echo " The bin with index $min0_bin_index contains the structures with the lowest energy"
 	sleep 2
 	echo $'\n Three representative structures will be extracted from this bin\n'
@@ -3442,8 +3444,8 @@ if [[ "$analysis" == *" 19 "* ]] ; then
 	analyser7; analyser8; analyser9; variables_for_regMD_Movie; analyser10
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
 elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2
-	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser10
-	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
+	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser9
+	analyser10; analyser11; analyser13; analyser14; analyser15; analyser16
 elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1
 	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
 	analyser8; variables_for_regMD_Movie; analyser10
