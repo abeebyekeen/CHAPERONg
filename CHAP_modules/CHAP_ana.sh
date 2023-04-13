@@ -1121,7 +1121,7 @@ analyser9()
 	bkupClusteringdir="$(pwd)""/#Clustering"".""backup.""$nClustering"
 	base_bkupClusteringdir=$(basename "$bkupClusteringdir")
 	if [[ -d "$currentClusteringdir" ]]; then
-		echo $'\n'"$currentClusteringdir"$' folder exists,\n'"backing it up as $base_bkupClusteringdir"
+		echo "${demA}$currentClusteringdir"$' folder exists,\n'"backing it up as $base_bkupClusteringdir"
 		sleep 1
 		while [[ -d "$bkupClusteringdir" ]]; do
 			nClustering=$(( nClustering + 1 ))
@@ -1133,6 +1133,10 @@ analyser9()
 		sleep 1
 	elif [[ ! -d "$currentClusteringdir" ]]; then mkdir ./Clustering
 	fi
+	
+	echo "${demB}"
+	sleep 3
+	
 	eval "$gmx_exe_path" xpm2ps -f rmsd-clust.xpm -o rmsd-clust.eps
 	ps2pdf rmsd-clust.eps rmsd-clust.pdf || true
 	mv cluster*.log cluster*.pdb cluster*.xvg cluster*.ndx rmsd-clust.* ./Clustering || true
