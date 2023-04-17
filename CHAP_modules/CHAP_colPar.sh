@@ -55,9 +55,8 @@ Required (int=integer; str=string):
 -i, --input <str>    Input coordinate file (.pdb or .gro)
 Optional (int=integer; str=string):
 -h, --help           Print this help
--b, --bt <str>       Box type i.e., cubic, dodecahedron, triclinic, octahedron
-                     (default: cubic)
--T, --nt <int>       Number of threads to use (default is 0: allow gmx to guess)
+-b, --bt <str>       Box type: cubic (default), dodecahedron, triclinic, etc.
+-T, --nt <int>       Number of threads to use [default: 0 (gmx guesses)]
 -g, --nb gpu         Calculate non-bonded interactions on gpu
 -G, --gpu_id <str>   List ID(s) of unique GPU device(s) available for use
 -p, --deffnm <str>   Set filename prefix (default for outputs: "md_filename")
@@ -104,6 +103,8 @@ Optional (int=integer; str=string):
 --ntmpi <int>        Number of thread-MPI ranks [default: 0 (gmx guesses)]
 --ntomp <int>        Number of OpenMP threads per MPI rank; default: 0 (guess)
 --paraFile <str>     Name of the CHAPERONg input parameter file
+--inputtraj <str>    Corrected trajectory to generate and use for analyses
+                     (options: noPBC, nojump, center, fit, combo)
 --clustr_cut <float> RMSD cut-off (nm) for cluster membership (default: 1.0)
 --clustr_methd <str> Method for cluster determination: gromos (default),
                      linkage, jarvis-patrick, monte-carlo, diagonalization
@@ -114,10 +115,10 @@ Optional (int=integer; str=string):
 --movieFrame <int>   Number of frames to extract and use for movie
 --trFrac <int>       Fraction of trajectory to use for g_mmpbsa
                      (enter 1 for all, 2 for 2nd half, 3 for last 3rd, etc.)
+--kde_opt <int>      Range (above and below the estimated) to test for the  
+                     optimization of histogram number of bins for KDE 
 --dist <float>       Solute-box distance (distance to box edge; default: 1.0)
 --bg                 Run production mdrun in the background with "nohup"
---inputtraj <str>    Corrected trajectory to generate and use for analyses
-                     (options: noPBC, nojump, center, fit, combo)
 --ter <prompt>       Interactively choose the N- & C-termini protonation 
                      states (default: ionized with NH3+ & COO-)
 guide_lg
@@ -136,6 +137,7 @@ PBCcorrectType='' ; trajFraction='' ; dt=1
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
+bin_number_range=''
 #gmxV=''
 
 # check if the paraFile flag is used and then read the provided parameter file
@@ -202,6 +204,7 @@ while [ "$1" != "" ]; do
 	-H | --Help) HHelp; Credit; exit 0;;
 	-i | --input) shift; coordinates_raw="$1";;
 	--inputtraj) shift; PBCcorrectType="$1";;
+	--kde_opt) shift; bin_number_range="$1";;
 	--ntomp) shift; ntomp="$1" ;;
 	--movieFrame) shift; customframeNo="$1" ;;
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
