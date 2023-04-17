@@ -1655,8 +1655,13 @@ askDataExist
 
 		# echo -e "\nauto mode,$automode" >> CHAP_kde_dataset_list.dat
 
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
+		if [[ "$bin_number_range" != '' ]] ; then
+			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde_hist_optimize.py || \
+			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde_hist_optimize.py			
+		elif [[ "$bin_number_range" == '' ]] ; then
+			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
+			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
+		fi
 
 	elif [[ "$plot_number" == 2 ]] ; then plot_type="multi-data plot"
 		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
@@ -3005,9 +3010,9 @@ extractMoreStructs
 				$'\n (sorted by time or energy) all containing the mapped simulation time, order'\
 				$'\n parameters and the corresponding free energy have been generated and saved'\
 				$'\n into the folder '"$results_folder""/collect_mappings."\
-				$'\n\n **You may use this file to identify the sumulation time(s) of the'\
-				$'\n structure(s) you may want to extract from the 2D representation of the free'\
-				$'\n energy landscape.'"${demB}"
+				$'\n\n *You may use this file to identify the simulation time(s) of the structure(s)'\
+				$'\n you may want to extract from the 2D representation of the free energy'\
+				$'\n landscape.'"${demB}"
 				sleep 2
 
 cat << extractMoreStructs
