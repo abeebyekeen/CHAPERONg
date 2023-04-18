@@ -1530,6 +1530,9 @@ AnalysisList
 		for i in ${data_kde_ext[*]} ; do
 			if (( $count_data_in == 0 )) ; then
 				echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
+				if [[ "$bin_number_range" != '' ]] ; then
+					echo -e "bin_number_range,${bin_number_range}" >> CHAP_kde_dataset_list.dat
+				fi
 				echo -e "\nData for ${filenm}" >> CHAP_kde_dataset_list.dat
 				count_data_in=$(( count_data_in + 1 ))				
 			fi
