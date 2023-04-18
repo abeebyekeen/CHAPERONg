@@ -115,7 +115,7 @@ Optional (int=integer; str=string):
 --movieFrame <int>   Number of frames to extract and use for movie
 --trFrac <int>       Fraction of trajectory to use for g_mmpbsa
                      (enter 1 for all, 2 for 2nd half, 3 for last 3rd, etc.)
---kde_opt <int>      Range (above and below the estimated) to test for the  
+--kde_opt <int>      Range (above and below the estimate) to test for the  
                      optimization of histogram number of bins for KDE 
 --dist <float>       Solute-box distance (distance to box edge; default: 1.0)
 --bg                 Run production mdrun in the background with "nohup"
