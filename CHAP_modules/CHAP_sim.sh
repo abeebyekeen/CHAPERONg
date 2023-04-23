@@ -369,6 +369,16 @@ US_simulate()
 		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
+	elif [[ $sysType == "protein_lig" && "$stage" == '0b' ]] ; then s0GenLigTop; s1DefBox; s2Solvat
+		s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1
+		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
+
+	elif [[ $sysType == "protein_lig" && "$stage" == '0b' ]] ; then s0GenLigTop; s1DefBox; s2Solvat
+		s3AddIons1; s4AddIons2; s5EnMin1; s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2; s9NPTeq1
+		s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
+		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
+
 	elif [[ "$stage" == 7 ]]; then s7NVTeq1; s8NVTeq2; s9NPTeq1; s10NPTeq2
 		umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames;
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
