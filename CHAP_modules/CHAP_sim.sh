@@ -365,7 +365,7 @@ US_simulate()
 		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 	
-	elif [[ "$stage" == 6 | "$stage" == '6a' ]]; then s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
+	elif [[ "$stage" == 6 || "$stage" == '6a' ]]; then s6EnMin2; s6bTempCoup; s7NVTeq1; s8NVTeq2
 		s9NPTeq1; s10NPTeq2; umbre_s11_SMD1; umbre_s12_SMD2; umbre_s13_SMD_movie; umbre_s14_xtractFrames
 		umbre_s15_calcCOMdist; umbre_s16_findIniConf; umbre_s17_USampling; umbre_s18_WHAM
 
