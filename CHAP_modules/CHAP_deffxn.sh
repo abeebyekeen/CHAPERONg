@@ -1031,7 +1031,7 @@ s0AcpypeStb()
 s0ligpargenSta()
 {
 	#find topology file
-	for ligLPGitp in ./ligpargen/tmp/* ; do
+	for ligLPGitp in ./ligpargen/* ; do
 		if [[ $ligLPGitp == *".itp" ]] ; then LPGitp="$ligLPGitp" ; break ; fi
 	done
 	#find ligand ID in topology file
@@ -1049,7 +1049,7 @@ s0ligpargenSta()
 	
 	#rename PDB--residue name in the .gro file with the user-provided lig name
 	#lignameDRGFIN=" ""$ligname"
-	for liggro in ./ligpargen/tmp/* ; do
+	for liggro in ./ligpargen/* ; do
 		if [[ $liggro == *".gro" ]] ; then cp $liggro ./"$ligname"".gro" ; break ; fi
 	done
 
@@ -1124,7 +1124,7 @@ s0ligpargenSta()
 s0ligpargenStb()
 {
 	#find topology file
-	for ligitp in ./ligpargen/tmp/* ; do
+	for ligitp in ./ligpargen/* ; do
 		if [[ $ligitp == *".itp" ]] ; then
 			LPGitp="$ligitp" 
 			#cp $ligitp .
