@@ -17,4 +17,4 @@ baseENV=$(conda env list | grep "base" | awk '{print $3}')
 conda config --append envs_dirs "${baseENV}/envs"
 
 # create the chaperong conda environment
-conda env create --prefix "${baseENV}/envs/CHAPERONg" --file ./conda_dependencies.yml
+conda env create --prefix "${baseENV}/envs/chaperong" --file ./conda_dependencies.yml
