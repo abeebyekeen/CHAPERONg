@@ -601,13 +601,13 @@ if [[ "$analysis" == *" 4 "* ]]; then analyser4 ; fi
 
 altHBOND()
 {
-echo "${demA}""There are multiple groups identified as ""$ligname""."\
-$'\nCHAPERONg will try to guess the appropriate group to be used for protein-'"$ligname"" hbond calculations""${demB}"
+echo "${demA}"" There are multiple groups identified as ""$ligname""."\
+$'\n CHAPERONg will try to guess the appropriate group to be used for protein-'"$ligname"" hbond calculations""${demB}"
 
 sleep 2
 
-echo "${demA}""CHAPERONg: Selecting group 13 for ""$ligname""."\
-$'\nIf this is wrong, terminate and re-run hbond analysis without the automation flag!'"${demB}"
+echo "${demA}"" Selecting group 13 for ""$ligname"". If this is wrong,"\
+$'\n terminate and re-run hbond analysis using the CHAPERONg semi-auto mode!'"${demB}"
 
 sleep 2
 echo 1 13 | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_ProLig_${filenm}.xvg \
