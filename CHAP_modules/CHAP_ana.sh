@@ -3455,12 +3455,11 @@ if [[ "$analysis" == *" 19 "* ]] ; then
 	ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5; analyser6
 	analyser7; analyser8; analyser9; variables_for_regMD_Movie; analyser10
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2
-	analyser3; analyser4; analyser5; analyser6; analyser7; analyser8; analyser9
+elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
+	analyser4; analyser5; analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
 	analyser10; analyser11; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1
-	analyser2; analyser3; analyser4; analyser5; analyser6; analyser7
-	analyser8; variables_for_regMD_Movie; analyser10
-	analyser11; analyser13; analyser14; analyser15; analyser16
+elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
+	analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
+	analyser10; analyser11; analyser13; analyser14; analyser15; analyser16
 fi
 }
