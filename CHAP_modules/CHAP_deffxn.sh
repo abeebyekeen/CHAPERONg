@@ -41,7 +41,9 @@ modTop1()
 	while IFS= read -r line; do
 		if [[ "$ligtopSt" == 1 ]] ; then
 			ligtopSt=$(( ligtopSt + 1 ))
-			lignamFile=$(echo "$line" | awk '{print $2}' | tr -d '"' | tr -d '.itp')
+			# lignamFile=$(echo "$line" | awk '{print $2}' | tr -d '"' | tr -d '.itp')
+			# Get name of ligand as contained in the topol.top file
+			lignamFile=$(echo "$line" | awk '{print $2}' | tr -d '".' | sed 's/itp//')
 		elif [[ "$line" == "$catchLigTOPO" ]]; then
 			ligtopSt=$(( ligtopSt + 1 ))
 		fi
