@@ -137,7 +137,7 @@ PBCcorrectType='' ; trajFraction='' ; dt=1
 mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
-bin_number_range=''
+bin_number_range='' ; customNDXask=''
 #gmxV=''
 
 # check if the paraFile flag is used and then read the provided parameter file
