@@ -7,7 +7,7 @@ Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
 Date: 2022.02.11
 '''
 
-##lines with ## are actual comments
+## lines with ## are actual comments
 def get_spaced_frame_dist(phrase='us_window_spacing'):
 	with open("paraFile.par") as par:
 		for parameter in par.readlines():
@@ -21,14 +21,14 @@ def get_spaced_frame_dist(phrase='us_window_spacing'):
 	with open("distances_summary.txt") as alldata:
 		alldataLines = alldata.readlines()
 		for lineNo, line in enumerate(alldataLines):
-			##using enumerate to map each line of the file to
-			##it's line_number starting line number from zero
+			## using enumerate to map each line of the file to
+			## its line_number, with line number starting from zero
 			datalist = str(line).split("\t")
 			frame = int(datalist[0])
 			dist = float(datalist[1])
 			#bkup_dst = dist 
 			if int(lineNo) == 0:
-				##register and write out the distance for frame zero
+				## register and write out the distance for frame zero
 				#regFrame = frame
 				regDist = dist
 				with open("configuratns_list.txt", "w") as config:
@@ -40,20 +40,20 @@ def get_spaced_frame_dist(phrase='us_window_spacing'):
 				continue
 
 			elif int(lineNo) > 0:
-				##this condition applies to other frames after frame zero
+				## this condition applies to other frames after frame zero
 				diff = float("{:.3f}".format(dist - regDist))
-				##setting a range for configurations to save
+				## setting a range for configurations to save
 				spacing_upper = float(spacing) + float(spacing/16)
 				spacing_lower = float(spacing) - float(spacing/16)
 				#print ("lineNo "+str(frame)+" "+str(dist))			
 				if diff > spacing_upper:
-					##if the distance for the current frame jumps too higher, higher
-					##than the interval, use the distance for the frame just before it
+					## if the distance for the current frame jumps too higher--higher
+					## than the interval--use the distance for the frame just before it
 					diff = float("{:.3f}".format(bkup_dst - regDist))
 					with open("configuratns_list.txt", "a") as config:
 						capture = str(bkup_frame)+"\t"+str(bkup_dst)+"\t"+str(diff)+"\n"
 						config.write(capture)
-						##now use the bkup as the new regDist
+						## now use the bkup as the new regDist
 						regDist = bkup_dst
 					diff = float("{:.3f}".format(dist - regDist))
 
