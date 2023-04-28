@@ -6,6 +6,7 @@ Author -- Abeeb A. Yekeen
 Contact -- yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
 Date: 2022.02.11
 '''
+
 ##lines with ## are actual comments
 def get_spaced_frame_dist(phrase='us_window_spacing'):
 	with open("paraFile.par") as par:
