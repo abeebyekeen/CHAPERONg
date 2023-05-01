@@ -2059,6 +2059,15 @@ s9NPTeq1()
 		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $WarnMax
 	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $runNVTeq == "no" ]] ; then
 		eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
+	# if resuming simulation from NPT equil
+	else
+		if [[ $sysType == "protein_only" ]] ; then
+			eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -o npt.tpr -maxwarn $WarnMax || \
+			eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -o npt.tpr -maxwarn $WarnMax
+		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then
+			eval $gmx_exe_path grompp -f npt.mdp -c nvt.gro -r nvt.gro -t nvt.cpt -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax || \
+			eval $gmx_exe_path grompp -f npt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o npt.tpr -maxwarn $WarnMax
+		fi
 	fi
 }
 
@@ -2904,6 +2913,21 @@ umbre_s18_WHAM()
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o PMF_profile_YminAdjusted.xvg \
 	-hist umbrella_sampling_histograms.xvg -unit kCal -zprof0 $displacentATdGmin || true
 
+	# shift the PMF plot so that the displacement (x-axis) starts at 1 nm
+	# write out the XVG comments and headers
+	grep "^[@#]" PMF_profile_YminAdjusted.xvg > PMF_profile_XminYminAdjusted.xvg
+	count_data=0
+	while IFS= read -r line; do
+		# skip comments and headers
+		[[ "$line" =~ ^[#@] ]] && continue
+		displacement=$(echo "$line" | awk '{print $1}')
+		count_data=$(( count_data + 1 ))
+		if [[ "$count_data" == 1 ]] ; then startingDisplacement="$displacement" ; fi
+		adjustedDisplacement=$(awk "BEGIN {print "$displacement" - "$startingDisplacement" + 1}")
+		echo "$adjustedDisplacement" >> PMF_profile_XminYminAdjusted.xvg
+	done < PMF_profile_YminAdjusted.xvg
+
+
 	echo "${demA}"$' Generating finished figures of key results of WHAM analysis...'"${demB}"
 	sleep 2
 	gracebat -nxy umbrella_sampling_histograms.xvg -hdevice PNG -autoscale xy -printfile \
@@ -2914,6 +2938,10 @@ umbre_s18_WHAM()
 	PMF_profile_YminAdjusted.png -fixed 7500 4000 -legend load || true
 	dG_PMF=$(awk "BEGIN {print $minPMFdG - $maxPMFdG}")
 	echo $'Binding Free Energy (dG) = '"$dG_PMF"$' kCal/mol' > summary_dG.dat
+
+	gracebat PMF_profile_XminYminAdjusted.xvg -hdevice PNG -autoscale xy -printfile \
+	PMF_profile_XminYminAdjusted.png -fixed 7500 4000 -legend load || true
+
 
 	AnaName="Data_Analysis_PMF"
 	currentAnadir="$(pwd)""/$AnaName"
@@ -2933,10 +2961,11 @@ umbre_s18_WHAM()
 		sleep 2
 	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
 	fi
-	mv umbrella_sampling_histograms.xvg umbrella_sampling_histograms.png PMF_profile_YminAdjusted.xvg summary_dG.dat ./$AnaName || true
-	mv PMF_profile.xvg PMF_profile.png PMF_profile_YminAdjusted.png ./$AnaName || true
+	mv umbrella_sampling_histograms.xvg PMF_profile.xvg \
+	PMF_profile_YminAdjusted.xvg PMF_profile_XminYminAdjusted.xvg ./$AnaName || true
+	mv umbrella_sampling_histograms.png PMF_profile.png PMF_profile_YminAdjusted.png \
+	PMF_profile_XminYminAdjusted.png summary_dG.dat ./$AnaName || true
 	
-
 	echo "${demA}"$' Generate finished figures of results of WHAM analysis...DONE'
 	sleep 2
 	echo -e "${demA}\033[92m Extract the PMF and plot the umbrella histograms...DONE\033[m${demB}"
