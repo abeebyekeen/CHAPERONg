@@ -2424,7 +2424,7 @@ variables_for_SMD_Movie()
 
 analyser10()
 {
-	ScanTRAJ
+	[[ $mdType == "regularMD" ]] && ScanTRAJ
 	echo "${demA} $message_Movie"
 
 	if [[ $customframeNo == '' ]]; then
