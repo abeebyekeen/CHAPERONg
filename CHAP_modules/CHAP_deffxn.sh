@@ -2994,7 +2994,8 @@ umbre_s18_WHAM()
 		gibbsEnergy=$(echo "$line" | awk '{print $2}')
 		count_data=$(( count_data + 1 ))
 		if [[ "$count_data" == 1 ]] ; then startingDisplacement="$displacement" ; fi
-		adjustedDisplacement=$(awk "BEGIN {print "$displacement" - "$startingDisplacement" + 1}")
+		# adjustedDisplacement=$(awk "BEGIN {print "$displacement" - "$startingDisplacement" + 1}")
+		adjustedDisplacement=$(awk "BEGIN {print "$displacement" - "$startingDisplacement"}")
 		echo -e "${adjustedDisplacement}\t${gibbsEnergy}" >> PMF_profile_XminYminAdjusted.xvg
 	done < PMF_profile_YminAdjusted.xvg
 
