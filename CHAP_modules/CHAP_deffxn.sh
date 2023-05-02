@@ -2584,6 +2584,7 @@ if [[ $mdType == "umbrellaSampl" ]] ; then
 
 	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
 	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+	fi
 fi
 
 }
@@ -2683,6 +2684,7 @@ if [[ $mdType == "umbrellaSampl" ]] ; then
 
 	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
 	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+	fi
 fi
 
 }
@@ -2758,44 +2760,72 @@ umbre_s15_calcCOMdist()
 	StructNo=0
 
 	currentDist_SMDdir="$(pwd)""/distances_SMD"
+	nDist_SMD=1
+	bkupDist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$nDist_SMD"
+	base_bkupDist_SMDdir=$(basename "$bkupDist_SMDdir")
 	if [[ -d "$currentDist_SMDdir" ]]; then
-		rm -r distances_SMD || true
-		mkdir distances_SMD || true
+		echo "$currentDist_SMDdir"$' folder exists,\n'"backing it up as $base_bkupDist_SMDdir"
+		sleep 1
+		while [[ -d "$bkupDist_SMDdir" ]]; do
+			nDist_SMD=$(( nDist_SMD + 1 ))
+			bkupDist_SMDdir="$(pwd)""/#distances_SMD"".""backup.""$nDist_SMD"
+			base_bkupDist_SMDdir=$(basename "$bkupDist_SMDdir")
+		done
+		mv "$currentDist_SMDdir" "$bkupDist_SMDdir" && mkdir ./distances_SMD || true
+		echo $'\nBacking up the last distances_SMD folder and its contents as'\
+		$'\n'"$base_bkupDist_SMDdir"$'\n\n\n'
+		sleep 1
 	elif [[ ! -d "$currentDist_SMDdir" ]]; then mkdir distances_SMD
 	fi
 
+	# currentDist_SMDdir="$(pwd)""/distances_SMD"
+	# if [[ -d "$currentDist_SMDdir" ]]; then
+	# 	rm -r distances_SMD || true
+	# 	mkdir distances_SMD || true
+	# elif [[ ! -d "$currentDist_SMDdir" ]]; then mkdir distances_SMD
+	# fi
+
 	com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
 
-	for Structure in ./coordinates_SMD/"coordinate"*".gro" ; do
-		#calculate distance between the groups
-		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
-		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
-		sleep 1
-		# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
-		# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
-		# then sleep 2
-		# fi
+	currentcoords_SMDdir="$(pwd)""/coordinates_SMD"
+	if [[ -d "$currentcoords_SMDdir" ]]; then
+		for Structure in ./coordinates_SMD/"coordinate"*".gro" ; do
+			#calculate distance between the groups
+			eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
+			-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
+			sleep 1
+			# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
+			# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
+			# then sleep 2
+			# fi
 
-		# no_of_structure_milestone=(50 100 150 200 250 300 350 400 450 500)
-		# if [[ "${no_of_structure_milestone[@]}" =~ "${StructNo}" ]]; then
-		# sleep 2
-		# fi
+			# no_of_structure_milestone=(50 100 150 200 250 300 350 400 450 500)
+			# if [[ "${no_of_structure_milestone[@]}" =~ "${StructNo}" ]]; then
+			# sleep 2
+			# fi
 
-		if (( StructNo % 50 == 0 )); then sleep 2
-		fi
+			if (( StructNo % 50 == 0 )); then sleep 2
+			fi
 
-		# extract the distances into a summary file
-		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
-		if [[ $StructNo == 0 ]] ; then
-			echo "$StructNo"$'\t'"$distanc" > distances_summary.txt
-		else
-			echo "$StructNo"$'\t'"$distanc" >> distances_summary.txt
-		fi
-		StructNo=$(( StructNo + 1 ))
-	done
-	rm -r distances_SMD
-	echo -e "${demA}\033[92m Calculate COM distances...DONE\033[m${demB}"
-	sleep 2
+			# extract the distances into a summary file
+			distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
+			if [[ $StructNo == 0 ]] ; then
+				echo "$StructNo"$'\t'"$distanc" > distances_summary.txt
+			else
+				echo "$StructNo"$'\t'"$distanc" >> distances_summary.txt
+			fi
+			StructNo=$(( StructNo + 1 ))
+		done
+		rm -r distances_SMD
+		echo -e "${demA}\033[92m Calculate COM distances...DONE\033[m${demB}"
+		sleep 2
+	elif [[ ! -d "$currentcoords_SMDdir" ]]; then
+		echo " Frames have not yet been extracted from the steered MDS trajectory!"
+		sleep 4
+		echo " Run stage 14 first!!"
+		sleep 4
+		exit 0
+	fi
 }
 
 umbre_s16_findIniConf()
@@ -2927,10 +2957,23 @@ umbre_s18_WHAM()
 	rm umbrella_sampling_histograms0.xvg || true
 	sleep 2
 
-	minPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
-	maxPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | tail -1 | awk '{print $2}')
-	displacentATdGmin=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $1}')
+	# minPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $2}')
+	# maxPMFdG=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | tail -1 | awk '{print $2}')
+	# displacentATdGmin=$(grep -v "^[@#]" PMF_profile.xvg | sort -gk 2,2 | head -1 | awk '{print $1}')
 
+	## The above method works, but sometimes, for some reason,
+	##  the script terminates after the minPMFdG line
+	## So I splitted the long command into bits. Why? This is the 2nd time I experienced this with
+	##  the sort command. And that was what solved the problem the 1st time (or so I believed)
+	
+	grep -Ev "^[@#]|^$" PMF_profile.xvg > tempPMF
+	sort -gk 2,2 -o tempPMF tempPMF
+	head -n 1 tempPMF > tempPMFmin
+	tail -n 1 tempPMF > tempPMFmax
+	minPMFdG=$(grep "[0-9]" tempPMFmin | awk '{print $2}')
+	maxPMFdG=$(grep "[0-9]" tempPMFmax | awk '{print $2}')
+	rm tempPMF tempPMFmin tempPMFmax
+	
 	# gromacs .xvg outputs often contain decimals in scientific notations and 
 	# sort command with the -g flag handles that.
 	# LC_ALL=C is necessary for users whose locales use a comma instead of a period to indicate
@@ -2947,10 +2990,11 @@ umbre_s18_WHAM()
 		# skip comments and headers
 		[[ "$line" =~ ^[#@] ]] && continue
 		displacement=$(echo "$line" | awk '{print $1}')
+		gibbsEnergy=$(echo "$line" | awk '{print $2}')
 		count_data=$(( count_data + 1 ))
 		if [[ "$count_data" == 1 ]] ; then startingDisplacement="$displacement" ; fi
 		adjustedDisplacement=$(awk "BEGIN {print "$displacement" - "$startingDisplacement" + 1}")
-		echo "$adjustedDisplacement" >> PMF_profile_XminYminAdjusted.xvg
+		echo -e "${adjustedDisplacement}\t${gibbsEnergy}" >> PMF_profile_XminYminAdjusted.xvg
 	done < PMF_profile_YminAdjusted.xvg
 
 
