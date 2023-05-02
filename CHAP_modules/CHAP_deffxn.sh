@@ -2972,6 +2972,7 @@ umbre_s18_WHAM()
 	tail -n 1 tempPMF > tempPMFmax
 	minPMFdG=$(grep "[0-9]" tempPMFmin | awk '{print $2}')
 	maxPMFdG=$(grep "[0-9]" tempPMFmax | awk '{print $2}')
+	displacentATdGmin=$(grep "[0-9]" tempPMFmin | awk '{print $1}')
 	rm tempPMF tempPMFmin tempPMFmax
 	
 	# gromacs .xvg outputs often contain decimals in scientific notations and 
@@ -2980,7 +2981,7 @@ umbre_s18_WHAM()
 	# decimals, in which case the sort -g command would fail to sort dot decimals properly
 
 	eval $gmx_exe_path wham -it tpr_files.dat -if pullf_files.dat -o PMF_profile_YminAdjusted.xvg \
-	-hist umbrella_sampling_histograms.xvg -unit kCal -zprof0 $displacentATdGmin || true
+	-hist umbrella_sampling_histograms.xvg -unit kCal -zprof0 $displacentATdGmin
 
 	# shift the PMF plot so that the displacement (x-axis) starts at 1 nm
 	# write out the XVG comments and headers
