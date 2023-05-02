@@ -2527,7 +2527,7 @@ fi
 
 echo $'save PyMOLsession_allSet.pse\nmpng frame_.png\nquit' >> prep_movie_Pyscript.pml
 	
-echo "${demA}"$'Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
+echo "${demA}"$' Now, PyMOL will do the job. You sit back and have a cup of tea...Cheers!'"${demB}"
 sleep 2
 pyM=0
 pymol prep_movie_Pyscript.pml || pyM=1
@@ -2573,6 +2573,19 @@ rm ./PyMOLsession.pse || true
 #rm *movie_Pyscript.pml prep_movie_Pyscript.pml || true
 echo -e "${demA}\033[92m Convert images to movie...DONE\033[m${demB}"
 cd ..
+
+if [[ $mdType == "umbrellaSampl" ]] ; then
+	read -p ' Do you want to proceed with umbrella sampling? (yes/no): ' procdWithUS
+
+	while [[ ! " ${valid_YesNo_response[@]} " =~ " ${procdWithUS} " ]] ; do
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+		read -p ' Do you want to proceed with umbrella sampling? (y/n): ' procdWithUS
+	done
+
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+fi
+
 }
 
 analyser10update()
@@ -2659,6 +2672,19 @@ rm frame_*.png || true
 rm ./*movie_Pyscript.pml || true
 echo -e "${demA}\033[92m Convert images to movie...DONE\033[m${demB}"
 cd ..
+
+if [[ $mdType == "umbrellaSampl" ]] ; then
+	read -p ' Do you want to proceed with umbrella sampling? (yes/no): ' procdWithUS
+
+	while [[ ! " ${valid_YesNo_response[@]} " =~ " ${procdWithUS} " ]] ; do
+		echo $'Please enter the appropriate response ("yes"/"y" or "no"/"n")!!\n'
+		read -p ' Do you want to proceed with umbrella sampling? (y/n): ' procdWithUS
+	done
+
+	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
+	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+fi
+
 }
 
 # umbre_s13_SMD_movie()
