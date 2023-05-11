@@ -177,6 +177,39 @@ def estimate_PDF_with_KDE_single():
 				num_of_bins_sqrt = int(np.ceil(math.sqrt(len(dist))))
 				num_of_bins_rice = int(np.ceil( 2 * (len(dist) ** (1 / 3))))
 
+				# Calculate and record other statistics of the data
+				mean = dist.mean()
+				mean = float("{:.5f}".format(mean))
+				stdev = float("{:.5f}".format(stdev))
+				mode = dist.mode()
+
+				def writeOut_stats():
+					data_stats.write(f'{input_data}\n'
+								f'mean = {mean}\n'
+								f'standard deviation = {stdev}\n'
+								f'minimum = {data_min}\n'
+								f'maximum = {data_max}\n'
+								)
+					mode_list = mode.values.tolist()
+					if len(mode_list) > 1:
+						data_stats.write("modes (the most frequent values) = ")
+					mode_counter = 0
+					for mode_value in mode_list:
+						mode_counter += 1
+						mode_value_float = float("{:.5f}".format(mode_value))
+						if len(mode_list) == 1:
+							data_stats.write(f'mode (the most frequent value) = {mode_value_float}')
+						elif (len(mode_list) > 1 and mode_counter < len(mode_list)):
+							data_stats.write(f'{mode_value_float}, ')
+						elif (len(mode_list) > 1 and mode_counter == len(mode_list)):
+							data_stats.write(f'{mode_value_float}')
+								
+				with open(f'{input_data}_data_statistics.dat', "w") as data_stats:
+					writeOut_stats()				
+
+				output_and_para_files.append(f'{input_data}_data_statistics.dat')
+
+
 				def write_binning_parameters():
 					bin_summary.write(
 						f'=> {input_data}\n'
