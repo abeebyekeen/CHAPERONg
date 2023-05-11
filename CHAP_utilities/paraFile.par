@@ -79,6 +79,12 @@
 ; Fraction of trajectory to use for g_mmpbsa calculations
 # trFrac 	        =      x
 
+; Number of frames to extract for g_mmpbsa
+# mmFrame           =      400
+
+; Time (in ps) to begin reading frames from trajectory for g_mmpbsa
+# mmBegin           =      x
+
 ; PARAMETERS FOR CLUSTERING
 ; RMSD cut-off (nm) for two structures to be neighbors
 # clustr_cut        =      0.15
