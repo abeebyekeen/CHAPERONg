@@ -2568,7 +2568,7 @@ rm ../"${outXTCmovie}.xtc" || true
 mv ../*.pse ./ || true ; rm ../*_movie_Pyscript.pml || true
 rm ./*_movie_Pyscript.pml || true
 rm ./PyMOLsession.pse || true
-#rm prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml
+rm ./prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml || true
 #rm ../prep_movie_Pyscript.pml || true; cd ..
 #rm *movie_Pyscript.pml prep_movie_Pyscript.pml || true
 echo -e "${demA}\033[92m Convert images to movie...DONE\033[m${demB}"
@@ -2670,7 +2670,8 @@ fi
 
 rm frame_*.png || true 
 # rm ../*movie_Pyscript.pml || true
-rm ./*movie_Pyscript.pml || true
+rm ./*movie_Pyscript.pml ../*movie_Pyscript.pml || true
+rm ./prep_movie_Pyscript.pml ../prep_movie_Pyscript.pml || true
 echo -e "${demA}\033[92m Convert images to movie...DONE\033[m${demB}"
 cd ..
 
