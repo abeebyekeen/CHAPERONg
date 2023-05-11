@@ -1036,20 +1036,29 @@ analyser8()
 		echo $' Converting output ss_xpm to an eps file...\n\n'
 		sleep 2
 		#eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype2.eps -rainbow blue || true
-		eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_colortype1.eps || true
+		# Four-color notation
+		eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}"_HETC.xpm -o ss_"${filenm}"_HETC_colortype1.eps || true
+		
+		# Original eight-color notation
+		eval "$gmx_exe_path" xpm2ps -f ss_"${filenm}".xpm -o ss_"${filenm}"_colortype1.eps || true
+
 		echo "${demA}"$' Converting eps to pdf...\n'
 		sleep 1
-		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
-		# ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size2.pdf || true
-		#ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size2.pdf || true
-		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1size1.pdf || true
-		#ps2pdf ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size1.pdf || true
+		ps2pdf ss_"${filenm}"_HETC_colortype1.eps ss_"${filenm}"_HETC_colortype1.pdf || true
+		ps2pdf ss_"${filenm}"_colortype1.eps ss_"${filenm}"_colortype1.pdf || true
+		
+		# ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_HETC_colortype1.eps ss_"${filenm}"_HETC_colortype1size2.pdf || true
+		# ps2pdf -sPAPERSIZE=ledger ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size2.pdf || true
+		# ps2pdf ss_"${filenm}"_HETC_colortype1.eps ss_"${filenm}"_HETC_colortype1size1.pdf || true
+		# ps2pdf ss_"${filenm}"_colortype2.eps ss_"${filenm}"_colortype2size1.pdf || true
 
 		echo $' Converting ss_eps to png...\n'
 		sleep 1
+		convert ss_"${filenm}"_HETC_colortype1.eps -trim -bordercolor ss_"${filenm}"_HETC_colortype1.png || echo "${demA}"$' The program "convert" not found!\n'
 		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor ss_"${filenm}"_colortype1.png || echo "${demA}"$' The program "convert" not found!\n'
 
-		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype1.png || echo "${demA}"$' The program "convert" not found!\n'
+		convert ss_"${filenm}"_HETC_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype2.png || echo "${demA}"$' The program "convert" not found!\n'
+		convert ss_"${filenm}"_colortype1.eps -trim -bordercolor white -units pixelsperinch -density 600 ss_"${filenm}"_colortype2.png || echo "${demA}"$' The program "convert" not found!\n'
 		
 		currentSecStrdir="$(pwd)""/Secondary_structure"
 		nSecStr=1
@@ -1768,44 +1777,93 @@ if [[ $mmGMXpath != '' ]] ; then
 	indexer=''
 	#if [[ $sysType == 1 ]]; then indexer=''
  	if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] ; then indexer='-n index.ndx' ; fi
+
+	echo "${demA}"$'\nChoose the stage to start/resume g_MMPBSA calculations from\n'
+cat << iniGenLigTop
+ Stage  Step to begin/resume g_MMPBSA free energy calculations 
+   a    Generate a compatible .tpr for g_MMPBSA
+   b    Generate a compatible fraction of the trajectory for g_MMPBSA
+   c    Extract the specified number of frames from the selected fraction
+   d    Run g_MMPBSA
+   e    Calculate average binding energy & residue contribution
+
+*ENTER A RESPONSE BELOW USING THE APPROPRIATE OPTION
+
+iniGenLigTop
+
+	read -p ' Initiate ligand preparation at stage: ' step_mmpbsa
+
+	valid_entries=( "a" "b" "c" "d" "e")
+	while [[ ! "${valid_entries[@]}" =~ "${step_mmpbsa}" ]] ; do
+	# while [[ "$step_mmpbsa" != 'a' && "$step_mmpbsa" != 'b' && \
+	# 	"$step_mmpbsa" != 'c' && "$step_mmpbsa" != 'd' ]] ; do
+		echo $'\nYou entered: '"$step_mmpbsa"
+		echo $'Please enter a valid option (a, b, c or d)!!\n'
+		read -p ' Initiate ligand preparation at stage (Enter a, b, c or d): ' step_mmpbsa
+	done
+
 	echo "${demA}"$' Preparing to generate input files for g_MMPBSA free energy calculations...\n'
 
-	if [[ $trajFraction == '' ]]; then trajFraction=3 ; fi
-	trajFraction=$(echo ${trajFraction%\.*})
-
-	if (( $trajFraction == 1 )) ; then
-		simDuratnps_lastFractn_beginINT=0
-	elif (( $trajFraction >= 2 )) ; then
-		trajFractionFactor=$(( trajFraction - 1 ))
-		simDuratnps_lastFractn_begin=$(awk "BEGIN {print $simDuratnps * $trajFractionFactor / $trajFraction}")
-		simDuratnps_lastFractn_beginINT=$(echo ${simDuratnps_lastFractn_begin%\.*})
-	fi
-	No_of_last_third_frames=$(awk "BEGIN {print $No_of_frames / $trajFraction}")
-	No_of_last_third_framesINT=$(echo ${No_of_last_third_frames%\.*})
-
-	if [[ $mmpbframesNo == '' ]]; then mmpbframesNo=100 ;fi	
+	if [[ $mmpbframesNo == '' ]]; then mmpbframesNo=100 ; fi	
 	
-	if (( $No_of_last_third_framesINT >= $mmpbframesNo )) ; then
-		skipframegpsa=$(awk "BEGIN {print $No_of_last_third_frames / $mmpbframesNo }")
-		skipframegpsaINT=$(echo ${skipframegpsa%\.*})
-		echo "${demA}"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'" ${skipframegpsaINT} frames will be skipped at intervals to produce a total of ~100 frames for"\
-		$'\n'" g_mmpbsa calculations.""${demB}"
-		
-	elif (( $No_of_last_third_framesINT < $mmpbframesNo )) ; then
-		skipframegpsaINT=1
-		echo "${demA}"" Number of frames in the last third of the trajectory: ${No_of_last_third_frames}"\
-		$'\n'" Total number of frames in the trajectory is less than 200."\
-		$'\n'" No frames will be skipped for g_mmpbsa calculations.""${demB}"
+	if [[ $mmpb_begin == '' ]] ; then
+		if [[ $trajFraction == '' ]]; then
+			trajFraction=3
+			trajFraction_name="in the last 3rd"
+		fi
+		trajFraction=$(echo ${trajFraction%\.*})
+
+		if (( $trajFraction == 1 )) ; then
+			simDuratnps_lastFractn_beginINT=0
+			trajFraction_name="in the entire span"
+		elif (( $trajFraction >= 2 )) ; then
+			trajFractionFactor=$(( trajFraction - 1 ))
+			simDuratnps_lastFractn_begin=$(awk "BEGIN {print $simDuratnps * $trajFractionFactor / $trajFraction}")
+			simDuratnps_lastFractn_beginINT=$(echo ${simDuratnps_lastFractn_begin%\.*})
+			if (( $trajFraction == 2 )) ; then
+				trajFraction_name="in the last half"
+			elif (( $trajFraction == 3 )) ; then
+				trajFraction_name="in the last 3rd"
+			elif (( $trajFraction >= 4 )) ; then
+				trajFraction_name="in the last ${trajFraction}th"
+			fi
+		fi
+		No_of_frames_in_last_fraction=$(awk "BEGIN {print $No_of_frames / $trajFraction}")
+		No_of_frames_in_last_fractionINT=$(echo ${No_of_frames_in_last_fraction%\.*})
+
+	elif [[ $mmpb_begin != '' ]] ; then
+		trajFraction_fromFramebegin=$(awk "BEGIN {print 1 - $mmpb_begin / $simDuratnps}")
+		No_of_frames_in_last_fraction=$(awk "BEGIN {print $No_of_frames * $trajFraction_fromFramebegin}")
+		No_of_frames_in_last_fractionINT=$(echo ${No_of_frames_in_last_fraction%\.*})
+		trajFraction_name="from time ${mmpb_begin} till the end"
 	fi
 
-	if [[ "$mmGMX" == "1" ]] ; then
+	if (( $No_of_frames_in_last_fractionINT >= $mmpbframesNo )) ; then
+		skipframepbsa=$(awk "BEGIN {print $No_of_frames_in_last_fraction / $mmpbframesNo }")
+		skipframepbsaINT=$(echo ${skipframepbsa%\.*})
+		echo "  Number of frames ${trajFraction_name} of the trajectory: ${No_of_frames_in_last_fractionINT}"\
+		$'\n'"  Skipping ${skipframepbsaINT} frames at intervals to produce ~${mmpbframesNo} frames for g_mmpbsa""${demB}"
+		
+	elif (( $No_of_frames_in_last_fractionINT < $mmpbframesNo )) ; then
+		skipframepbsaINT=1
+		echo "  Number of frames ${trajFraction_name} of the trajectory: ${No_of_frames_in_last_fractionINT}"\
+		$'\n'"  Total number of frames in the trajectory is less than 200."\
+		$'\n'"  No frames will be skipped for g_mmpbsa calculations.""${demB}"
+	fi
+
+	gen_compatibleTPR_stgA()
+	{
+	# if [[ "$mmGMX" == "1" ]] ; then
 		echo "${demA}"$' Preparing to generate a compatible .tpr for g_MMPBSA...\n\n\n'
 		sleep 2
 		eval $mmGMXpath grompp -f md.mdp -c "${filenm}".gro -p topol.top -o \
 		"${filenm}"_TPR_for_g_mmpbsa.tpr $indexer
 		echo "${demA}"$' Generate a compatible .tpr for g_MMPBSA...DONE'"${demB}"
 		sleep 2
+	}
+
+	gen_compatible_trajFrac_stgB()
+	{
 		echo "${demA}"$' Generating a compatible fraction of the trajectory for g_MMPBSA...\n\n\n'
 		sleep 2
 		if [[ $automode == "full" ]]; then
@@ -1814,33 +1872,41 @@ if [[ $mmGMXpath != '' ]] ; then
 		
 			echo "${demA}"$' Generate a compatible trajectory file for g_MMPBSA...DONE'"${demB}"
 			sleep 2
-		
-			echo "${demA} Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
-			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
-			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
-		
-			echo -e "${demA}\033[92m Extract $mmpbframesNo frames from the trajectory...DONE\033[m${demB}"
-			sleep 2
-		
 		elif [[ $automode != "full" ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_${wraplabel}.xtc \
 			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
 		
 			echo "${demA}"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"${demB}"
 			sleep 2
-		
+		fi
+	}
+	
+	extract_frames_for_mmpbsa_stgC()
+	{
+		if [[ $automode == "full" ]]; then	
 			echo "${demA} Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
-		
-			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
-			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframegpsaINT
+			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
+			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframepbsaINT
 		
 			echo -e "${demA}\033[92m Extract $mmpbframesNo frames from the trajectory...DONE\033[m${demB}"
 			sleep 2
-		fi	
-	
+		
+		elif [[ $automode != "full" ]]; then
+			echo "${demA} Extracting $mmpbframesNo frames from the trajectory..."$'\n\n\n'
+		
+			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_lastFractntraj4_mmpbsa.xtc \
+			-o "${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc -skip $skipframepbsaINT
+		
+			echo -e "${demA}\033[92m Extract $mmpbframesNo frames from the trajectory...DONE\033[m${demB}"
+			sleep 2
+		fi
 		echo $' Generate input files for g_MMPBSA free energy calculations...DONE'"${demB}"
 		sleep 2
 
+	}
+
+	runMMPBSA_stgD()
+	{
 		echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
 		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/g_mmpbsa -f \
@@ -1853,74 +1919,110 @@ if [[ $mmGMXpath != '' ]] ; then
 		fi
 		echo -e "${demA}\033[92m Run g_MMPBSA calculations...DONE\033[m${demB}"
 		sleep 2
-	elif [[ "$mmGMX" == '' ]] ; then
-		echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
-		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
-			echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s \
-			"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \
-			echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
-		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
-			g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
-			-pbsa -decomp || echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
-		fi
-	fi
-	echo "${demA}"$' Calculating average binding energy & contribution of residues...\n'
-	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
-	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
-	-m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
+	}
+	# elif [[ "$mmGMX" == '' ]] ; then
+	# 	echo "${demA}"$' Now preparing to run g_MMPBSA calculations...\n\n\n'
+	# 	if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
+	# 		echo 1 "$ligname" | g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s \
+	# 		"${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 -pbsa -decomp || \
+	# 		echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+	# 	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
+	# 		g_mmpbsa -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -n index.ndx -i pbsa.mdp -pdie 2 \
+	# 		-pbsa -decomp || echo "${demA}"$' g_mmpbsa failed to run. Ensure your environments are properly set...\n'
+	# 	fi
+	# fi
 
-	python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs \
-	-nbs 2000 \-m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
-	python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs \
-	-nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
+	altEnergy2bfac()
+	{
+		echo "${demA}"$' There are multiple groups identified as '"$ligname"\
+			$'.\n CHAPERONg will try to guess the appropriate group number to be used\n'
+		sleep 2
+		echo "  Selecting group 13 for ""$ligname"\
+			$'.\n  If this is wrong, then the energy2bfac run would consequently be wrong!'"${demB}"
+		sleep 2
 
-	if [[ "$mmGMX" == "1" ]] ; then
+		echo 1 13 | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
+			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+	}
+
+	average_BEnergy_stgE()
+	{
+		echo "${demA}"$' Calculating average binding energy & contribution of residues...\n'
+		python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStat.py \
+		-m energy_MM.xvg -p polar.xvg -a apolar.xvg || \
+		python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaStatPy3.py \
+		-m energy_MM.xvg -p polar.xvg -a apolar.xvg || true
+
+		python ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecomp.py -bs \
+		-nbs 2000 \-m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || \
+		python3 ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/MmPbSaDecompPy3.py -bs \
+		-nbs 2000 -m contrib_MM.dat -p contrib_pol.dat -a contrib_apol.dat || true
+		
 		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
 			echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
-			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || altEnergy2bfac
 		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
 			eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
 			"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
 		fi
-	elif [[ "$mmGMX" == '' ]] ; then
-		if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
-			echo 1 "$ligname" | energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
-			echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
-		elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
-			energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
-			echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
+		
+		echo -e "${demA}\033[92m Calculate average binding energy & contribution of residues...DONE\033[m${demB}"
+		sleep 2
+
+		AnaName="MMPBSA"
+		currentAnadir="$(pwd)""/$AnaName"
+		nDir=1
+		bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
+		if [[ -d "$currentAnadir" ]]; then
+			base_currentAnadir=$(basename "$currentAnadir")
+			base_bkupAnadir=$(basename "$bkupAnadir")
+			echo $'\n'"$base_currentAnadir"$' folder exists,\n'"backing it up as $base_bkupAnadir"
+			sleep 1
+			while [[ -d "$bkupAnadir" ]]; do
+				nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
+			done
+			mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
+			echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
+			sleep 1
+		elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
 		fi
+		rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc \
+		"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
+		mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
+		mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
+		mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
+	}
+	
+	if [[ "$step_mmpbsa" == 'a' ]] ; then gen_compatibleTPR_stgA; gen_compatible_trajFrac_stgB
+		extract_frames_for_mmpbsa_stgC; runMMPBSA_stgD; average_BEnergy_stgE
+	elif [[ "$step_mmpbsa" == 'b' ]] ; then gen_compatible_trajFrac_stgB
+		extract_frames_for_mmpbsa_stgC; runMMPBSA_stgD; average_BEnergy_stgE
+	elif [[ "$step_mmpbsa" == 'c' ]] ; then
+		extract_frames_for_mmpbsa_stgC; runMMPBSA_stgD; average_BEnergy_stgE
+	elif [[ "$step_mmpbsa" == 'd' ]] ; then runMMPBSA_stgD; average_BEnergy_stgE
+	elif [[ "$step_mmpbsa" == 'e' ]] ; then average_BEnergy_stgE
 	fi
 
-	echo -e "${demA}\033[92m Calculate average binding energy & contribution of residues...DONE\033[m${demB}"
-	sleep 2
-
-	AnaName="MMPBSA"
-	currentAnadir="$(pwd)""/$AnaName"
-	nDir=1
-	bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
-	if [[ -d "$currentAnadir" ]]; then
-		base_currentAnadir=$(basename "$currentAnadir")
-		base_bkupAnadir=$(basename "$bkupAnadir")
-		echo $'\n'"$base_currentAnadir"$' folder exists,\n'"backing it up as $base_bkupAnadir"
-		sleep 1
-		while [[ -d "$bkupAnadir" ]]; do
-			nDir=$(( nDir + 1 )); bkupAnadir="$(pwd)""/#""$AnaName"".backup.""$nDir"
-		done
-		mv "$currentAnadir" "$bkupAnadir" && mkdir ./$AnaName
-		echo $'\n'"Backing up the last $AnaName folder and its contents as $base_bkupAnadir"
-		sleep 1
-	elif [[ ! -d "$currentAnadir" ]]; then mkdir ./$AnaName
-	fi
-	rm "${filenm}"_TPR_for_g_mmpbsa.tpr "${filenm}"_lastFractntraj4_mmpbsa.xtc \
-	"${filenm}"_"$mmpbframesNo"frames_4_mmpbsa.xtc || true
-	mv energy_MM.xvg polar.xvg apolar.xvg contrib_MM.dat contrib_pol.dat contrib_apol.dat ./$AnaName || true
-	mv full_energy.dat summary_energy.dat final_contrib_energy.dat energyMapIn.dat ./$AnaName || true
-	mv complex.pdb subunit_1.pdb subunit_2.pdb ./$AnaName || true
+	# if [[ "$mmGMX" == "1" ]] ; then
+		# if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
+		# 	echo 1 "$ligname" | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
+		# 	"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || altEnergy2bfac
+		# elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
+		# 	eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
+		# 	"${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat
+		# fi
+	# elif [[ "$mmGMX" == '' ]] ; then
+	# 	if [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode == "full" ]]; then
+	# 		echo 1 "$ligname" | energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || altEnergy2bfac || \
+	# 		echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
+	# 	elif [[ $sysType == "protein_lig" || $sysType == "protein_dna" ]] && [[ $automode != "full" ]] ; then
+	# 		energy2bfac -s "${filenm}"_TPR_for_g_mmpbsa.tpr -i energyMapIn.dat || \
+	# 		echo "${demA}"$'energy2bfac failed to run. Ensure your environment are properly set...\n'
+	# 	fi
+	# fi
 
 elif [[ $mmGMXpath == '' ]] ; then
-	echo "${demA}"$'GMX path for g_mmpbsa not set. Use the paraFile option!\n'
+	echo "${demA}"$'GMX path for g_mmpbsa not set. Use the paraFile option!'"${demB}"
 fi
 
 }
