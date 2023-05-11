@@ -138,6 +138,7 @@ mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
 bin_number_range='' ; customNDXask=''
+mmpb_begin=''
 #gmxV=''
 
 # check if the paraFile flag is used and then read the provided parameter file
@@ -169,6 +170,8 @@ read_paraFile()
 			elif [[ "$par" == "dist" ]]; then edgeDist="$par_input"
 			elif [[ "$par" == "inputtraj" ]]; then PBCcorrectType="$par_input"
 			elif [[ "$par" == "trFrac" ]]; then trajFraction="$par_input"
+			elif [[ "$par" == "mmFrame" ]]; then mmpbframesNo="$par_input"
+			elif [[ "$par" == "mmBegin" ]]; then mmpb_begin="$par_input"
 			elif [[ "$par" == "gmx_exe" ]]; then gmx_exe_path="$par_input"
 			elif [[ "$par" == "clustr_methd" ]]; then method_clust="$par_input"
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
