@@ -483,7 +483,7 @@ altRMSD()
 		$'.\nCHAPERONg will try to guess the appropriate group to be used for '"$ligname"" RMSD calculations""${demB}"
 	sleep 2
 	echo "${demA}""CHAPERONg: Selecting group 13 for ""$ligname"\
-		$'.\nIf this is wrong, terminate and re-run RMSD analysis without the automation flag!'"${demB}"
+		$'.\nIf this is wrong, terminate and re-run RMSD analysis with the CHAPERONg semi-auto parameter!'"${demB}"
 	sleep 2
 
 	echo 13 13 | eval "$gmx_exe_path" rms -s "${filenm}".tpr -f "${filenm}"_${wraplabel}.xtc -o ${filenm}_"$ligname"-rmsd.xvg -tu ns
@@ -1836,6 +1836,7 @@ iniGenLigTop
 		No_of_frames_in_last_fraction=$(awk "BEGIN {print $No_of_frames * $trajFraction_fromFramebegin}")
 		No_of_frames_in_last_fractionINT=$(echo ${No_of_frames_in_last_fraction%\.*})
 		trajFraction_name="from time ${mmpb_begin} till the end"
+		simDuratnps_lastFractn_beginINT=$(echo ${mmpb_begin})
 	fi
 
 	if (( $No_of_frames_in_last_fractionINT >= $mmpbframesNo )) ; then
@@ -1868,13 +1869,13 @@ iniGenLigTop
 		sleep 2
 		if [[ $automode == "full" ]]; then
 			echo 0 | eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_${wraplabel}.xtc \
-			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
+			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b "$simDuratnps_lastFractn_beginINT"
 		
 			echo "${demA}"$' Generate a compatible trajectory file for g_MMPBSA...DONE'"${demB}"
 			sleep 2
 		elif [[ $automode != "full" ]]; then
 			eval $mmGMXpath trjconv -s "${filenm}"_TPR_for_g_mmpbsa.tpr -f "${filenm}"_${wraplabel}.xtc \
-			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b $simDuratnps_lastFractn_beginINT
+			-o "${filenm}"_lastFractntraj4_mmpbsa.xtc -b "$simDuratnps_lastFractn_beginINT"
 		
 			echo "${demA}"$' Generate a compatible fraction of the trajectory for g_MMPBSA...DONE'"${demB}"
 			sleep 2
@@ -1938,7 +1939,7 @@ iniGenLigTop
 			$'.\n CHAPERONg will try to guess the appropriate group number to be used\n'
 		sleep 2
 		echo "  Selecting group 13 for ""$ligname"\
-			$'.\n  If this is wrong, then the energy2bfac run would consequently be wrong!'"${demB}"
+			$'.\n  If this is wrong, then re-run this step using the CHAPERONg semi-auto mode!'"${demB}"
 		sleep 2
 
 		echo 1 13 | eval ${CHAPERONg_PATH}/CHAP_utilities/g_mmpbsa_pkg/energy2bfac -s \
