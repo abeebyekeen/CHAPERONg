@@ -1,13 +1,14 @@
 #! /bin/bash
 
+########################################################################################
+# CHAP_deffxn - The function definition module of CHAPERONg                            #
+# CHAPERONg -- An automation program for GROMACS md simulation and trajectory analysis #
+########################################################################################
 
-######################################################################
-#  CHAP_deffxn - The function definition module of CHAPERONg         #
-#  CHAPERONg -- An automation program for GROMACS md simulation and  #
-#    trajectory analysis                                             #
-#  Author -- Abeeb A. Yekeen (abeeb.yekeen@hotmail.com)              #
-#  Date: 2022.02.11                                                  #
-######################################################################
+__author__  = 'Abeeb A. Yekeen'
+__email__   = 'abeeb.yekeen@hotmail.com'
+__date__    = '2022.02.11'
+__version__ = '1.0'
 
 set -e
 set -o pipefail
