@@ -4,7 +4,8 @@
 #  CHAP_sim -- The simulation module of CHAPERONg                    #
 #  CHAPERONg -- An automation program for GROMACS md simulation and  #
 #    trajectory analysis                                             #
-#  Author -- Abeeb A. Yekeen (abeeb.yekeen@hotmail.com)              #
+#  Author -- Abeeb A. Yekeen                                         #
+#  Contact -- abeeb.yekeen@hotmail.com                               #
 #  Date -- 2022.02.11                                                #
 ######################################################################
 
