@@ -1,10 +1,15 @@
 #! /bin/bash
 
-#CHAP_colPar - The parameter collection module of CHAPERONg
-#CHAPERONg - An automation program for GROMACS md simulation
-#Author: Abeeb A. Yekeen
-#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date: 2022.02.11
+########################################################################################
+# CHAP_colPar -- The simulation module of CHAPERONg                                    #
+# CHAPERONg -- An automation program for GROMACS md simulation and trajectory analysis #
+########################################################################################
+
+__author__  = 'Abeeb A. Yekeen'
+__email__   = 'abeeb.yekeen@hotmail.com'
+__date__    = '2022.02.11'
+__version__ = '1.0'
+
 
 set -e
 set -o pipefail
@@ -199,6 +204,7 @@ while [ "$1" != "" ]; do
 	-E | --gmx_exe) shift; gmx_exe_path="$1";;
 	-f | --ff) shift; ffUse="$1";;
 	-F | --mmFrame) shift; mmpbframesNo="$1";;
+	--mmBegin) shift; mmpb_begin="$1";;
 	--frame_beginT) shift; frame_b="$1";;
 	--frame_endT) shift; frame_e="$1";;
 	-g | --nb) nb=1;;
@@ -219,7 +225,7 @@ while [ "$1" != "" ]; do
 	-T | --nt) shift; nt="$1";;
 	-t | --temp) shift; Temp="$1";;
 	--ter) termini=1;;
-	--trFrac) shift; trajFraction="$1";;	
+	--trFrac) shift; trajFraction="$1";;
 	-v | --version) echo "$demA"$' CHAPERON version: '"$CHAPERONg_version"; Credit; echo $''; exit 0 ;;
 	-W | --maxwarn) shift; WarnMax="$1";;
 	*) echo "Invalid option: $1"; Help; echo $''; exit 1;;
