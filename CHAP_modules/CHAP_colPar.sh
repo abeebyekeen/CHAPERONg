@@ -130,6 +130,7 @@ guide_lg
 demA=$'\n\n'"#================================= CHAPERONg =================================#"$'\n'
 demB=$'\n'"#=============================================================================#"$'\n\n'
 
+
 # Initialize (default) parameters
 btype='cubic' ; edgeDist="1.0"; WarnMax=0; nt=0
 wat=""; nb='' ; termini=0 ; gmx_exe_path="gmx"
