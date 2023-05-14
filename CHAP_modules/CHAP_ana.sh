@@ -19,6 +19,7 @@ set -o pipefail
 demA=$'\n\n'"#================================= CHAPERONg =================================#"$'\n'
 demB=$'\n'"#=============================================================================#"$'\n\n'
 
+
 if [[ $initiator2 != 'avail' ]] ; then
 	echo "${demA}"$'Do not run modules independently!\nLaunch CHAPERONg with run_CHAPERONg-<version>!!'"${demB}"	
 	exit 1
@@ -706,10 +707,20 @@ elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	-hbm hb_matrix_intraPro_${filenm}.xpm -hbn hb_index_intraPro_${filenm}.ndx -tu ns $hbthread
 	echo -e "${demA}\033[92m Intra-protein hydrogen bonding analysis...DONE\033[m${demB}"
 	sleep 2
+
+	echo 1 "SOL" | eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_Pro-SOL_${filenm}.xvg \
+	-hbm hb_matrix_Pro-SOL_${filenm}.xpm -hbn hb_index_Pro-SOL_${filenm}.ndx -tu ns $hbthread || \
+	echo "${demA}"$' There are multiple groups with the name SOL. Skipping...'
+	echo -e "${demA}\033[92m Protein-SOL hydrogen bonding analysis...DONE\033[m${demB}"
+	sleep 2
+
 	gracebat hbnum_ProLig_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_ProLig_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
 	gracebat hbnum_intraPro_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
 	hbnum_intraPro_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+	gracebat hbnum_Pro-SOL_${filenm}.xvg -hdevice PNG -autoscale xy -printfile \
+	hbnum_Pro-SOL_${filenm}.png -fixed 7500 4000 -legend load || notifyImgFail
+
 elif [[ $sysType == "protein_only" && $automode == "semi" ]] ; then
 	eval "$gmx_exe_path" hbond -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr -num hbnum_${filenm}.xvg \
 	-hbm hb_matrix_${filenm}.xpm -hbn hb_index_${filenm}.ndx -tu ns $hbthread
