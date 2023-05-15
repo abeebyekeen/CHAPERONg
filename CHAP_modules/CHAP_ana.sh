@@ -1568,7 +1568,7 @@ AnalysisList
 					echo "Hbond_protein-water" >> CHAP_kde_dataset_list.dat
 				elif [[ "$i" == 3 && "$sysType" == "protein_lig" ]] ; then
 					echo "Hbond_intra-protein" >> CHAP_kde_dataset_list.dat
-					echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
+					# echo "Hbond_protein-lig" >> CHAP_kde_dataset_list.dat
 				elif [[ "$i" == 4 ]] ; then	echo "SASA" >> CHAP_kde_dataset_list.dat
 				fi
 				count_data_in=$(( count_data_in + 1 ))
@@ -1589,7 +1589,7 @@ AnalysisList
 			elif [[ "$line" == "Hbond_protein-protein" ]]; then input_data_array+=("$line")
 			elif [[ "$line" == "Hbond_protein-water" ]]; then input_data_array+=("$line")
 			elif [[ "$line" == "Hbond_intra-protein" ]]; then input_data_array+=("$line")
-			elif [[ "$line" == "Hbond_protein-lig" ]]; then input_data_array+=("$line")
+			# elif [[ "$line" == "Hbond_protein-lig" ]]; then input_data_array+=("$line")
 			elif [[ "$line" == "SASA" ]] ; then input_data_array+=("$line")
 			fi
 		done < CHAP_kde_dataset_list.dat
@@ -1612,9 +1612,9 @@ AnalysisList
 			elif [[ "$inputData" == "Hbond_intra-protein" ]] ; then
 				dataIN="$inputData"
 				existData="$(pwd)""/hbond/""hbnum_intraPro_${filenm}.xvg"
-			elif [[ "$inputData" == "Hbond_protein-lig" ]] ; then
-				dataIN="$inputData"
-				existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
+			# elif [[ "$inputData" == "Hbond_protein-lig" ]] ; then
+			# 	dataIN="$inputData"
+			# 	existData="$(pwd)""/hbond/""hbnum_ProLig_${filenm}.xvg"
 			elif [[ "$inputData" == "SASA" ]] ; then
 				dataIN="SASA"
 				existData=$(echo "$(pwd)""/SASA/""sasa"*"${filenm}.xvg")
