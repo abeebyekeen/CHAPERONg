@@ -1691,13 +1691,31 @@ askDataExist
 		fi
 
 	elif [[ "$plot_number" == 2 ]] ; then plot_type="multi-data plot"
-		read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
+		# read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
+		read -p ' Enter one or more options here (separated by a space): ' data_kde
 
-		while ! [[ "$data_kde" =~ ^([1-4])$ ]] ; do
-			echo $'\n You entered: '"$data_kde"
-			echo $' Please enter a valid number!!\n'
-			read -p ' Enter your option here (1, 2, 3, OR 4): ' data_kde  
+		# create a bash array listing valid numbers
+		valid_numbers=(1 2 3 4)
+
+		analyse_array=("$data_kde")
+
+		# check if all choices are among the available options
+		while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+			echo $'\n You entered: '"$data_kde"$'\n'
+			echo -e " \033[31;40mPlease enter a valid (set of) number(s)!!\033[m\n"
+			read -p ' Enter one (or a combination) of the options (separated by a space): ' data_kde
+			analyse_array=("$data_kde")
 		done
+
+		data_kde_ext=("$data_kde")
+		count_data_in=0
+
+		# while ! [[ "$data_kde" =~ ^([1-4])$ ]] ; do
+		# 	echo $'\n You entered: '"$data_kde"
+		# 	echo $' Please enter a valid number!!\n'
+		# 	read -p ' Enter your option here (1, 2, 3, OR 4): ' data_kde  
+		# done
 
 		# if [[ "$data_kde" == 1 ]]; then echo "RMSD" > CHAP_kde_dataset_list.dat
 		# elif [[ "$data_kde" == 2 ]]; then echo "Rg" > CHAP_kde_dataset_list.dat
@@ -1705,77 +1723,90 @@ askDataExist
 		# elif [[ "$data_kde" == 4 ]]; then echo "SASA" > CHAP_kde_dataset_list.dat
 		# fi	
 
-		# Set data type
-		case "$data_kde" in
-			1) data_type="RMSD";;
-			2) data_type="Rg";;
-			3) data_type="Hbond";;
-			4) data_type="SASA";;
-		esac
+		for currentdata in ${data_kde_ext[*]} ; do
+			# Set data type
+			case "$currentdata" in
+				1) data_type="RMSD";;
+				2) data_type="Rg";;
+				3) data_type="Hbond";;
+				4) data_type="SASA";;
+			esac
 
-		# Write data type to file
-		echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
-		echo -e "\n$data_type" >> CHAP_kde_dataset_list.dat
+			echo -e "${demA} Collecting the input files for the ${data_type} KDE \n"
+			sleep 2
 
-		# echo -e "auto mode,$automode\n\n$data_type" > CHAP_kde_dataset_list.dat
+			# Write data type to file
+			echo -e "auto mode,$automode\nplot type,${plot_type}" > CHAP_kde_dataset_list.dat
+			echo -e "\n$data_type" >> CHAP_kde_dataset_list.dat
 
-		# Prompt the user to enter the first data label and path
-		read -p $'\n Provide a label for the first data for the KDE: ' data1_kde_label
-		read -p $'\n Enter the path to the first .XVG data: ' data1_kde_path
-		
-		# Trim potential leading and trailing whitespaces from the path
-		data1_kde_path=$(echo "$data1_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-		
-		cat "$data1_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
-		"${data1_kde_label}_Data.dat" || true
-		
-		# Write name and label of the 1st data to file
-		echo "${data1_kde_label},${data1_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
+			# echo -e "auto mode,$automode\n\n$data_type" > CHAP_kde_dataset_list.dat
 
-		# Prompt user to enter the second data label and path
-		read -p $'\n Provide a label for the second data for the KDE: ' data2_kde_label
-		read -p $'\n Enter the path to the second data for the KDE: ' data2_kde_path
+			# Prompt the user to enter the first data label and path
+			echo ""
+			read -p " Provide a label for the 1st data of the ${data_type}: " data1_kde_label
+			echo ""
+			read -p " Enter the path to the 1st ${data_type} .XVG data: " data1_kde_path
+			
+			# Trim potential leading and trailing whitespaces from the path
+			data1_kde_path=$(echo "$data1_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+			
+			cat "$data1_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
+			"${data1_kde_label}_Data.dat" || true
+			
+			# Write name and label of the 1st data to file
+			echo "${data1_kde_label},${data1_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
 
-		# Trim potential leading and trailing whitespaces from the path
-		data2_kde_path=$(echo "$data2_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
-		cat "$data2_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
-		"${data2_kde_label}_Data.dat" || true
-		
-		# Write name and label of the 2nd data to file
-		echo "${data2_kde_label},${data2_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
-
-		read -p $'\n Do you want to enter additional data?(yes/no): ' more_data_prompt
-
-		# Verify validity of input
-		while [[ ! " ${valid_YesNo_response[@]} " =~ " ${more_data_prompt} " ]]; do
-			echo $'\n Please enter the appropriate response (a "yes" or a "no")!!\n'
-			echo $' Do you want to enter additional data?'
-			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
-		done
-
-		# count_add_data=3
-		while [[ "$more_data_prompt" == "yes" || "$more_data_prompt" == '"yes"' ]]
-		do
-			read -p $'\n Provide a label for the additional data: ' data_kde_label
-			read -p $'\n Enter the path to the additional data: ' data_kde_path
+			# Prompt user to enter the second data label and path
+			echo ""
+			read -p " Provide a label for the 2nd data of the ${data_type}: " data2_kde_label
+			echo ""
+			read -p " Enter the path to the 2nd ${data_type} .XVG data: " data2_kde_path
 
 			# Trim potential leading and trailing whitespaces from the path
-			data_kde_path=$(echo "$data_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+			data2_kde_path=$(echo "$data2_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
-			cat "$data_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
-			"${data_kde_label}_Data.dat" || true
+			cat "$data2_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
+			"${data2_kde_label}_Data.dat" || true
 			
 			# Write name and label of the 2nd data to file
-			echo "${data_kde_label},${data_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
-			
-			# Prompt the user to enter more data if required
-			echo $'\n Do you want to enter additional data?'
-			read -p $'\n Enter a response here (yes/no): ' more_data_prompt
-		done
+			echo "${data2_kde_label},${data2_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
 
-		python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
-		python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
+			echo -e "\n"
+			read -p " Do you want to enter additional ${data_type} data?(yes/no): " more_data_prompt
+
+			# Verify validity of input
+			while [[ ! " ${valid_YesNo_response[@]} " =~ " ${more_data_prompt} " ]]; do
+				echo $'\n Please enter the appropriate response (a "yes" or a "no")!!\n'
+				echo -e " Do you want to enter additional ${data_type} data?"
+				read -p $'\n Enter a response here (yes/no): ' more_data_prompt
+			done
+
+			# count_add_data=3
+			while [[ "$more_data_prompt" == "yes" || "$more_data_prompt" == '"yes"' ]]
+			do
+				echo ""
+				read -p " Provide a label for the additional ${data_type} data: " data_kde_label
+				echo ""
+				read -p " Enter the path to the additional ${data_type} .XVG data: " data_kde_path
+
+				# Trim potential leading and trailing whitespaces from the path
+				data_kde_path=$(echo "$data_kde_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+				cat "$data_kde_path" | grep -v "^[@#]" | awk '{print $2}' > \
+				"${data_kde_label}_Data.dat" || true
+				
+				# Write name and label of the 2nd data to file
+				echo "${data_kde_label},${data_kde_label}_Data.dat" >> CHAP_kde_dataset_list.dat
+				
+				# Prompt the user to enter more data if required
+				echo -e "\n Do you want to enter additional ${data_type} data?"
+				
+				read -p $'\n Enter a response here (yes/no): ' more_data_prompt
+			done
+
+			python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py || \
+			python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_generate_kde.py
+		done
 
 	fi
 
