@@ -2793,10 +2793,10 @@ umbre_s15_calcCOMdist()
 
 		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
 		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
-		sleep 1
+
 		# extract the distances into a summary file
 		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
-		
+		sleep 1		
 	}
 
 	altCalcDist()
@@ -2807,7 +2807,7 @@ umbre_s15_calcCOMdist()
 			$'.\n CHAPERONg will try to guess the appropriate group number to be used\n'
 		sleep 2
 		echo -e "  Selecting group 13 for ""$ligname"\
-			$'.\n \033[31;7m If this is wrong, re-run this step using the CHAPERONg semi-auto mode! \033[m'"${demB}"
+			$'\n \033[31;7m If this is wrong, re-run this step using the CHAPERONg semi-auto mode! \033[m'"${demB}"
 		sleep 2
 
 		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
@@ -2892,7 +2892,7 @@ umbre_s16_findIniConf()
 	touch configuratns_list.txt
 
 	#run CHAP_set_US_starting_configs.py script
-	echo $'\n'" Identifying corresponding frames at the specified window spacing..."
+	echo $" Identifying corresponding frames at the specified window spacing..."
 	sleep 2
 	python3 ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py || \
 	python ${CHAPERONg_PATH}/CHAP_utilities/CHAP_set_US_starting_configs.py
