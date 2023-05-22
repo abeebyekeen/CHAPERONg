@@ -6,10 +6,13 @@
 #    read by this script                                                    #
 #  CHAPERONg -- An automation program for GROMACS md simulation and         #
 #    trajectory analysis                                                    #
-#  Author -- Abeeb A. Yekeen (abeeb.yekeen@hotmail.com)                     #
-#  Date: 2023.01.16                                                         #
 #############################################################################
 
+__author__  = 'Abeeb A. Yekeen'
+__email__   = 'abeeb.yekeen@hotmail.com'
+__date__    = '2023.01.16'
+__version__ = '1.0'
+__status__  = 'Production'
 
 import math
 import os
@@ -734,3 +737,14 @@ elif plot_type == "multi-data plot" :
 	dataName, XaxisLabelXVG, XaxisLabelPNG = plot_multidata_hist(dataName, input_data_dict)
 	estimate_PDF_with_KDE_multiplot(dataName, XaxisLabelXVG, XaxisLabelPNG)
 	sort_data(motherDir)
+	try:
+		outdir = dataName + "_Kernel_Density_Estimation_multi_plot"
+		if os.path.exists(outdir):
+			backup_count = 1
+			backupDir=f'#{outdir}.backup.{backup_count}'
+			while os.path.exists(backupDir):
+				backup_count += 1
+				backupDir = f'#{outdir}.backup.{backup_count}'			
+			shutil.move(outdir, backupDir)
+		os.rename("Kernel_Density_Estimation_multi_plot", outdir)
+	except: pass
