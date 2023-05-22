@@ -2423,7 +2423,9 @@ variables_for_SMD_Movie()
 
 analyser10()
 {
-	[[ $mdType == "regularMD" ]] && ScanTRAJ
+	if [[ $mdType == "regularMD" ]] ; then 
+		ScanTRAJ
+	fi
 	echo "${demA} $message_Movie"
 
 	if [[ $customframeNo == '' ]]; then
@@ -2582,7 +2584,7 @@ if [[ $mdType == "umbrellaSampl" ]] ; then
 	done
 
 	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
-	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0 ; Credit
 	fi
 fi
 
@@ -2683,7 +2685,7 @@ if [[ $mdType == "umbrellaSampl" ]] ; then
 	done
 
 	if [[ "${acceptable_Yes_response[@]}" =~ "$procdWithUS" ]] ; then echo ""
-	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0
+	elif [[ "${acceptable_No_response[@]}" =~ "$procdWithUS" ]] ; then exit 0 ; Credit
 	fi
 fi
 
@@ -2785,15 +2787,43 @@ umbre_s15_calcCOMdist()
 	# elif [[ ! -d "$currentDist_SMDdir" ]]; then mkdir distances_SMD
 	# fi
 
-	com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
+	CalcDist()
+	{
+		com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
+
+		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
+		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
+		sleep 1
+		# extract the distances into a summary file
+		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
+		
+	}
+
+	altCalcDist()
+	{
+		com_groups=$'"'"com of group 13 plus com of group $group2_name"$'"'
+
+		echo "${demA}"$' There are multiple groups in your index file labelled as '"$ligname"\
+			$'.\n CHAPERONg will try to guess the appropriate group number to be used\n'
+		sleep 2
+		echo -e "  Selecting group 13 for ""$ligname"\
+			$'.\n \033[31;7m If this is wrong, re-run this step using the CHAPERONg semi-auto mode! \033[m'"${demB}"
+		sleep 2
+
+		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
+		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
+
+		# extract the distances into a summary file
+		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
+
+	}
 
 	currentcoords_SMDdir="$(pwd)""/coordinates_SMD"
 	if [[ -d "$currentcoords_SMDdir" ]]; then
 		for Structure in ./coordinates_SMD/"coordinate"*".gro" ; do
-			#calculate distance between the groups
-			eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
-			-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
-			sleep 1
+			multiError=0
+			# calculate distance between the groups
+			CalcDist || multiError=1
 			# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
 			# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
 			# then sleep 2
@@ -2804,11 +2834,12 @@ umbre_s15_calcCOMdist()
 			# sleep 2
 			# fi
 
+			if [[ $multiError == 1 ]] ; then
+				altCalcDist
+			fi
 			if (( StructNo % 50 == 0 )); then sleep 2
 			fi
 
-			# extract the distances into a summary file
-			distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
 			if [[ $StructNo == 0 ]] ; then
 				echo "$StructNo"$'\t'"$distanc" > distances_summary.txt
 			else
@@ -2824,7 +2855,7 @@ umbre_s15_calcCOMdist()
 		sleep 4
 		echo " Run stage 14 first!!"
 		sleep 4
-		exit 0
+		exit 0 ; Credit
 	fi
 }
 
