@@ -1,6 +1,5 @@
 #! /bin/bash
 
-
 ######################################################################
 #  CHAP_deffxn - The function definition module of CHAPERONg         #
 #  CHAPERONg -- An automation program for GROMACS md simulation and  #
@@ -2691,16 +2690,10 @@ fi
 
 }
 
-# umbre_s13_SMD_movie()
-# {
-# 	ScanTRAJ_SMD; variables_for_SMD_Movie; analyser10;
-
-# }
-
 umbre_s13_SMD_movie()
 {
 	ScanTRAJ_SMD; variables_for_SMD_Movie
-	if [[ "$stage" == 13 ]] && [[ -d "$movieDIRECORY" ]]; then
+	if [[ -d "$movieDIRECORY" ]]; then
 cat << MovChoic
 $demA
 Make a new movie or adjust (e.g. the orientation of) a previously prepared one?
@@ -2721,7 +2714,7 @@ MovChoic
 		if [[ "$moviechoic" == "a" ]]; then analyser10
 		elif [[ "$moviechoic" == "b" ]]; then analyser10update
 		fi
-	elif [[ "$stage" == 13 ]] && [[ ! -d "$movieDIRECORY" ]]; then analyser10
+	elif [[ ! -d "$movieDIRECORY" ]]; then analyser10
 	fi
 }
 
@@ -2792,7 +2785,7 @@ umbre_s15_calcCOMdist()
 		com_groups=$'"'"com of group $group1_name plus com of group $group2_name"$'"'
 
 		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
-		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg
+		-n index.ndx -select "$com_groups" -oall ./distances_SMD/dist${StructNo}.xvg || multiError=1
 
 		# extract the distances into a summary file
 		distanc=$(tail -n 1 ./distances_SMD/dist${StructNo}.xvg | awk '{print $2}')
@@ -2806,8 +2799,8 @@ umbre_s15_calcCOMdist()
 		echo "${demA}"$' There are multiple groups in your index file labelled as '"$ligname"\
 			$'.\n CHAPERONg will try to guess the appropriate group number to be used\n'
 		sleep 2
-		echo -e "  Selecting group 13 for ""$ligname"\
-			$'\n \033[31;7m If this is wrong, re-run this step using the CHAPERONg semi-auto mode! \033[m'"${demB}"
+		echo -e "  Selecting group 13 for $ligname \n"\
+			" \033[31;7m If this is wrong, re-run this step using the CHAPERONg semi-auto mode! \033[m ${demB}"
 		sleep 2
 
 		eval $gmx_exe_path distance -s pull.tpr -f ./coordinates_SMD/coordinate"$StructNo".gro \
@@ -2820,19 +2813,21 @@ umbre_s15_calcCOMdist()
 
 	currentcoords_SMDdir="$(pwd)""/coordinates_SMD"
 	if [[ -d "$currentcoords_SMDdir" ]]; then
+		multiError=0
 		for Structure in ./coordinates_SMD/"coordinate"*".gro" ; do
-			multiError=0
-			# calculate distance between the groups
-			CalcDist || multiError=1
-			# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
-			# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
-			# then sleep 2
-			# fi
+			if [[ $multiError == 0 ]] ; then
+				# calculate distance between the groups
+				CalcDist || multiError=1
+				# if [[ $StructNo == 50 || $StructNo == 100 || $StructNo == 150 || \
+				# 	$StructNo == 200 || $StructNo == 250 || $StructNo == 300 ]]
+				# then sleep 2
+				# fi
 
-			# no_of_structure_milestone=(50 100 150 200 250 300 350 400 450 500)
-			# if [[ "${no_of_structure_milestone[@]}" =~ "${StructNo}" ]]; then
-			# sleep 2
-			# fi
+				# no_of_structure_milestone=(50 100 150 200 250 300 350 400 450 500)
+				# if [[ "${no_of_structure_milestone[@]}" =~ "${StructNo}" ]]; then
+				# sleep 2
+				# fi
+			fi
 
 			if [[ $multiError == 1 ]] ; then
 				altCalcDist
