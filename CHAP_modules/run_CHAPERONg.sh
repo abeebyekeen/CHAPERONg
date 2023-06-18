@@ -1,9 +1,13 @@
 #! /bin/bash
 
-#CHAPERONg - An automation program for GROMACS md simulation
-#Author: Abeeb A. Yekeen
-#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
-#Date: 2022.02.11
+######################################################################
+#  CHAPERONg -- An automation program for GROMACS md simulation and  #
+#    trajectory analysis                                             #
+#  Author -- Abeeb A. Yekeen                                         #
+#  Contact -- abeeb.yekeen@hotmail.com                               #
+#  Date -- 2022.02.11                                                #
+######################################################################
+
 
 set -e
 set -o pipefail
