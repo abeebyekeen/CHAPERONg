@@ -72,6 +72,9 @@
 ; Parameter for umbrella sampling window spacing
 # us_window_spacing =      0.2
 
+; Parameter for averaged plot of replica analysis plots
+# path_av_plot      =      x
+
 ; PARAMETERS FOR g_mmpbsa CALCULATIONS
 ; Absolute path to gmx binary to be used for mmpbsa
 # mmgpath           =      /home/abeeb/local/gromacs5.1/bin/gmx
