@@ -119,7 +119,8 @@ Optional (int=integer; str=string):
 --trFrac <int>       Fraction of trajectory to use for g_mmpbsa
                      (enter 1 for all, 2 for 2nd half, 3 for last 3rd, etc.)
 --kde_opt <int>      Range (above and below the estimate) to test for the  
-                     optimization of histogram number of bins for KDE 
+                     optimization of histogram number of bins for KDE
+--path_av_plot<str>  Path to input files for average of replica plots
 --dist <float>       Solute-box distance (distance to box edge; default: 1.0)
 --bg                 Run production mdrun in the background with "nohup"
 --ter <prompt>       Interactively choose the N- & C-termini protonation 
@@ -142,7 +143,7 @@ mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
 bin_number_range='' ; customNDXask=''
-mmpb_begin=''
+mmpb_begin='' ; path_av=''
 #gmxV=''
 
 # check if the paraFile flag is used and then read the provided parameter file
@@ -181,6 +182,7 @@ read_paraFile()
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
 			elif [[ "$par" == "dt" ]]; then dt="$par_input"
 			elif [[ "$par" == "auto_mode" ]]; then automode="$par_input"
+			elif [[ "$par" == "path_av_plot"]]; then path_av="$part_input"
 			fi
 		done < "$parfilename"
 	fi
@@ -218,6 +220,7 @@ while [ "$1" != "" ]; do
 	-M | --mmgpath) shift; mmGMXpath="$1"; mmGMX="1";;
 	-N | --negname) shift; nn="$1";;
 	-P | --posname) shift; pn="$1";;
+	--path_av_plot) shift; path_av="$1";;
 	--paraFile) shift; parfilename="$1";;	
 	--ntmpi) shift; ntmpi="$1";;
 	-s | --water) shift; wat="$1";;
