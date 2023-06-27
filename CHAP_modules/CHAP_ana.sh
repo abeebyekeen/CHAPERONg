@@ -95,11 +95,12 @@ Option | Analysis
   14   | Free energy surface using the CHAPERONg FES scripts
   15   | Interactive 3D plot of the FES (using md-davis)
   16   | Interactive hydrogen bond matrix (using md-davis)
-  17   | Extract frames from the trajectory
-  18   | Make index groups (make_ndx)
-  19   | All analyses but (0,) 17 and 18
-  20   | All analyses but (0,) 12, 17 and 18
-  21   | All analyses but (0,) 9, 12, 17 and 18
+  17   | Average of replica analysis plots
+  18   | Extract frames from the trajectory
+  19   | Make index groups (make_ndx)
+  20   | All analyses but (0,) 17, 18 and 19
+  21   | All analyses but (0,) 12, 17, 18 and 19
+  22   | All analyses but (0,) 9, 12, 17, 18 and 19
   
 AnalysisList
 
@@ -3557,6 +3558,64 @@ askFELuseexist
 if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
 
 analyser17()
+{
+	echo "${demA}"$' Generating an average of replica analysis plots...\n'
+	
+cat << askDataType
+
+ Select the type of replica plots from the options below:
+
+   1) RMSD
+   2) RMSF
+   3) Rg
+   4) Number of hydrogen bonds
+   5) SASA
+   6) Others (specify)
+
+askDataType
+
+	read -p 'Enter a NUMBER from the options above?: ' repDataType
+ 
+	valid_entries = (1 2 3 4 5 6)
+
+	while [[ ! "${valid_entries[@]}" =~ "${repDataType}" ]]
+	do
+		echo $'Please enter the appropriate response (a NUMBER between 1 and 6)!!\n'
+		read -p 'Enter a NUMBER from the options above?: ' repDataType
+	done
+	
+	if [[ "$repDataType" == 1 ]] ; then data_label="RMSD" 
+	elif [[ "$repDataType" == 2 ]] ; then data_label="RMSF"
+	elif [[ "$repDataType" == 3 ]] ; then data_label="Rg"
+	elif [[ "$repDataType" == 4 ]] ; then data_label="Hbond"
+	elif [[ "$repDataType" == 5 ]] ; then data_label="SASA"
+	elif [[ "$repDataType" == 6 ]] ; then
+		echo ""
+		read -p 'Provide the name or label of the analysis plot: ' data_label
+	fi
+
+	echo -e "${demA} Collecting the input files for the ${data_type} KDE \n"
+	sleep 2
+
+	if [[ "$path_av" == '' ]] ; then
+		echo "Provide the path to the directory containing the input files."
+		echo $'Enter "wd" if in current directory.\n'
+		read -p 'Enter the path here: ' path_av		
+	fi
+
+	if [[ "$path_av" == 'wd' || "$path_av" == '"wd"' || "$path_av" == "'wd'"]]
+	then path_av=$(pwd)
+	fi
+
+	python CHAP_average_replica_plots.py -l ${data_label} -d ${path_av} || \
+	python3 CHAP_average_replica_plots.py -l ${data_label} -d ${path_av} || true
+
+	echo -e "\033[92m Generate an average of replica analysis plots...DONE\033[m${demB}"
+}
+
+if [[ "$analysis" == *" 17 "* ]]; then analyser17 ; fi
+
+analyser18()
 {	
 read -p '*Please enter the number of frames to skip at intervals: ' ski
 if [[ "$ski" != "0" ]]; then skp="-skip ""$ski"
@@ -3577,7 +3636,7 @@ echo -e "${demA}\033[92m Extract frames...DONE\033[m${demB}"
 sleep 2
 }
 
-if [[ "$analysis" == *" 17 "* ]]; then analyser17 ; fi
+if [[ "$analysis" == *" 18 "* ]]; then analyser18 ; fi
 
 #defining a function for make_ndx
 
@@ -3598,16 +3657,16 @@ echo -e "${demA}\033[92m Make index group ${nameForIndex}...DONE\033[m${demB}"
 sleep 2
 }
 
-if [[ "$analysis" == *" 18 "* ]]; then makeNDXGroup2 ; fi
+if [[ "$analysis" == *" 19 "* ]]; then makeNDXGroup2 ; fi
 
-if [[ "$analysis" == *" 19 "* ]] ; then
+if [[ "$analysis" == *" 20 "* ]] ; then
 	ScanTRAJ; analyser1; analyser2; analyser3; analyser4; analyser5; analyser6
 	analyser7; analyser8; analyser9; variables_for_regMD_Movie; analyser10
 	analyser11; analyser12; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 20 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
+elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
 	analyser4; analyser5; analyser6; analyser7; analyser8; analyser9; variables_for_regMD_Movie
 	analyser10; analyser11; analyser13; analyser14; analyser15; analyser16
-elif [[ "$analysis" == *" 21 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
+elif [[ "$analysis" == *" 22 "* ]] ; then ScanTRAJ; analyser1; analyser2; analyser3
 	analyser4; analyser5; analyser6; analyser7; analyser8; variables_for_regMD_Movie
 	analyser10; analyser11; analyser13; analyser14; analyser15; analyser16
 fi
