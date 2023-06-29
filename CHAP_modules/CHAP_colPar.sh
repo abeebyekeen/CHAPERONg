@@ -143,7 +143,7 @@ mmGMX='' ; mmGMXpath='' ; coordinates_raw=''
 parfilename='' ; frame_b=0 ; frame_e=0
 method_clust='gromos' ; cut_cl='0.1'
 bin_number_range='' ; customNDXask=''
-mmpb_begin='' ; path_av=''
+mmpb_begin='' ; path_av='' ; data_label=''
 #gmxV=''
 
 # check if the paraFile flag is used and then read the provided parameter file
@@ -182,7 +182,8 @@ read_paraFile()
 			elif [[ "$par" == "clustr_cut" ]]; then cut_cl="$par_input"
 			elif [[ "$par" == "dt" ]]; then dt="$par_input"
 			elif [[ "$par" == "auto_mode" ]]; then automode="$par_input"
-			elif [[ "$par" == "path_av_plot"]]; then path_av="$part_input"
+			elif [[ "$par" == "path_av_plot" ]]; then path_av="$part_input"
+			elif [[ "$par" == "data_label" ]]; then data_label="$part_input"
 			fi
 		done < "$parfilename"
 	fi
