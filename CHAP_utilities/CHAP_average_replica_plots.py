@@ -41,9 +41,9 @@ if not os.path.isdir(input_directory):
 input_files = [file for file in os.listdir(input_directory) if file.endswith(".xvg")]
 file_count = len(input_files)
 
-print ("\n Files found:\n")
+print ("  Files found:\n")
 for file in input_files:
-    print (f"   {file}\n")
+    print (f"    {file}\n")
     time.sleep(1)
 
 # Load data from input files
