@@ -412,7 +412,7 @@ sleep 2
 }
 if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
-if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] && [[ "$analysis" != *" 17 "* ]]; then
 	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
 	sleep 2
 	analyser0
@@ -3560,41 +3560,42 @@ if [[ "$analysis" == *" 16 "* ]]; then analyser16 ; fi
 analyser17()
 {
 	echo "${demA}"$' Generating an average of replica analysis plots...\n'
-	
+
+	if [[ "" ]] ; then
+
 cat << askDataType
 
- Select the type of replica plots from the options below:
+Select the type of replica plots from the options below:
 
-   1) RMSD
-   2) RMSF
-   3) Rg
-   4) Number of hydrogen bonds
-   5) SASA
-   6) Others (specify)
+	1) RMSD
+	2) RMSF
+	3) Rg
+	4) Number of hydrogen bonds
+	5) SASA
+	6) Others (specify)
 
 askDataType
 
-	read -p 'Enter a NUMBER from the options above?: ' repDataType
- 
-	valid_entries = (1 2 3 4 5 6)
-
-	while [[ ! "${valid_entries[@]}" =~ "${repDataType}" ]]
-	do
-		echo $'Please enter the appropriate response (a NUMBER between 1 and 6)!!\n'
-		read -p 'Enter a NUMBER from the options above?: ' repDataType
-	done
+		read -p '  Enter a NUMBER from the options above: ' repDataType
 	
-	if [[ "$repDataType" == 1 ]] ; then data_label="RMSD" 
-	elif [[ "$repDataType" == 2 ]] ; then data_label="RMSF"
-	elif [[ "$repDataType" == 3 ]] ; then data_label="Rg"
-	elif [[ "$repDataType" == 4 ]] ; then data_label="Hbond"
-	elif [[ "$repDataType" == 5 ]] ; then data_label="SASA"
-	elif [[ "$repDataType" == 6 ]] ; then
-		echo ""
-		read -p 'Provide the name or label of the analysis plot: ' data_label
-	fi
+		valid_entries=(1 2 3 4 5 6)
 
-	echo -e "${demA} Collecting the input files for the ${data_type} KDE \n"
+		while [[ ! "${valid_entries[@]}" =~ "${repDataType}" ]]
+		do
+			echo $'Please enter the appropriate response (a NUMBER between 1 and 6)!!\n'
+			read -p 'Enter a NUMBER from the options above?: ' repDataType
+		done
+		
+		if [[ "$repDataType" == 1 ]] ; then data_label="RMSD" 
+		elif [[ "$repDataType" == 2 ]] ; then data_label="RMSF"
+		elif [[ "$repDataType" == 3 ]] ; then data_label="Rg"
+		elif [[ "$repDataType" == 4 ]] ; then data_label="Hbond"
+		elif [[ "$repDataType" == 5 ]] ; then data_label="SASA"
+		elif [[ "$repDataType" == 6 ]] ; then echo ""
+			read -p '  Provide the name or label of the analysis plot: ' data_label
+		fi
+	fi
+	echo -e "${demA} Collecting the input files for the ${data_label} KDE \n"
 	sleep 2
 
 	if [[ "$path_av" == '' ]] ; then
@@ -3603,7 +3604,7 @@ askDataType
 		read -p 'Enter the path here: ' path_av		
 	fi
 
-	if [[ "$path_av" == 'wd' || "$path_av" == '"wd"' || "$path_av" == "'wd'"]]
+	if [[ "$path_av" == 'wd' || "$path_av" == '"wd"' || "$path_av" == "'wd'" ]]
 	then path_av=$(pwd)
 	fi
 
