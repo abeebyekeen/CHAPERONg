@@ -117,7 +117,7 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 * Python3
 
-> The analyses run with **CHAPERON*****g*** have been tested with Python versions 3.8.x and 3.9.x.
+>   The analyses run with **CHAPERON*****g*** have been tested with Python versions 3.8.x and 3.9.x.
 
 **&nbsp; 2\. [Grace](https://plasma-gate.weizmann.ac.il/Grace/)**
 <br>
