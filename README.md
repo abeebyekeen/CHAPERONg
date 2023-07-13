@@ -45,16 +45,14 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 
 ## 3. Uninstall
 
-<font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply--and CAREFULLY--deleting the lines that have been added your `~/.bashrc` file.
+<font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply, and **CAREFULLY**, deleting the lines that have been added your `~/.bashrc` file.
 </p></font>
 
 ## 4. Optional Dependencies
 
 <font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses facilitated by **CHAPERON*****g***. The more of these additional tools you install, the more you are able to maximize the usage and functionalities that **CHAPERON*****g*** offers.</p></font>
 
-{{< admonition note "Existing dependencies do not need to be re-installed" >}}
-If you have been using GROMACS before, you probably have some or most of these dependencies installed already. You do not need to re-install any active packages.
-{{< /admonition >}}
+> Existing dependencies do not need to be re-installed<br>If you have been using GROMACS before, you probably have some or most of these dependencies installed already. You do not need to re-install any active packages.
 
 <br>
 
