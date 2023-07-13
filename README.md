@@ -15,7 +15,7 @@
 
 ## 2. Installation
 
-**Step 1:** Copy the downloaded **CHAPERON*****g*** package to your preferred installation directory.
+**Step 1:** Copy the **CHAPERON*****g*** package to your preferred installation directory.
 
 **Step 2:** Extract the package with:
 
@@ -28,7 +28,6 @@ or with:
 ```bash
 unzip CHAPERONg-v0.1.zip
 ```
-<br>
 
 **Step 3:** Enter the extracted **CHAPERON*****g*** folder:
 
