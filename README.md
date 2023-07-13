@@ -34,20 +34,16 @@ unzip CHAPERONg-v0.1.zip
 ```bash
 cd CHAPERONg-v0.1
 ```
-<br>
 
 **Step 4:** Run the installation script:
 ```bash
 chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
 ```
 
+Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message.
 <br>
 
-Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message as shown below:<br><br>
-
-{{< image src="chaperong-installation2.png" caption="CHAPERONg installation" width="800">}}
-<br>
-At any time, you can uninstall **CHAPERON*****g*** by simply, and CAREFULLY, deleting the lines that have been added your `~/.bashrc` file.
+## At any time, you can uninstall **CHAPERON*****g*** by simply, and CAREFULLY, deleting the lines that have been added your `~/.bashrc` file.
 <br><br>
 
 ## 4. Optional Dependencies {#optional-dependencies}
