@@ -58,71 +58,39 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 - ***installation in conda environment (recommended), or***
 - ***global (system-wide) installation.***
 
-<br>
+### 4.1. Installing dependencies with conda (recommended)
 
-### 4.1. Installing dependencies with conda (recommended) {#installing-dependencies-with-conda}
-
-{{< admonition tip "Tip" >}}
-Installation in conda environment is recommended for most of the dependencies.
-{{< /admonition >}}
-
-<font><p align="justify">This approach simplifies the installation of **all** the optional dependencies (including `python-3.8`, `pymol-2.5.0`, `imagemagick`, `numpy`, `matplotlib`, `networkx-2.3`, `md-davis`, `pandas`, `scipy`, etc.), hence maximizing the usage of **CHAPERON*****g***.</p></font><br>
+> Installation in conda environment is recommended for most of the dependencies.
 
 **Step 1**: Change to your `base` anaconda (default) environment:
 ```bash
 conda activate base
 ```
 
-<br>
-
 **Step 2**: Run the conda environment setup script `conda_env_setup.sh` while in the **CHAPERON*****g*** folder:
 ```bash
 chmod +x conda_env_setup.sh && ./conda_env_setup.sh
 ```
-Note that this step requires an internet connection and could take a while to complete depending on the size of the available `RAM` and the stength of your connection. So, relax and give it time.
 
-{{< admonition info "Troubleshooting errors" >}}
-In case the above command terminates with the following error:
+> This step requires an internet connection and could take a while to complete depending on the stength of your connection. So, relax and give it time.
 
-`Collecting package metadata (current_repodata.json): failed`<br>
-`CondaHTTPError: HTTP 000 CONNECTION FAILED for url <https://conda.anaconda.org/conda-forge/linux-64/current_repodata.json>`<br>
-`Elapsed: -`<br>
-`An HTTP error occurred when trying to retrieve this URL.`,<br>
-try the following sequence of commands instead, entering them in order, line-by-line:
-`conda config --set ssl_verify false`<br>
-`conda_env_setup.sh`<br>
-`conda config --set ssl_verify true`<br>
-{{< /admonition >}}
+> For potential error troubleshooting, see the [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/)
 
+You should see a message indicating that the `chaperong` environment has been set up successfully.
 
-{{< admonition tip "Tip" >}}
-The input parameters for the `conda_env_setup.sh` script are specified in the `conda_dependencies.yml` configuration file. Although the default parameters specified in the <em>`yaml`</em> file contained in the package as you have downloaded it are the most suited for **CHAPERON*****g***, you can however alter the specifications based on your other needs. (But do this only if you know what you are doing. &#x1F923; )
-{{< /admonition >}}
-
-<br>
-
-You should see a message like the one shown below, indicating that the `chaperong` environment has been set up successfully.
-
-<br>
-
-{{< image src="chaperong-env.png" caption="CHAPERONg conda environment" width="800">}}
-<br>
-
-{{< admonition tip "Tip" >}}
 You can confirm the newly created environment named `chaperong` with:
 ```bash
 conda env list
 ```
+
 You should see `chaperong` listed among your conda environments.
 
 You can then change into the `chaperong` environment with:
 ```bash
 conda activate chaperong
 ```
-{{< /admonition >}}
 
-{{< admonition note "Note" >}}
-If after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in system-wide [Option 1](#install-system-wide-option1) below.
+> If, after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in *system-wide option 1* below.
 {{< /admonition >}}
 
 <br>
