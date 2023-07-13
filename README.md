@@ -43,7 +43,7 @@ chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
 Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message.
 <br>
 
-## 3. Uninstall
+### 3. Uninstall
 
 <font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply, and CAREFULLY, deleting the lines that have been added your `~/.bashrc` file.
 </p></font>
