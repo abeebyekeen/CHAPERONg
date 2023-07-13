@@ -115,6 +115,10 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 #### 4.2.2. Option 2: One-by-one installation
 
-See the [relevant section](https://abeebyekeen.com/chaperong-online-documentation/#install-system-wide-option2) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation).
+See the [relevant section](https://abeebyekeen.com/chaperong-online-documentation/#install-system-wide-option2) of the **CHAPERON*g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation).
 
-<br><br><br>
+## 5. Citation
+
+If you use this code in your work, kindly cite it as:
+
+**Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., & Arise R. O. (2023). CHAPERON<em>g</em>: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, <em>bioRxiv</em> 2023.2007.2001.546945. [<a href="https://doi.org/10.1101/2023.07.01.546945">Link</a>][<a href="https://www.biorxiv.org/content/10.1101/2023.07.01.546945v1.full.pdf">PDF</a>]**
