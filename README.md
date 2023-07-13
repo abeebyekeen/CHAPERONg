@@ -15,7 +15,7 @@
 
 ## 2. Installation
 
-**Step 1:** Copy the downloaded **CHAPERON*****g*** &#xf1c6; &#xf1c6; package to your preferred installation directory.
+**Step 1:** Copy the downloaded **CHAPERON*****g*** &#xF1c6; &#xF1c6; package to your preferred installation directory. <p><i class="fas" style="font-size:25px"> &#xf1c6; </i></p>
 
 <br>
 
