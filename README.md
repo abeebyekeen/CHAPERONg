@@ -4,7 +4,7 @@
 [![DOI](https://zenodo.org/badge/doi/10.1101/2023.07.01.546945.svg?style=svg)](https://doi.org/10.1101/2023.07.01.546945)
 
 
-### For detailed documentations and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/)
+### For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
 
 ## 1. Prerequisites/Requirements
 
@@ -50,7 +50,7 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 
 ## 4. Optional Dependencies
 
-<font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses facilitated by **CHAPERON*****g***. The more of these additional tools you install, the more you are able to maximize the usage and functionalities that **CHAPERON*****g*** offers.</p></font>
+<font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses. The more of these additional tools you install, the more you are able to maximize the usage and functionalities of **CHAPERON*****g***.</p></font>
 
 > **Existing dependencies do not need to be re-installed**, i.e., you do not need to re-install any active packages.
 
@@ -74,11 +74,11 @@ chmod +x conda_env_setup.sh && ./conda_env_setup.sh
 
 > This step requires an internet connection and could take a while to complete depending on the stength of your connection. So, relax and give it time.
 
-> For potential error troubleshooting, see the [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/)
+> For potential error troubleshooting, see the [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/).
 
 You should see a message indicating that the `chaperong` environment has been set up successfully.
 
-You can confirm the newly created environment named `chaperong` with:
+You can confirm the newly created environment with:
 ```bash
 conda env list
 ```
@@ -90,12 +90,9 @@ You can then change into the `chaperong` environment with:
 conda activate chaperong
 ```
 
-> If, after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in *system-wide option 1* below.
-{{< /admonition >}}
+> If, after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in the *system-wide option 1* below.
 
-<br>
-
-### 4.2. Installing dependencies system-wide (optional) {#install-dependencies-system-wide}
+### 4.2. Installing dependencies system-wide (optional)
 #### 4.2.1. Option 1: Batch installation {#install-system-wide-option1}
 
 **Step 1**: To install all of the dependencies at once, enter the following command:
