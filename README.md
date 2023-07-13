@@ -43,8 +43,10 @@ chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
 Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message.
 <br>
 
-## At any time, you can uninstall **CHAPERON*****g*** by simply, and CAREFULLY, deleting the lines that have been added your `~/.bashrc` file.
-<br><br>
+## 3. Uninstall
+
+<font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply, and CAREFULLY, deleting the lines that have been added your `~/.bashrc` file.
+</p></font>
 
 ## 4. Optional Dependencies {#optional-dependencies}
 <font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses facilitated by **CHAPERON*****g***. The more of these additional tools you install, the more you are able to maximize the usage and functionalities that **CHAPERON*****g*** offers.</p></font>
