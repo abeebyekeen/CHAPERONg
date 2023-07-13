@@ -109,22 +109,15 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 > `sudo apt install python3-pip`
 
-And then, run the command:
+> And then, run the command:
 
-`pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3`
+>`pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3`
 
-{{< /admonition >}}
+#### 4.2.2. Option 2: One-by-one installation
 
-<br>
+* Python3
 
-#### 4.2.2. Option 2: One-by-one installation {#install-system-wide-option1}
-
-**&nbsp; 1\. Python3**
-{{< admonition note "Note" >}}
-The analyses run with **CHAPERON*****g*** have been tested with Python versions 3.8.x and 3.9.x.
-{{< /admonition >}}
-
-<br>
+> The analyses run with **CHAPERON*****g*** have been tested with Python versions 3.8.x and 3.9.x.
 
 **&nbsp; 2\. [Grace](https://plasma-gate.weizmann.ac.il/Grace/)**
 <br>
