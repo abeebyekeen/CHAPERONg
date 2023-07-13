@@ -111,7 +111,7 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 > And then, run the command:
 
->`pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3`
+> `pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3`
 
 #### 4.2.2. Option 2: One-by-one installation
 
