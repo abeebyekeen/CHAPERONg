@@ -52,12 +52,9 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 
 <font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses facilitated by **CHAPERON*****g***. The more of these additional tools you install, the more you are able to maximize the usage and functionalities that **CHAPERON*****g*** offers.</p></font>
 
-> Existing dependencies do not need to be re-installed<br>If you have been using GROMACS before, you probably have some or most of these dependencies installed already. You do not need to re-install any active packages.
+> **Existing dependencies do not need to be re-installed**, i.e., you do not need to re-install any active packages.
 
-<br>
-
-***There are two options by which you can install the dependencies:***
-
+**There are two options by which you can install the dependencies:**
 - ***installation in conda environment (recommended), or***
 - ***global (system-wide) installation.***
 
