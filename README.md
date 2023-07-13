@@ -8,11 +8,9 @@
 
 ## 1. Prerequisites/Requirements
 
-<font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/) <sup><i class="fas fa-external-link-alt" style="color:green ; font-size:12px" ></i></sup>, or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html) <sup><i class="fas fa-external-link-alt" style="color:green ; font-size:12px" ></i></sup>.</p></font>
+<font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/), or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html).
+</p></font>
 
-{{< admonition tip "CHAPERONg is compatible with recent and older GROMACS versions" >}}
-**CHAPERON*****g*** has been tested with GROMACS versions 2020.x, 2021.x, and 2022.x, but should generally work with GROMACS 5.x versions and later. 
-{{< /admonition >}}
 <br>
 
 ## 2. Download **CHAPERON*****g*** {#download-chaperong}
