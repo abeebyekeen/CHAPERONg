@@ -1,10 +1,10 @@
-# CHAPERON*g*: Automated GROMACS-based MD Simulations and Trajectory Analyses
+## CHAPERON*g*: Automated GROMACS-based MD Simulations and Trajectory Analyses
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/abeebyekeen/CHAPERONg?style=flat-square)](https://github.com/abeebyekeen/CHAPERONg/releases)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.7049711.svg?style=svg)](https://doi.org/10.1101/2023.07.01.546945)
 
 
-## For detailed documentations and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/)
+### For detailed documentations and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/)
 
 ## 1. Prerequisites/Requirements
 
@@ -49,6 +49,7 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 </p></font>
 
 ## 4. Optional Dependencies
+
 <font><p align="justify">**CHAPERON*****g*** will run the entire GROMACS simulation pipelines without additional dependencies installed. However, some other dependencies are required to run some specific analyses facilitated by **CHAPERON*****g***. The more of these additional tools you install, the more you are able to maximize the usage and functionalities that **CHAPERON*****g*** offers.</p></font>
 
 {{< admonition note "Existing dependencies do not need to be re-installed" >}}
