@@ -3,7 +3,9 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/abeebyekeen/CHAPERONg?style=flat-square)](https://github.com/abeebyekeen/CHAPERONg/releases)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.7049711.svg?style=svg)](https://zenodo.org/record/7049711#.YxWvrHZBzi0)
 
- 
+
+## For detailed documentations and tutorials, see the [CHAPERON*g* homepage](abeebyekeen.com/chaperong-online/)
+
 ## 1. Prerequisites/Requirements
 
 <font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/) <sup><i class="fas fa-external-link-alt" style="color:green ; font-size:12px" ></i></sup>, or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html) <sup><i class="fas fa-external-link-alt" style="color:green ; font-size:12px" ></i></sup>.</p></font>
