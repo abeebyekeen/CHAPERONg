@@ -93,23 +93,21 @@ conda activate chaperong
 > If, after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in the *system-wide option 1* below.
 
 ### 4.2. Installing dependencies system-wide (optional)
-#### 4.2.1. Option 1: Batch installation {#install-system-wide-option1}
+#### 4.2.1. Option 1: Batch installation
 
-**Step 1**: To install all of the dependencies at once, enter the following command:
+**Step 1**: Install all of the dependencies at once:
 ```bash
 sudo apt install grace pymol libpng-dev libjpeg-dev ghostscript-x imagemagick-6.q16 ffmpeg
 ```
-<br>
 
 **Step 2**: Install/update python libraries as well as a few other packages:
 ```bash
 pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 ```
 
-{{< admonition note "If the pip package is not available" >}}
-If you don't have pip installed, you can first install it with:
+> If you don't have pip installed, you can first install it with:
 
-`sudo apt install python3-pip`
+> `sudo apt install python3-pip`
 
 And then, run the command:
 
