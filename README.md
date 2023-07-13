@@ -11,17 +11,7 @@
 <font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/), or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html).
 </p></font>
 
-<br>
-
-## 2. Download **CHAPERON*****g*** {#download-chaperong}
-
-You can get **CHAPERON*****g*** for free via this instant [![Download CHAPERONg]][Link] or by visiting the [**CHAPERON*****g*** GitHub <i class="fab fa-github"></i> repository](https://github.com/abeebyekeen/CHAPERONg).
-<br><br>
-
-[Download CHAPERONg]: https://img.shields.io/badge/download_link-37a779?style=for-the-badge&logoColor=white&logo=DocuSign
-[Link]: https://github.com/abeebyekeen/CHAPERONg
-
-## 3. Installation {#installation}
+## 2. Installation {#installation}
 
 **Step 1:** Copy the downloaded **CHAPERON*****g*** :(far fa-file-archive fa-fw): package to your preferred installation directory.
 
