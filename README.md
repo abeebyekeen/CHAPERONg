@@ -8,12 +8,14 @@
 
 ## 1. Prerequisites/Requirements
 
-<font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, <a href="google.com">the link</a> a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> &#xf35d;  run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/), or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html).
+<font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/), or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html).
+
+> **CHAPERON*****g*** has been tested with GROMACS versions 2020.x, 2021.x, and 2022.x, but should generally work with GROMACS 5.x versions and later.
 </p></font>
 
 ## 2. Installation
 
-**Step 1:** Copy the downloaded **CHAPERON*****g*** :(far fa-file-archive fa-fw): package to your preferred installation directory.
+> **Step 1:** Copy the downloaded **CHAPERON*****g*** :(far fa-file-archive fa-fw): package to your preferred installation directory.
 
 <br>
 
