@@ -12,22 +12,11 @@
 set -e
 set -o pipefail
 
-#set version
+# set version
 CHAPERONg_version="v0.1"
 
 
-#Defining primary functions
-# Credit()
-# {
-# echo \
-#   $'\n###############################################################################'\
-#   $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-#   $'\n#             If you use this program in your work, please cite:              #'\
-#   $'\n#  Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023).  #'\
-#   $'\n#      CHAPERONg: A tool for automated GROMACS-based molecular dynamics       #'\
-#   $'\n#     simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945.     #'\
-#   $'\n###############################################################################'
-# }
+# Defining primary functions
 
 Credit()
 {
@@ -253,6 +242,21 @@ fi
 # 	exit 1
 # fi
 
+echo -e \
+	'\033[92m'\
+	'\n###############################################################################'\
+	'\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
+	'\n#              If you use this program in your work, please cite:             #'\
+	'\n# \033[92;7m'\
+	'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
+	'\033[92m#'\
+	'\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
+	'\033[92m     #'\
+	'\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
+	'\033[92m   #'\
+	'\n###############################################################################'\
+	'\033[m'
+
 if [[ "$#" == 1 ]] || [[ "$#" == 2 ]] && [[ "$flag" != "h" ]] && [[ "$flag" != "H" ]]; then
 	echo "$demA"" No arguments are given. Default parameters will be used...""$demB"
 	sleep 1
@@ -315,20 +319,6 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 	threader='' && THREA="-nt ""${nt}" && hbthread="-nthreads ""${nt}"
 fi
 
-	echo -e \
-	'\033[92m'\
-	'\n###############################################################################'\
-	'\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
-	'\n#              If you use this program in your work, please cite:             #'\
-	'\n# \033[92;7m'\
-	'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
-	'\033[92m#'\
-	'\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
-	'\033[92m     #'\
-	'\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
-	'\033[92m   #'\
-	'\n###############################################################################'\
-	'\033[m'
 
 sleep 2
 
