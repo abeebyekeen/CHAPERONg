@@ -13,23 +13,25 @@ CHAPERONg has been tested with GROMACS versions 2020.x, 2021.x, and 2022.x, but 
 
 ## 2. Installation
 
+> In the instructions that follow, replace `xxx` with whatever suffix you have in the downloaded package
+
 Step 1 -- Copy the CHAPERONg package to your preferred installation directory.
 
 Step 2 -- Extract the package with:
 
-      tar xfz CHAPERONg-v0.1.tar.gz
+      tar xfz CHAPERONg-xxx.tar.gz
 
 or with:
 
-      unzip CHAPERONg-v0.1.zip
+      unzip CHAPERONg-xxx.zip
 
 Step 3 -- Enter the extracted CHAPERONg folder:
 
-      cd CHAPERONg-v0.1
+      cd CHAPERONg-xxx
 
-Step 4 -- Run the installation script:
+Step 4 -- Run the installation executable:
 
-      chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
+      chmod +x install_CHAPERONg && ./install_CHAPERONg
 
    Enter `y` or `yes` when prompted for permission.
    During installation, CHAPERONg will append the installation path to your `$PATH` via the `~/.bashrc` file.
@@ -104,19 +106,18 @@ And then, run the command:
 
 ## 5. Usage
 
-The basic usage of **CHAPERON*****g*** is:
+The basic usage of CHAPERONg is:
 
-```bash
-run_CHAPERONg -i inputStructure_filename [more options]
-```
+      run_CHAPERONg -i inputStructure_filename [more options]
 
-For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
+
+For more details, see the CHAPERONg documentation (https://abeebyekeen.com/chaperong-online-documentation/) and tutorials(https://abeebyekeen.com/chaperong-online-tutorials/)
 
 ## 6. Citation
 
 If you use this code in your work, kindly cite it as:
 
-Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERONg: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. DOI: https://doi.org/10.1101/2023.07.01.546945
+      Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERONg: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. DOI: https://doi.org/10.1101/2023.07.01.546945
 
 For BibTeX, you can insert the following:
 
