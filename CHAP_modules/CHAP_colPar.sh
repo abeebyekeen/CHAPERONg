@@ -19,12 +19,13 @@ CHAPERONg_version="v0.1"
 #Defining primary functions
 # Credit()
 # {
-# 	echo \
+# echo \
 #   $'\n###############################################################################'\
 #   $'\n#--------------------------------- CHAPERONg ---------------------------------#'\
-#   $'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-#   $'\n#    If you use this program in your work, please cite the relevant paper:    #'\
-#   $'\n#                   Yekeen, A.A. et al. To be published...                    #'\
+#   $'\n#             If you use this program in your work, please cite:              #'\
+#   $'\n#  Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023).  #'\
+#   $'\n#      CHAPERONg: A tool for automated GROMACS-based molecular dynamics       #'\
+#   $'\n#     simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945.     #'\
 #   $'\n###############################################################################'
 # }
 
@@ -34,12 +35,14 @@ Credit()
   '\033[92m'\
   '\n###############################################################################'\
   '\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
-  '\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-  '\n#   \033[92;7m'\
-  'If you use this program in your work, please cite the relevant paper: \033[m '\
-  '\033[92m #'\
-  '\n#                  \033[92;7m Yekeen, A.A. et al. To be published... \033[m '\
-  '\033[92m                 #'\
+  '\n#              If you use this program in your work, please cite:             #'\
+  '\n# \033[92;7m'\
+  'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
+  '\033[92m#'\
+  '\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
+  '\033[92m     #'\
+  '\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
+  '\033[92m   #'\
   '\n###############################################################################'\
   '\033[m'
 }
@@ -51,8 +54,7 @@ Help()
 cat << guide_sh
 
 Usage:
-chmod +x ./setup_CHAPERONg-<version>
-./run_CHAPERONg-<version> -i inputStructure_filename
+run_CHAPERONg -i inputStructure_filename [-More options]
 
 Required (int=integer; str=string):
 -i, --input <str>    Input coordinate file (.pdb or .gro)
@@ -76,8 +78,7 @@ HHelp()
 cat << guide_lg
 
 Usage:
-chmod +x ./setup_CHAPERONg-<version>
-./run_CHAPERONg-<version> -i inputStructure_filename [-More options]
+run_CHAPERONg -i inputStructure_filename [-More options]
 
 Required (int=integer; str=string):
 -i, --input <str>    Input coordinate file (.pdb or .gro)
@@ -314,52 +315,22 @@ elif [[ "$nt" != 0 ]] && [[ "$ntmpi" == 0 ]] && [[ "$ntomp" == 0 ]]; then
 	threader='' && THREA="-nt ""${nt}" && hbthread="-nthreads ""${nt}"
 fi
 
-
-	# '\033[92m'\
-	# '\n###############################################################################'\
-	# '\n#--------------------------------- CHAPERONg ---------------------------------#'\
-	# '\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-	# '\n#    If you use this program in your work, please cite the relevant paper:    #'\
-	# '\n#                   Yekeen, A.A. et al. To be published...                    #'\
-	# '\n###############################################################################'\
-	# '\033[m'
-
-echo -e \
-'\033[92m'\
-'\n###############################################################################'\
-'\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
-'\n#   An automated pipeline for GROMACS MD simulation and trajectory analyses   #'\
-'\n#   \033[92;7m'\
-' If you use this program in your work, please cite the relevant paper: \033[m  '\
-'\033[92m #'\
-'\n#                  \033[92;7m Yekeen, A.A. et al. To be published... \033[m '\
-'\033[92m                  #'\
-'\n###############################################################################'\
-'\033[m'
+	echo -e \
+	'\033[92m'\
+	'\n###############################################################################'\
+	'\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
+	'\n#              If you use this program in your work, please cite:             #'\
+	'\n# \033[92;7m'\
+	'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
+	'\033[92m#'\
+	'\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
+	'\033[92m     #'\
+	'\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
+	'\033[92m   #'\
+	'\n###############################################################################'\
+	'\033[m'
 
 sleep 2
-# cat << usageSt
-
-# #-----------------------------------------------------------------------------#
-# ######## ======================== BASIC USAGE ======================== ########
-# #-----------------------------------------------------------------------------#
-
-# chmod +x ./run_CHAPERONg-<version>
-# ./run_CHAPERONg-<version> -i inputStructure_filename [-More options]
-
-# #-----------------------------------------------------------------------------#
-# ######## ========================= IMPORTANT ========================= ########
-# #-----------------------------------------------------------------------------#
-#  MAKE SURE the following are in the current working directory:
-#   (1) Input structure (.pdb or .gro)
-#   (2) mdp files (named as minim.mdp/em.mdp, nvt.mdp, npt.md, ions.mdp, md.mdp)
-#     *PLEASE READ THE HIGHLIGHTED NOTES PRINTED ON THE TERMINAL DURING RUNS!!
-#        *THIS WAY, YOU WON'T MISS ANY INFO YOU MAY FIND IMPORTANT... ENJOY!
-# #-----------------------------------------------------------------------------#
-
-# usageSt
-
-# sleep 2
 
 if [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'noPBC' ]] ; then touch pbcmol
 elif [[ "$PBCcorrectType" != '' && "$PBCcorrectType" == 'nojump' ]] ; then touch pbcjump
