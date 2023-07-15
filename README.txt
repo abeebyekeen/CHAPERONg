@@ -1,6 +1,6 @@
 CHAPERONg: A Tool for Automated GROMACS-based MD Simulations and Trajectory Analyses
 
-For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
+For detailed documentation and tutorials, see the CHAPERONg homepage(https://abeebyekeen.com/chaperong-online/).
 
 ## 1. Prerequisites/Requirements
 
