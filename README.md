@@ -34,7 +34,7 @@ unzip CHAPERONg-xxx.zip
 **Step 3:** Enter the extracted **CHAPERON*****g*** folder:
 
 ```bash
-cd CHAPERONg-v0.1
+cd CHAPERONg-xxx
 ```
 
 **Step 4:** Run the installation script:
