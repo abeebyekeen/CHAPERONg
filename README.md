@@ -15,18 +15,20 @@
 
 ## 2. Installation
 
+> *In the instructions that follow, replace `xxx` with whatever suffix you have in the downloaded package*
+
 **Step 1:** Copy the **CHAPERON*****g*** package to your preferred installation directory.
 
 **Step 2:** Extract the package with:
 
 ```bash
-tar xfz CHAPERONg-v0.1.tar.gz
+tar xfz CHAPERONg-xxx.tar.gz
 ```
 
 or with:
 
 ```bash
-unzip CHAPERONg-v0.1.zip
+unzip CHAPERONg-xxx.zip
 ```
 
 **Step 3:** Enter the extracted **CHAPERON*****g*** folder:
