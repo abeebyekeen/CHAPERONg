@@ -37,7 +37,8 @@ unzip CHAPERONg-xxx.zip
 cd CHAPERONg-xxx
 ```
 
-**Step 4:** Run the installation script:
+**Step 4:** Run the installation executable:
+
 ```bash
 chmod +x install_CHAPERONg && ./install_CHAPERONg
 ```
@@ -65,11 +66,13 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 > Installation in conda environment is recommended for most of the dependencies.
 
 **Step 1**: Change to your `base` anaconda (default) environment:
+
 ```bash
 conda activate base
 ```
 
 **Step 2**: Run the conda environment setup script `conda_env_setup.sh` while in the **CHAPERON*****g*** folder:
+
 ```bash
 chmod +x conda_env_setup.sh && ./conda_env_setup.sh
 ```
@@ -94,7 +97,7 @@ conda activate chaperong
 
 > If, after setting up the conda environment as described above, some python modules/libraries are, for some reasons, not accessible, you can further run the commands described in the *system-wide option 1* below.
 
-### 4.2. Installing dependencies system-wide (optional)
+### 4.2. Installing dependencies system-wide
 #### 4.2.1. Option 1: Batch installation
 
 **Step 1**: Install all of the dependencies at once:
