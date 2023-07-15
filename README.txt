@@ -13,7 +13,7 @@ CHAPERONg has been tested with GROMACS versions 2020.x, 2021.x, and 2022.x, but 
 
 ## 2. Installation
 
-> In the instructions that follow, replace `xxx` with whatever suffix you have in the downloaded package
+> In the instructions that follow, replace "xxx" with "main" or "v0.1" as you have it in the downloaded package
 
 Step 1 -- Copy the CHAPERONg package to your preferred installation directory.
 
