@@ -1,5 +1,7 @@
 CHAPERONg: A Tool for Automated GROMACS-based MD Simulations and Trajectory Analyses
 
+For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
+
 ## 1. Prerequisites/Requirements
 
 The only essential requirement of CHAPERONg is, of course, a functional installation of the GROMACS software run on Linux (Ubuntu) or Windows (via WSL).
@@ -100,7 +102,17 @@ And then, run the command:
       pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 
-## 5. Citation
+## 5. Usage
+
+The basic usage of **CHAPERON*****g*** is:
+
+```bash
+run_CHAPERONg -i inputStructure_filename [more options]
+```
+
+For a more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
+
+## 6. Citation
 
 If you use this code in your work, kindly cite it as:
 

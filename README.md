@@ -117,7 +117,17 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 See the [relevant section](https://abeebyekeen.com/chaperong-online-documentation/#install-system-wide-option2) of the **CHAPERON*g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation).
 
-## 5. Citation
+## 5. Usage
+
+The basic usage of **CHAPERON*****g*** is:
+
+```bash
+run_CHAPERONg -i inputStructure_filename [more options]
+```
+
+For a more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
+
+## 6. Citation
 
 If you use this code in your work, kindly cite it as:
 
