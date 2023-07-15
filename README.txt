@@ -110,7 +110,7 @@ The basic usage of **CHAPERON*****g*** is:
 run_CHAPERONg -i inputStructure_filename [more options]
 ```
 
-For a more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
+For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
 
 ## 6. Citation
 
