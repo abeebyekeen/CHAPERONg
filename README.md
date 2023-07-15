@@ -15,7 +15,7 @@
 
 ## 2. Installation
 
-> *In the instructions that follow, replace `xxx` with whatever suffix you have in the downloaded package*
+> ***In the instructions that follow, replace `xxx` with whatever suffix you have in the downloaded package***
 
 **Step 1:** Copy the **CHAPERON*****g*** package to your preferred installation directory.
 
