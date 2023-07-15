@@ -39,7 +39,7 @@ cd CHAPERONg-xxx
 
 **Step 4:** Run the installation script:
 ```bash
-chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
+chmod +x install_CHAPERONg && ./install_CHAPERONg
 ```
 
 Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message.
