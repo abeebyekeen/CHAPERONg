@@ -70,6 +70,9 @@ Step 2 -- Run the conda environment setup script `conda_env_setup.sh` while in t
    This step requires an internet connection and could take a while to complete depending on the stength of your connection.
    So, relax and give it time.
 
+   In case of errors, see the installation page (https://abeebyekeen.com/chaperong-online-documentation/#installation) of the
+   CHAPERONg documentation (https://abeebyekeen.com/chaperong-online-documentation/) for troubleshooting.
+
 You should see a message indicating that the `chaperong` environment has been set up successfully.
 
 You can confirm the newly created environment with:
