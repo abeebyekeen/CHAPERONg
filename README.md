@@ -79,7 +79,7 @@ chmod +x conda_env_setup.sh && ./conda_env_setup.sh
 
 > This step requires an internet connection and could take a while to complete depending on the stength of your connection. So, relax and give it time.
 
-> For potential error troubleshooting, see the [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/).
+> In case of errors, see the [installation page](https://abeebyekeen.com/chaperong-online-documentation/#installation) of the [CHAPERON*g* documentation](https://abeebyekeen.com/chaperong-online-documentation/) for guides on troubleshooting.
 
 You should see a message indicating that the `chaperong` environment has been set up successfully.
 
