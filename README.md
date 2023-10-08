@@ -22,7 +22,7 @@
 **Step 2:** Extract the package with:
 
 ```bash
-tar xfz CHAPERONg-xxx.tar.gz
+tar xzvf CHAPERONg-xxx.tar.gz
 ```
 
 or with:
