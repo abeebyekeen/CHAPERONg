@@ -136,4 +136,4 @@ For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekee
 
 If you use this code in your work, kindly cite it as:
 
-**Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERON<em>g</em>: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, <em>bioRxiv</em> 2023.2007.2001.546945. DOI: https://doi.org/10.1101/2023.07.01.546945**
+**Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERON<em>g</em>: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, <em>Computational and Structural Biotechnology Journal</em> 21: 4849-4858. DOI: https://doi.org/10.1016/j.csbj.2023.09.024**
