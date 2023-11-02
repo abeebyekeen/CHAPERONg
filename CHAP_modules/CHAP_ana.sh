@@ -5,7 +5,7 @@
 #  CHAPERONg -- An automation program for GROMACS md simulation and  #
 #    trajectory analysis                                             #
 #  Author -- Abeeb A. Yekeen                                         #
-#  Contact -- abeeb.yekeen@hotmail.com                               #
+#  Contact -- contact@abeebyekeen.com                                #
 #  Date -- 2022.02.11                                                #
 ######################################################################
 
@@ -21,7 +21,7 @@ demB=$'\n'"#====================================================================
 
 
 if [[ $initiator2 != 'avail' ]] ; then
-	echo "${demA}"$'Do not run modules independently!\nLaunch CHAPERONg with run_CHAPERONg-<version>!!'"${demB}"	
+	echo "${demA}"$'Do not run modules independently!\nLaunch CHAPERONg with run_CHAPERONg.sh!!'"${demB}"	
 	exit 1
 fi	
 

@@ -5,7 +5,7 @@
 #  CHAPERONg -- An automation program for GROMACS md simulation and  #
 #    trajectory analysis                                             #
 #  Author -- Abeeb A. Yekeen                                         #
-#  Contact -- abeeb.yekeen@hotmail.com                               #
+#  Contact -- contact@abeebyekeen.com                                #
 #  Date -- 2022.02.11                                                #
 ######################################################################
 
@@ -20,7 +20,8 @@ CHAPERONg_version="v0.1"
 
 Credit()
 {
-	echo -e \
+  
+  echo -e \
   '\033[92m'\
   '\n###############################################################################'\
   '\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
@@ -30,10 +31,13 @@ Credit()
   '\033[92m#'\
   '\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
   '\033[92m     #'\
-  '\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
-  '\033[92m   #'\
+  '\n#  \033[92;7m simulations  and  trajectory  analyses,  Computational  and  Structural \033[m'\
+  '\033[92m #'\
+  '\n#                   \033[92;7m Biotechnology Journal 21: 4849-4858. \033[m'\
+  '\033[92m                   #'\
   '\n###############################################################################'\
   '\033[m'
+
 }
 
 Help()
@@ -43,7 +47,7 @@ Help()
 cat << guide_sh
 
 Usage:
-run_CHAPERONg -i inputStructure_filename [-More options]
+run_CHAPERONg.sh -i inputStructure_filename [-More options]
 
 Required (int=integer; str=string):
 -i, --input <str>    Input coordinate file (.pdb or .gro)
@@ -67,7 +71,7 @@ HHelp()
 cat << guide_lg
 
 Usage:
-run_CHAPERONg -i inputStructure_filename [-More options]
+run_CHAPERONg.sh -i inputStructure_filename [-More options]
 
 Required (int=integer; str=string):
 -i, --input <str>    Input coordinate file (.pdb or .gro)
@@ -242,20 +246,24 @@ fi
 # 	exit 1
 # fi
 
+
 echo -e \
-	'\033[92m'\
-	'\n###############################################################################'\
-	'\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
-	'\n#              If you use this program in your work, please cite:             #'\
-	'\n# \033[92;7m'\
-	'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
-	'\033[92m#'\
-	'\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
-	'\033[92m     #'\
-	'\n#    \033[92;7m simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. \033[m'\
-	'\033[92m   #'\
-	'\n###############################################################################'\
-	'\033[m'
+  '\033[92m'\
+  '\n###############################################################################'\
+  '\n#\033[5m--------------------------------- CHAPERONg ---------------------------------\033[25m#'\
+  '\n#              If you use this program in your work, please cite:             #'\
+  '\n# \033[92;7m'\
+  'Yekeen A.A., Durojaye O.A., Idris M.O., Muritala H.F., Arise R.O. (2023). \033[m'\
+  '\033[92m#'\
+  '\n#     \033[92;7m CHAPERONg: A tool for automated GROMACS-based molecular dynamics \033[m'\
+  '\033[92m     #'\
+  '\n#  \033[92;7m simulations  and  trajectory  analyses,  Computational  and  Structural \033[m'\
+  '\033[92m #'\
+  '\n#                   \033[92;7m Biotechnology Journal 21: 4849-4858. \033[m'\
+  '\033[92m                   #'\
+  '\n###############################################################################'\
+  '\033[m'
+
 
 if [[ "$#" == 1 ]] || [[ "$#" == 2 ]] && [[ "$flag" != "h" ]] && [[ "$flag" != "H" ]]; then
 	echo "$demA"" No arguments are given. Default parameters will be used...""$demB"

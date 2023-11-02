@@ -1,10 +1,19 @@
 
 
-#install_CHAPERONg - The automated installation and preparatory script for CHAPERONg
+#install_CHAPERONg.sh - The installation and preparatory script for CHAPERONg
 #CHAPERONg - An automation program for GROMACS md simulation
 #Author: Abeeb A. Yekeen
-#Contact: yekeenaa@mail.ustc.edu.cn, abeeb.yekeen@hotmail.com
+#Contact: contact@abeebyekeen.com
 #Date: 2022.10.11  # Modified: 2022.10.26
+
+###############################################################################
+# conda_env_setup.sh -- The conda environment setup script for CHAPERONg      #
+# CHAPERONg -- An automation program for GROMACS md simulation and trajectory #
+#    analysis                                                                 #
+# Author -- Abeeb A. Yekeen                                                   #
+# Contact -- contact@abeebyekeen.com                                          #
+# Date -- 2022.02.11                                                          #
+###############################################################################
 
 set -e
 set -o pipefail

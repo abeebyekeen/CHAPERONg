@@ -40,7 +40,7 @@ cd CHAPERONg-xxx
 **Step 4:** Run the installation executable:
 
 ```bash
-chmod +x install_CHAPERONg && ./install_CHAPERONg
+chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
 ```
 
 Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON*****g*** will append the installation path to your `$PATH` via the `~/.bashrc` file. After installation, you should see a completion message.
@@ -127,7 +127,7 @@ See the [relevant section](https://abeebyekeen.com/chaperong-online-documentatio
 The basic usage of **CHAPERON*****g*** is:
 
 ```bash
-run_CHAPERONg -i inputStructure_filename [more options]
+run_CHAPERONg.sh -i inputStructure_filename [more options]
 ```
 
 For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)

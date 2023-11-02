@@ -8,7 +8,7 @@
 #############################################################################
 
 __author__  = 'Abeeb A. Yekeen'
-__email__   = 'abeeb.yekeen@hotmail.com'
+__email__   = 'contact@abeebyekeen.com'
 __date__    = '2023.06.22'
 __version__ = '1.0'
 __status__  = 'Production'

@@ -19,7 +19,7 @@ Step 1 -- Copy the CHAPERONg package to your preferred installation directory.
 
 Step 2 -- Extract the package with:
 
-      tar xfz CHAPERONg-xxx.tar.gz
+      tar xzvf CHAPERONg-xxx.tar.gz
 
 or with:
 
@@ -31,7 +31,7 @@ Step 3 -- Enter the extracted CHAPERONg folder:
 
 Step 4 -- Run the installation executable:
 
-      chmod +x install_CHAPERONg && ./install_CHAPERONg
+      chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
 
    Enter `y` or `yes` when prompted for permission.
    During installation, CHAPERONg will append the installation path to your `$PATH` via the `~/.bashrc` file.
@@ -111,7 +111,7 @@ And then, run the command:
 
 The basic usage of CHAPERONg is:
 
-      run_CHAPERONg -i inputStructure_filename [more options]
+      run_CHAPERONg.sh -i inputStructure_filename [more options]
 
 
 For more details, see the CHAPERONg documentation (https://abeebyekeen.com/chaperong-online-documentation/) and tutorials(https://abeebyekeen.com/chaperong-online-tutorials/)
@@ -120,19 +120,19 @@ For more details, see the CHAPERONg documentation (https://abeebyekeen.com/chape
 
 If you use this code in your work, kindly cite it as:
 
-      Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERONg: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, bioRxiv 2023.2007.2001.546945. DOI: https://doi.org/10.1101/2023.07.01.546945
+      Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERONg: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, Computational and Structural Biotechnology Journal 21: 4849-4858. DOI: https://doi.org/10.1016/j.csbj.2023.09.024
 
 For BibTeX, you can insert the following:
 
-@article {yekeenbiorxiv2023chaperong,
+@article {yekeenCSBJ2023chaperong,
 	author = {Abeeb Abiodun Yekeen and Olanrewaju Ayodeji Durojaye and Mukhtar Oluwaseun Idris and Hamdalat Folake Muritala and Rotimi Olusanya Arise},
-	title = {{CHAPERONg}: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses},
-	elocation-id = {2023.07.01.546945},
+	title = {{CHAPERONg}: A tool for automated {GROMACS}-based molecular dynamics simulations and trajectory analyses},
+	journal = {{Computational and Structural Biotechnology Journal}},
+	volume = {21},
+	pages = {4849-4858},
 	year = {2023},
-	doi = {10.1101/2023.07.01.546945},
-	publisher = {Cold Spring Harbor Laboratory},
-	URL = {https://www.biorxiv.org/content/early/2023/07/02/2023.07.01.546945},
-	eprint = {https://www.biorxiv.org/content/early/2023/07/02/2023.07.01.546945.full.pdf},
-	journal = {bioRxiv}
+	issn = {2001-0370},
+	doi = {https://doi.org/10.1016/j.csbj.2023.09.024},
+	publisher = {Elsevier},
+	url = {https://www.sciencedirect.com/science/article/pii/S2001037023003367}
 }
-
