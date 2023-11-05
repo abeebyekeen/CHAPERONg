@@ -164,7 +164,7 @@ do
 	echo -e "\033[31;40m $i is invalid!! \033[m\n"
 	echo -e "\033[31;40m Please enter a valid (set of) number(s)!! \033[m\n"
 	# checkstage="no"
-	read -p '*Enter one or more combinations of the options here (separated by a space): ' analyse
+	read -p '*Enter one or more (space-separated) combinations of the options: ' analyse
 	analyse_array=("$analyse")
 
 	for i in ${analyse_array[@]}; do
@@ -197,10 +197,12 @@ if [[ "$coordinates" == '' ]]; then
 	coordinates="$filenm"
 fi
 
+# KDEneedScanTRAJ="no"
 # Function to scan the trajectory to extract simulation details
 ScanTRAJ()
 {
-if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+# if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] && [[ "$analyse" != 11 || "$KDEneedScanTRAJ" == "yes" ]]; then
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] ; then
 	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
 	sleep 2
 	analyser0
@@ -332,7 +334,7 @@ elif [[ $automode != "full" && $sysType == "protein_only" ]]; then
 		sleep 4
 		eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"nojump".xtc -pbc nojump -center
 	fi
-		
+
 elif [[ $automode == "full" && $sysType == "protein_lig" ]]; then
 	if [[ "$PBCcorrectType" != '' && "$wraplabel" == 'center' ]] ; then
 		echo 1 0 | eval "$gmx_exe_path" trjconv -s "${filenm}".tpr -f "${filenm}".xtc -o "${filenm}"_"center".xtc -center -pbc mol -ur compact
@@ -412,7 +414,7 @@ sleep 2
 }
 if [[ "$analysis" == *" 0 "* ]]; then analyser0; fi
 
-if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] && [[ "$analysis" != *" 17 "* ]]; then
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] && [[ "$analysis" != *" 11 "* && "$analysis" != *" 17 "* ]]; then
 	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
 	sleep 2
 	analyser0
@@ -1523,29 +1525,31 @@ AnalysisList
 	sleep 2
 			
 	if [[ "$plot_number" == 1 ]] ; then plot_type="single-data plot"
-		read -p ' Enter one or more options here (separated by a space): ' data_kde
+		read -p ' Enter one or more (space-separated) options here: ' data_kde
 
 		# create a bash array listing valid numbers
 		valid_numbers=(1 2 3 4)
 
-		# while ! [[ "$data_kde" =~ ^([[:space:]]*[0-9][[:space:]]*)+$ ]] && \
-		# 	! [[ "$data_kde" =~ (^|[[:space:]])("${valid_numbers[@]}")([[:space:]]|$) ]]
-		# do
-		# 	printf "\n You entered: ${data_kde}\n\n"
-		# 	printf " Please enter a valid number!!\n\n"
-		# 	read -p ' Enter one or more options here (separated by a space): ' data_kde
-		# done
-
-		analyse_array=("$data_kde")
-
-		# check if all choices are among the available options
-		while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
-			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+		while [[ ! "$data_kde" =~ ^([[:space:]]*[1-4][[:space:]]*)+$ || \
+			! "$data_kde" =~ ^[[:space:]1-4]+$ ]]
+		do
 			echo $'\n You entered: '"$data_kde"$'\n'
 			echo -e " \033[31;40mPlease enter a valid (set of) number(s)!!\033[m\n"
-			read -p ' Enter one (or a combination) of the options (separated by a space): ' data_kde
-			analyse_array=("$data_kde")
+			read -p ' Enter one (or a space-separated combination) of the options: ' data_kde
+			# analyse_array=("$analyse")
 		done
+
+
+		# analyse_array=("$data_kde")
+
+		# # check if all choices are among the available options
+		# while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
+		# 	! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+		# 	echo $'\n You entered: '"$data_kde"$'\n'
+		# 	echo -e " \033[31;40mPlease enter a valid (set of) number(s)!!\033[m\n"
+		# 	read -p ' Enter one (or a space-separated combination) of the options: ' data_kde
+		# 	analyse_array=("$data_kde")
+		# done
 
 		data_kde_ext=("$data_kde")
 		count_data_in=0
@@ -1628,6 +1632,7 @@ AnalysisList
 			fi
 
 			if [[ ! -f "$existData" ]] ; then
+				# KDEneedScanTRAJ="yes"
 				if [[ "$dataIN" == "RMSD" ]] ; then analyser2
 				elif [[ "$dataIN" == "Rg" ]] ; then analyser4
 				elif [[ "$dataIN" == "Hbond" ]] ; then analyser5
@@ -1692,21 +1697,40 @@ askDataExist
 		fi
 
 	elif [[ "$plot_number" == 2 ]] ; then plot_type="multi-data plot"
-		# read -p ' Enter your option here (1, 2, 3, or 4): ' data_kde
-		read -p ' Enter one or more options here (separated by a space): ' data_kde
+		read -p ' Enter one or more (space-separated) options here: ' data_kde
 
 		# create a bash array listing valid numbers
 		valid_numbers=(1 2 3 4)
 
 		analyse_array=("$data_kde")
 
-		# check if all choices are among the available options
-		while [[ ! "${valid_numbers[@]}" =~ "${analyse_array[@]}" && \
-			! "${valid_numbers[@]}" == "${analyse_array[@]}" ]]; do
+		valid_input="no"
+
+		# Check if all choices are among the available options
+		for choice in ${analyse_array[@]}
+		do
+			if [[ ${valid_numbers[@]} =~ "$choice" || ${valid_numbers[@]} == "$choice" ]]
+				then valid_input="yes"
+			else valid_input="no" ; break
+			fi
+		done
+
+		while [[ "$valid_input" != "yes" ]]
+		do
 			echo $'\n You entered: '"$data_kde"$'\n'
-			echo -e " \033[31;40mPlease enter a valid (set of) number(s)!!\033[m\n"
-			read -p ' Enter one (or a combination) of the options (separated by a space): ' data_kde
+			echo -e " \033[31;40m $choice is invalid!! \033[m\n"
+			echo -e " \033[31;40m Please enter a valid (set of) number(s)!!\033[m\n"
+			read -p ' Enter one (or a space-separated combination) of the options: ' data_kde
+			
 			analyse_array=("$data_kde")
+
+			for choice in ${analyse_array[@]}
+			do
+				if [[ ${valid_numbers[@]} =~ "$choice" || ${valid_numbers[@]} == "$choice" ]]
+					then valid_input="yes"
+				else valid_input="no" ; break
+				fi
+			done
 		done
 
 		data_kde_ext=("$data_kde")

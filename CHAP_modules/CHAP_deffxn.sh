@@ -2339,9 +2339,13 @@ fi
 	fi
 }
 
+
+# KDEneedScanTRAJ="no"
+# Function to scan the trajectory to extract simulation details
 ScanTRAJ()
 {
-if [[ ! -f "${filenm}_${wraplabel}.xtc" ]];	then
+# if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] && [[ "$analyse" != 11 || "$KDEneedScanTRAJ" == "yes" ]]; then
+if [[ ! -f "${filenm}_${wraplabel}.xtc" ]] ; then
 	echo -e "${demA} The trajectory hasn't been corrected for pbc yet. Running this first...${demB}"
 	sleep 2
 	analyser0
