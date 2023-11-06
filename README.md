@@ -13,16 +13,13 @@
 
 ## Contents
 
-- [Prerequisites/Requirements](#Prerequisites/Requirements)
-- [Motivation & Preparation](#motivation--preparation)
-- [Curriculum](#curriculum)
-- [How to use this guide](#how-to-use-this-guide)
-- [Prerequisite](#prerequisite)
-- [How to collaborate](#how-to-collaborate)
-- [Code of Conduct](#code-of-conduct)
-- [Community](#community)
-- [Team](#team)
-- [References](#references)
+1. [Prerequisites/Requirements](#1-prerequisitesrequirements)
+2. [Installation](#2-installation)
+3. [Uninstall](#3-uninstall)
+4. [Optional Dependencies](#4-optional-dependencies)
+5. [Usage](#5-usage)
+6. [Updating the Code](#6-updating-the-code)
+7. [Citation](#7-citation)
 
 ## 1. Prerequisites/Requirements
 
