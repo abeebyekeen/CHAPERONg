@@ -11,7 +11,7 @@
 
 ### For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
 
-## Contents {#contents}
+## Contents
 
 - [Prerequisites/Requirements](#Prerequisites/Requirements)
 - [Motivation & Preparation](#motivation--preparation)
@@ -24,7 +24,7 @@
 - [Team](#team)
 - [References](#references)
 
-## 1. Prerequisites/Requirements {#prerequisites}
+## 1. Prerequisites/Requirements
 
 <font><p align="justify">The only essential requirement of **CHAPERON*****g*** is, of course, a functional installation of the <a href=https://www.gromacs.org/ target="_blank">GROMACS software</a> run on Linux (Ubuntu) or Windows (via WSL). You can download and install a version by visiting the [GROMACS documentation page](https://manual.gromacs.org/), or you could find the latest version of GROMACS [here](https://manual.gromacs.org/current/index.html).
 
