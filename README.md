@@ -13,7 +13,7 @@
 
 ## 0. Contents
 
-0. [Contents](contents)
+0. [Contents](#0-contents)
 1. [Prerequisites/Requirements](#1-prerequisitesrequirements)
 2. [Installation](#2-installation)
 3. [Uninstall](#3-uninstall)
