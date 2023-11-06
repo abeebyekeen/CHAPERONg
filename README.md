@@ -153,3 +153,21 @@ Run the `install_CHAPERONg.sh` script in the installation directory:
 If you use this code in your work, kindly cite it as:
 
 **Yekeen A. A., Durojaye O. A., Idris M. O., Muritala H. F., and Arise R. O. (2023). CHAPERON<em>g</em>: A tool for automated GROMACS-based molecular dynamics simulations and trajectory analyses, <em>Computational and Structural Biotechnology Journal</em> 21: 4849-4858. DOI: https://doi.org/10.1016/j.csbj.2023.09.024**
+
+For BibTeX, you can insert the following:
+
+```latex
+@article {yekeenCSBJ2023chaperong,
+	author = {Abeeb Abiodun Yekeen and Olanrewaju Ayodeji Durojaye and Mukhtar Oluwaseun Idris and Hamdalat Folake Muritala and Rotimi Olusanya Arise},
+	title = {{CHAPERONg}: A tool for automated {GROMACS}-based molecular dynamics simulations and trajectory analyses},
+	journal = {{Computational and Structural Biotechnology Journal}},
+	volume = {21},
+	pages = {4849-4858},
+	year = {2023},
+	issn = {2001-0370},
+	doi = {https://doi.org/10.1016/j.csbj.2023.09.024},
+	publisher = {Elsevier},
+	url = {https://www.sciencedirect.com/science/article/pii/S2001037023003367}
+}
+
+```
