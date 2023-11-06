@@ -18,7 +18,7 @@
 2. [Installation](#2-installation)
 3. [Uninstall](#3-uninstall)
 4. [Optional Dependencies](#4-optional-dependencies)
- 4.1. [Installing dependencies with conda (recommended)](#41-installing-dependencies-with-conda-recommended)
+	4.1. [Installing dependencies with conda (recommended)](#41-installing-dependencies-with-conda-recommended)
 6. [Usage](#5-usage)
 7. [Updating the Code](#6-updating-the-code)
 8. [Citation](#7-citation)
