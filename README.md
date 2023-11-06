@@ -134,7 +134,7 @@ For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekee
 
 ## 6. Updating the Code
 
-With the updates of **CHAPERON*****g*** pushed since Nov. 5 2023, it is now possible to automatically update **CHAPERON*****g*** for users who installed **CHAPERON*****g*** after this date. To update the code, simply navigate to the **CHAPERON*****g*** installation directory:
+With the updates of **CHAPERON*****g*** pushed since Nov. 5 2023, it is now possible to automatically update **CHAPERON*****g*** for users who installed **CHAPERON*****g*** from this date onwards. To update the code, simply navigate to the **CHAPERON*****g*** installation directory:
 
 ```bash
 cd $CHAPERONg_PATH
