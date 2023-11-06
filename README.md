@@ -3,6 +3,11 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/abeebyekeen/CHAPERONg?style=flat-square)](https://github.com/abeebyekeen/CHAPERONg/releases)
 [![DOI](https://zenodo.org/badge/doi/10.1101/2023.07.01.546945.svg?style=svg)](https://doi.org/10.1101/2023.07.01.546945)
 
+<p align="center">
+  <a href="https://github.com/abeebyekeen/CHAPERONg">
+	<img alt="CHAPERONg" src="CHAP_utilities/chaperong-banner-dir-lowRes.png">
+  </a>
+</p>
 
 ### For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
 
