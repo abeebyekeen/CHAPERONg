@@ -68,7 +68,7 @@ cat << usageSt
 
 usageSt
 sleep 2
-. ~/.bashrc
+source ~/.bashrc
 }
 
 demA=$'\n\n'"#================================= CHAPERONg =================================#"$'\n'
@@ -109,7 +109,6 @@ $'\n'"#=========================================================================
 
   echo "$demA"$' Installation completed'"$demB"	
   sleep 2
-  Credit
   complete_setup
 
 elif [[ "$CHAPERONg_PATH" != "" ]]
@@ -146,6 +145,7 @@ elif [[ "$CHAPERONg_PATH" != "" ]]
 
   echo "$demA"$' Update completed'"$demB"	
   sleep 2
-  Credit
   complete_setup
 fi
+
+source ~/.bashrc
