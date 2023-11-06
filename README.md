@@ -11,8 +11,9 @@
 
 ### For detailed documentation and tutorials, see the [CHAPERON*g* homepage](https://abeebyekeen.com/chaperong-online/).
 
-## Contents
+## 0. Contents
 
+0. [Contents](contents)
 1. [Prerequisites/Requirements](#1-prerequisitesrequirements)
 2. [Installation](#2-installation)
 3. [Uninstall](#3-uninstall)
