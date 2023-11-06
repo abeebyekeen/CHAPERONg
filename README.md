@@ -132,7 +132,23 @@ run_CHAPERONg.sh -i inputStructure_filename [more options]
 
 For more details, see the **CHAPERON*****g*** [documentation](https://abeebyekeen.com/chaperong-online-documentation/) and [tutorials](https://abeebyekeen.com/chaperong-online-tutorials/)
 
-## 6. Citation
+## 6. Updating the Code
+
+With the updates of **CHAPERON*****g*** pushed since Nov. 5 2023, it is now possible to automatically update **CHAPERON*****g*** for users who installed **CHAPERON*****g*** after this date. To update the code, simply navigate to the **CHAPERON*****g*** installation directory:
+
+```bash
+cd $CHAPERONg_PATH
+```
+
+Run the `install_CHAPERONg.sh` script in the installation directory:
+
+```bash
+./install_CHAPERONg.sh
+```
+
+**CHAPERON*****g*** will detect the existing installation, and you will be prompted to confirm if you would like to proceed with an update of the code.
+
+## 7. Citation
 
 If you use this code in your work, kindly cite it as:
 
