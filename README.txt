@@ -116,7 +116,25 @@ The basic usage of CHAPERONg is:
 
 For more details, see the CHAPERONg documentation (https://abeebyekeen.com/chaperong-online-documentation/) and tutorials(https://abeebyekeen.com/chaperong-online-tutorials/)
 
-## 6. Citation
+
+## 6. Updating the Code
+
+With the updates of CHAPERONg pushed since Nov. 5 2023, it is now possible to automatically update CHAPERONg for users who installed CHAPERONg after this date. To update the code, simply navigate to the CHAPERONg installation directory:
+
+	cd $CHAPERONg_PATH
+
+
+Run the `install_CHAPERONg.sh` script in the installation directory:
+
+
+	./install_CHAPERONg.sh
+
+
+CHAPERONg will detect the existing installation, and you will be prompted to confirm if you would like to proceed with an update of the code.
+
+
+
+## 7. Citation
 
 If you use this code in your work, kindly cite it as:
 
