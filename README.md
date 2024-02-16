@@ -64,7 +64,7 @@ Enter `y` or `yes` when prompted for permission. During installation, **CHAPERON
 
 ## 3. Uninstall
 
-<font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply, and **CAREFULLY**, deleting the lines that have been added your `~/.bashrc` file.
+<font><p align="justify">At any time, you can uninstall **CHAPERON*****g*** by simply, and **CAREFULLY**, deleting the relevant lines that have been added your `~/.bashrc` file.
 </p></font>
 
 ## 4. Optional Dependencies
