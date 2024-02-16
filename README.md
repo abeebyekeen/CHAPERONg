@@ -53,7 +53,7 @@ unzip CHAPERONg-xxx.zip
 cd CHAPERONg-xxx
 ```
 
-**Step 4:** Run the installation executable:
+**Step 4:** Run the install script:
 
 ```bash
 chmod +x install_CHAPERONg.sh && ./install_CHAPERONg.sh
