@@ -910,13 +910,22 @@ DSSPfail()
 	sleep 2
 	dsspCheck="notAvail"
 }
-
-DSSP_gmx2023_or_newer()
+useCHAPdssp()
 {
-	echo "${demA}"$' If you are using GMX 2023 or newer, DSSP implementation has changed!\n Checking if this is the case...\n'
-	sleep 2
-	echo "MainChain" | eval "$gmx_exe_path" dssp -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
-		-o ss_"${filenm}".dat -tu ns -dt ${dt_dssp}
+	echo "${demA}"$' DSSP not detected on your machine.'\
+	$'\nDo you want use the DSSP executable packaged with CHAPERONg?\n'
+	read -p ' Enter a response here (yes or no): ' configDSSP
+		while [[ "$configDSSP" != "yes" && "$movieLeng" != "y" \
+		&& "$movieLeng" != "no" && "$movieLeng" != "n" ]]; do
+			echo $'\nYou entered: '"$configDSSP"
+			echo $'Please enter a valid response (yes/no or y/n)!!\n'
+			read -p ' Enter a response here (y/n): ' configDSSP
+		done
+	if [[ $configDSSP == "yes" || $configDSSP == "y" ]] ; then
+		export DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+		alias DSSP="$(echo $CHAPERONg_PATH)/CHAP_utilities/dssp-x64"
+	elif [[ $configDSSP == "no" || $configDSSP == "n" ]] ; then echo ""
+	fi
 }
 
 useCHAPdsspGMX()
@@ -943,7 +952,7 @@ useCHAPdsspGMX()
 		echo $' Now attempting to run secondary analysis again...\n\n'
 		sleep 2
 		echo "MainChain" | eval "$gmx_exe_path" do_dssp -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
-		-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || DSSP_gmx2023_or_newer || DSSPfail
+		-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || DSSPfail
 
 	elif [[ $configDSSP == "no" || $configDSSP == "n" ]] ; then DSSPfail
 	fi
@@ -951,9 +960,56 @@ useCHAPdsspGMX()
 
 analyser8()
 {
+	# echo "${demA}"$' Checking DSSP availability and configuration...\n'
+	# sleep 2
+	# catchDSSP1error=''
+	# DSSP -h &> tempdssp.temp1 || true
+	# catchDSSP1error=$(cat tempdssp.temp1 | grep "not found")
+	# cat tempdssp.temp1
+	# echo $catchDSSP1error
+	# sleep 3
+	# cat tempdssp.temp1 | grep "not found"
+	# sleep 3
+	# echo "Pass 1"
+	# #rm tempdssp.temp1
+
+	# if [[ $catchDSSP1error == *"not found" ]]; then
+	# 	echo "Pass 2"
+	# 	catchdssp2error=''
+	# 	dssp -h &> tempdssp.temp2 || true
+	# 	catchdssp2error=$(cat tempdssp.temp2 | grep "not found")
+	# 	cat tempdssp.temp2
+	# 	echo $catchdssp2error
+	# 	sleep 3
+	# 	cat tempdssp.temp2 | grep "not found"
+	# 	sleep 3
+	# 	#rm tempdssp.temp2
+	# 	echo "Pass 3"
+	# 	if [[ $catchdssp2error == *"not found" ]]; then
+	# 		echo "Pass 4"
+	# 		useCHAPdssp
+	# 		echo "Pass 5"
+	# 	fi	
+	# fi
 
 	echo "${demA}"$' Now computing secondary structure with DSSP...\n'
 	sleep 2
+	#CollectDSSPdt()
+
+	#echo $'Enter a number below to set the time interval for frames to be used (dt).'\
+	#$'\nCHAPERONg recommends 0.1 for 100ns mds, 0.2 for 200ns etc.\nYou can also enter 0 instead, for gmx default estimation.\n'
+
+	#read -p 'Value of dt: ' dt_dssp
+	#echo $'\nYou entered: '"$dt_dssp"$'\n'
+
+	#sleep 2
+
+	#if [[ $simDuratnINTns == 1000 ]]; then dt_dssp=
+	#elif [[ $simDuratnINTns == 500 ]]; then dt_dssp="0.5"
+	#elif [[ $simDuratnINTns == 200 ]]; then dt_dssp="0.2"
+	#fi
+
+	#dt_dssp=$(echo "scale=3; ${simDuratnINTns} / 1000" | bc -l)
 
 	dt_dssp_alt()
 	{
@@ -964,7 +1020,7 @@ analyser8()
 	dt_dssp=$(awk "BEGIN {print $simDuratnINTns / 1000}") || dt_dssp_alt
 
 	echo "MainChain" | eval "$gmx_exe_path" do_dssp -f "${filenm}"_${wraplabel}.xtc -s "${filenm}".tpr \
-	-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || DSSP_gmx2023_or_newer || useCHAPdsspGMX
+	-o ss_"${filenm}".xpm -tu ns -dt ${dt_dssp} || useCHAPdsspGMX
 	if [[ "$dsspCheck" == "Avail" ]] ; then
 		echo -e "${demA}\033[92m Compute secondary structure...DONE\033[m${demB}"
 		sleep 1
