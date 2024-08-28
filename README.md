@@ -123,8 +123,9 @@ sudo apt install grace pymol libpng-dev libjpeg-dev ghostscript-x imagemagick-6.
 
 **Step 2**: Install/update python libraries as well as a few other packages:
 ```bash
-pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
+pip3 install numpy==1.23.4 scipy matplotlib pandas networkx==2.3
 ```
+> If `networkx==2.3` fails, install `networkx==2.5` instead
 
 > If you don't have pip installed, you can first install it with:
 
@@ -132,7 +133,7 @@ pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3
 
 > And then, run the command:
 
-> `pip3 install numpy=1.23.4 scipy matplotlib pandas networkx=2.3`
+> `pip3 install numpy==1.23.4 scipy matplotlib pandas networkx==2.3`
 
 #### 4.2.2. Option 2: One-by-one installation
 
