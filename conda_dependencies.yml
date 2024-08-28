@@ -17,7 +17,8 @@ dependencies:
 # Although numpy 1.18.5 & 1.23.4 both worked with python 3.8.10, 3.8.13, 3.8.15, 3.8.16
     - matplotlib # tested versions: 3.6.1, 3.6.2, 3.6.3
     # - pycairo
-    - networkx==2.5
+    - networkx==2.3
+    # - networkx==2.5 # if nextworkx==2.3 fails, try networkx==2.5
     - biopandas
     - biopython
     - click
