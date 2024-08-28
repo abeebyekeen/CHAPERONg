@@ -210,7 +210,7 @@ fi
 if [[ ! -f "trajectDetails.log" ]]; then
 	echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
 	sleep 2
-	eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc | tee trajectDetails.log
+	eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |2>&1 | tee trajectDetails.log
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}')
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
 	simDuratnpsINT=$(echo ${simDuratnps%\.*})
@@ -227,7 +227,7 @@ else
 	{
 		echo -e "${demA} Checking the trajectory to extract info about the number of frames and\n simulation time${demB}"
 		sleep 2
-		eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc | tee trajectDetails.log		
+		eval "$gmx_exe_path" check -f "${filenm}"_${wraplabel}.xtc |2>&1 | tee trajectDetails.log		
 	}
 	No_of_frames=$(cat trajectDetails.log | grep "Last" | awk '{print $(NF-2)}') || ScanTraj_again_if_err
 	simDuratnps=$(cat trajectDetails.log | grep "Last" | awk '{print $NF}')
