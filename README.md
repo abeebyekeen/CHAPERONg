@@ -125,7 +125,7 @@ sudo apt install grace pymol libpng-dev libjpeg-dev ghostscript-x imagemagick-6.
 ```bash
 pip3 install numpy==1.23.4 scipy matplotlib pandas networkx==2.3
 ```
-> If `networkx==2.3` fails, install `networkx==2.5` instead
+> **If `networkx==2.3` fails, install `networkx==2.5` instead**
 
 > If you don't have pip installed, you can first install it with:
 
