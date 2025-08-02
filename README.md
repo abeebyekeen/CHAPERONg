@@ -1,7 +1,7 @@
 ## CHAPERON*g*: Automated GROMACS-based MD Simulations and Trajectory Analyses
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/abeebyekeen/CHAPERONg?style=flat-square)](https://github.com/abeebyekeen/CHAPERONg/releases)
-[![DOI](https://zenodo.org/badge/doi/10.1101/2023.07.01.546945.svg?style=svg)](https://doi.org/10.1101/2023.07.01.546945)
+[![DOI](https://zenodo.org/badge/doi/10.1101/2023.07.01.546945.svg?style=svg)](http://dx.doi.org/10.1016/j.csbj.2023.09.024)
 
 <p align="center">
   <a href="https://github.com/abeebyekeen/CHAPERONg">
